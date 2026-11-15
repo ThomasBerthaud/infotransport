@@ -1,0 +1,222 @@
+# InfoTransport
+
+**Vos prochains transports et les perturbations de vos lignes, visibles d’un coup d’œil avant de partir.**
+
+InfoTransport est un tableau de départs personnel, en français, à héberger chez soi et à consulter sur son réseau local. Il rassemble les prochains passages des transports que vous choisissez en Île-de-France et les informations trafic associées, à partir de PRIM, la plateforme de données d’Île-de-France Mobilités.
+
+Par exemple, vous pouvez suivre la ligne L de La Défense vers Paris Saint-Lazare et la ligne U vers La Verrière sur un même écran. Vous voyez les temps d’attente, les heures de départ et les retards ou suppressions annoncés. En indiquant votre temps de trajet jusqu’à la gare, les départs trop proches sont atténués pour repérer plus facilement ceux que vous pouvez rejoindre.
+
+## Ce que permet le projet
+
+- **Suivre vos trajets habituels** : chaque bloc affiche une gare ou un arrêt, une ligne et une direction, avec une disposition et des réglages personnalisables.
+- **Consulter les perturbations** : la vue détaillée présente les messages disponibles pour les lignes suivies ; la vue épurée les signale par une icône.
+- **Garder un écran de départs à la maison** : une vue monochrome sans interaction est prévue notamment pour les petits écrans à encre électronique. La compatibilité et la lisibilité restent à vérifier sur votre appareil.
+- **Tout régler depuis le navigateur** : rechercher les arrêts, choisir les lignes et directions, organiser les blocs et définir les horaires de fonctionnement.
+- **Maîtriser les appels aux données** : le serveur partage son cache entre les vues, suspend la collecte hors des plages actives et suit les budgets PRIM.
+- **Essayer sans clé API** : le mode démonstration fournit des horaires et incidents fictifs pour découvrir l’interface.
+
+L’application est conçue pour un usage sur un réseau local de confiance, sans authentification intégrée. Elle fonctionne avec Node.js ou Docker, et conserve ses réglages dans des fichiers, sans base de données à installer.
+
+## Aperçu du site
+
+Ces captures montrent l’application en **mode démonstration** : les horaires et les incidents sont fictifs.
+
+### Tableau des départs — `/`
+
+La vue détaillée regroupe les prochains départs, les temps d’attente, les voies lorsqu’elles sont disponibles et les informations trafic.
+
+![Tableau des départs : lignes L et U à La Défense, temps d’attente et informations trafic fictives](docs/screenshots/departs.jpg)
+
+### Vue épurée — `/minimal`
+
+Une présentation monochrome limitée à l’essentiel : gare, ligne, direction, prochains départs et icône de perturbation. Elle affiche trois départs par bloc par défaut, sans défilement ni interaction, avec un HTML rendu côté serveur.
+
+![Vue épurée monochrome : trois prochains départs pour chacune des lignes L et U](docs/screenshots/vue-epuree.jpg)
+
+### Réglages — `/admin`
+
+L’administration permet de choisir les transports suivis, d’ajuster l’affichage et les plages de collecte, et de consulter la consommation des budgets PRIM.
+
+![Administration : configuration des gares, lignes et directions, avec le suivi des budgets PRIM](docs/screenshots/reglages.jpg)
+
+## Essayer en quelques minutes
+
+1. Démarrer l’application avec Docker Compose ou en [développement](#développement), comme indiqué ci-dessous.
+2. Sans clé `PRIM_API_KEY`, ouvrir la page d’accueil pour découvrir les deux blocs de démonstration pendant les plages actives (5 h–22 h par défaut, heure de Paris).
+3. Explorer les réglages dans `/admin` et ouvrir `/minimal` pour voir la présentation destinée à un écran de consultation.
+4. Pour suivre vos transports réels, ajouter une clé PRIM et [configurer vos arrêts, lignes et directions](#configurer-les-données-réelles).
+
+## Démarrer avec Docker Compose
+
+```sh
+docker compose up -d --build
+```
+
+Ouvrir [localhost:3000](http://localhost:3000). Le volume `infotransport-data` conserve configuration, cache et compteurs après redémarrage.
+
+**Sans `PRIM_API_KEY`, l'API locale renvoie automatiquement des données fictives et aucun appel PRIM n'est effectué.** Ce mode respecte également les plages actives, initialement 5 h–22 h en heure de Paris. Les données de démonstration sont signalées dans la vue riche et l'administration ; la vue épurée conserve son contenu minimal.
+
+Pour activer les données réelles ou changer le port, définir les variables dans `.env` à côté du Compose :
+
+```dotenv
+PRIM_API_KEY=votre_cle_prim
+PORT=4317
+```
+
+Puis recréer le conteneur :
+
+```sh
+docker compose up -d --force-recreate
+```
+
+Une clé non vide mais invalide ne bascule jamais silencieusement en démonstration : l'administration affiche les erreurs du fournisseur. Le serveur transmet le jeton à PRIM dans l'en-tête HTTP `apiKey`. La clé n'est ni enregistrée dans la configuration ni transmise au navigateur.
+
+## Configurer les données réelles
+
+La configuration initiale ne contient aucun bloc. En mode démonstration (sans `PRIM_API_KEY`), deux blocs de démonstration sont fournis : **La Défense · L · Paris Saint-Lazare** et **La Défense · U · La Verrière**. Leurs identifiants PRIM ne sont pas renseignés, car ils servent uniquement à illustrer l'interface.
+
+1. Dans `/admin`, rechercher la gare et sélectionner le résultat.
+2. Choisir la ligne et la direction parmi les passages disponibles, puis renseigner le nom court de ligne affiché si nécessaire.
+3. Enregistrer les réglages. La collecte démarre à la prochaine échéance pendant une plage active.
+
+La recherche de gares et de lignes utilise le référentiel local fourni (`resources/catalog.json`) : aucune requête PRIM, même hors plage ou sans clé. Les sens et terminus sont proposés à partir des passages SIRI Stop Monitoring, puis le trafic provient de SIRI General Message. La clé doit avoir accès à ces deux services. Les identifiants avancés peuvent aussi être renseignés manuellement : `MonitoringRef`, `LineRef`, et soit `DirectionRef`, soit `DestinationRef`. Pour le ferroviaire SNCF, utiliser une zone d'arrêt `STIF:StopArea:SP:…:` selon la documentation PRIM.
+
+La découverte des directions dépend des départs effectivement annoncés. Le sens (`DirectionRef`) est prioritaire sur une destination précise, pour conserver les trains d'une même direction ayant des terminus différents. Les noms affichés ne servent pas de filtre réseau. Aucun horaire théorique n'est inventé si PRIM ne renvoie pas suffisamment de trains.
+
+L'intégration réelle reste à vérifier avec une clé et les identifiants de vos arrêts ; les tests utilisent des réponses SIRI représentatives et un fournisseur simulé.
+
+## Référentiel local et autocomplétion
+
+Le fichier fourni `arrets-lignes.json` a été transformé en catalogue embarqué : 74 786 associations, 35 537 arrêts et 2 030 lignes. Les coordonnées et champs inutiles à la recherche sont écartés ; les communes, modes et opérateurs aident à distinguer les arrêts homonymes et les bus de remplacement.
+
+La conversion respecte la granularité : `IDFM:monomodalStopPlace:470549` devient `STIF:StopArea:SP:470549:` ; un identifiant de quai numérique devient `STIF:StopPoint:Q:…:`. Les lignes `IDFM:C…` deviennent `STIF:Line::C…:`. Le catalogue ne contient pas de directions : aucun sens réel n’est déduit de l’ordre des arrêts. En démonstration, les sens portent des références `DEMO:` qui ne peuvent pas servir de filtre de collecte réelle.
+
+Pour remplacer le référentiel puis reconstruire l’image :
+
+```sh
+npm run catalog:import -- /chemin/vers/arrets-lignes.json
+npm run build
+```
+
+Les suggestions s’ouvrent pendant la saisie, par nom ou code, dans les contrôles de choix et les champs techniques. Flèches haut/bas, Entrée et Échap sont pris en charge. Choisir un arrêt réinitialise la ligne et les filtres de direction pour éviter de conserver une combinaison incohérente.
+
+## Réglages et affichage
+
+Chaque bloc est un tuple autonome. Les blocs sont pleine largeur par défaut ; on peut les réordonner et choisir une demi-largeur pour placer deux blocs sur une même rangée.
+
+Les valeurs par défaut sont héritées dynamiquement. Chaque bloc peut personnaliser le temps de trajet, le nombre de départs par vue, la fréquence de collecte et ses plages. Le bouton « Reprendre la valeur par défaut » supprime une exception. Les plages globales restent une limite commune à toute collecte.
+
+Valeurs initiales modifiables : trajet de 14 minutes, 3 départs épurés, 8 départs riches, collecte toutes les 600 secondes, rafraîchissement d'écran toutes les 60 secondes, profil utile de 800 × 600 pixels. Ces dimensions sont un profil de départ à ajuster au navigateur réel.
+
+Pour mesurer cette zone, activer « Afficher les dimensions réelles » sous « Dimensions de l’écran », dans « Affichage & aperçu », puis enregistrer. Au prochain rafraîchissement de `/minimal`, un encart affiche la largeur × hauteur utile en pixels CSS et se met à jour lors d’un redimensionnement. Reporter ces valeurs dans les dimensions de l’écran, puis désactiver l’indicateur. Cette option (`screen.debugDimensions`) est désactivée par défaut et nécessite JavaScript uniquement pour la mesure.
+
+Dans « Affichage & aperçu », choisir de 1 à 12 lignes et colonnes pour la grille épurée. Chaque bloc choisit combien de colonnes il occupe dans « Blocs suivis ». Les blocs se placent dans l’ordre, de gauche à droite, puis sur la ligne suivante ; les lignes vides conservent leur place. Réduire le nombre de colonnes conserve la largeur choisie pour les blocs, même si elle dépasse la grille. Les anciennes configurations conservent leurs deux colonnes et leur nombre de lignes existant.
+
+L'administration avertit si une disposition dépasse une capacité de lecture prudente pour ce profil, sans bloquer la sauvegarde. Cela ne remplace pas l'essai sur l'écran cible : vérifier les noms longs, la place occupée par les barres du navigateur, les polices et la compatibilité CSS. Le contenu peut déborder des blocs et de l’écran ; aucun défilement horizontal ou vertical ne permet de consulter la partie hors écran. Ses blocs sont positionnés sans dépendre de CSS Grid.
+
+De 22 h à 5 h par défaut, les horaires sont masqués et les appels suspendus. La page épurée programme une seule navigation à la reprise, au lieu de rechargements nocturnes périodiques. Le navigateur doit rester actif : le site ne peut pas réveiller physiquement un appareil en veille ou réactiver son Wi-Fi.
+
+## Budget, cache et pannes
+
+- Deux quotas indépendants de **1 000 appels par API sur 24 heures glissantes** : prochains passages (requête unitaire, `stop-monitoring`) et messages affichés sur les écrans (`general-message`). Les autres API du compte ne sont pas utilisées et leurs quotas ne sont pas mutualisés.
+- Collecte automatique limitée à **900 par API**. La découverte manuelle des directions consomme le quota des passages. L’estimation et la validation des réglages vérifient chaque API séparément.
+- Les compteurs locaux conservent les réservations existantes et ne connaissent pas les appels faits par d’autres applications avec le même compte PRIM. La fenêtre glissante reste prudente, sans supposer le fuseau de remise à zéro du fournisseur.
+- Réservation persistée avant chaque appel, même s'il échoue. Requêtes sérialisées, timeout, prise en compte des limitations HTTP 429 et attente entre nouvelles tentatives.
+- Tous les appels PRIM annoncent `Accept-Encoding: gzip, deflate` ; le client HTTP Node.js décompresse automatiquement les réponses avant leur lecture JSON.
+- Mutualisation par arrêt et par ligne ; consulter une page ou rafraîchir TanStack Query ne déclenche pas de collecte PRIM.
+- Référentiel local d’arrêts/lignes embarqué dans l’image et disponible hors plage sans consommer de crédit. La découverte des sens reste mise en cache 3 minutes et soumise au budget et aux horaires actifs.
+- Les heures périmées sont retirées de l'affichage. Les diagnostics sont dans `/admin`.
+
+Les fichiers `config.json`, `cache.json` et `budget.json` se trouvent dans `DATA_DIR` (`/data` en Docker). Écritures atomiques, instance unique par volume. Une configuration ou un compteur corrompu bloque le démarrage plutôt que réinitialiser silencieusement les limites. Ne pas supprimer le compteur pour contourner le quota.
+
+L'estimation dans l'admin est prudente et inclut une heure de marge pour le changement d'heure. Elle dépend des ressources configurées et ne remplace pas les compteurs effectifs. Les quotas et droits réels restent ceux du compte PRIM.
+
+## Monitoring Grafana
+
+Le serveur expose `/metrics` au format Prometheus : CPU/RAM du processus Node.js,
+débit HTTP, erreurs, latences et consommation des quotas PRIM par API sur 24 heures
+glissantes. Aucun appel PRIM n’est déclenché par la collecte des métriques.
+
+Le dashboard unique **InfoTransport — Technique & quotas API** s’importe dans le
+Grafana standalone existant. La stack de collecte est séparée, avec Prometheus construit depuis le dépôt et accessible
+sur le port 9092.
+Voir [la procédure Compose/Portainer et l’import Grafana](observability/README.md).
+
+## Développement
+
+Node.js 24 recommandé et npm.
+
+```sh
+npm ci
+npm run dev
+```
+
+Frontend Vite : [localhost:5173](http://localhost:5173). Serveur Express : port 3000. Le proxy Vite transmet `/api`, `/minimal` et `/mcp`. Si le port serveur est occupé, modifier ensemble `PORT` et le proxy dans `vite.config.ts`.
+
+```sh
+npm run lint
+npm run fmt:check
+npm run typecheck
+npm test
+npm run build
+npm start
+```
+
+`npm start` sert le build de production. `PORT`, `DATA_DIR` et `PRIM_API_KEY` sont configurables par environnement ; `.env` est chargé au démarrage local. Le code source est en TypeScript strict ; seuls les builds produisent du JavaScript. React et l'admin sont compilés avec Vite ; aucun serveur Vite n'est requis en production.
+
+## Accès IA par MCP
+
+Le serveur expose un endpoint MCP **Streamable HTTP** à l’adresse `http://localhost:3000/mcp` (ou `http://<adresse-du-serveur>:<port>/mcp` depuis un autre appareil). Il démarre avec l’application, en développement comme en production et dans Docker, sans service supplémentaire. L’implémentation utilise le [SDK TypeScript officiel MCP v2](https://ts.sdk.modelcontextprotocol.io/v2/serving/express.html), sans sessions persistantes, avec des réponses JSON.
+
+Dans un client MCP compatible HTTP, ajouter cette URL comme serveur. Exemple de configuration pour les clients utilisant `mcpServers` et `url` :
+
+```json
+{
+  "mcpServers": {
+    "infotransport": {
+      "url": "http://localhost:3000/mcp"
+    }
+  }
+}
+```
+
+Le format exact dépend du client. L’IA doit pouvoir joindre le serveur : une IA hébergée à distance ne peut pas accéder au `localhost` de votre ordinateur ni, en général, à votre réseau local.
+
+| Outil            | Informations accessibles                                        | Arguments                            |
+| ---------------- | --------------------------------------------------------------- | ------------------------------------ |
+| `get_dashboard`  | Départs, directions, voies, incidents et états des blocs suivis | Aucun                                |
+| `get_traffic`    | Perturbations et disponibilité du trafic par bloc suivi         | Aucun                                |
+| `search_stops`   | Jusqu’à 20 arrêts du catalogue local                            | `query` : 2 à 100 caractères         |
+| `get_stop_lines` | Lignes desservant un arrêt du catalogue                         | `monitoringRef` issu de la recherche |
+| `get_status`     | Mode, budgets PRIM, dates de collecte et erreurs                | Aucun                                |
+
+Les ressources JSON `infotransport://dashboard` et `infotransport://status` permettent aussi de lire le tableau de départs et l’état du service. Exemple de demande : « Quels sont les prochains trains de mes lignes suivies et les perturbations annoncées ? »
+
+Tous les accès MCP sont **en lecture seule**, sans modification de configuration et sans appel PRIM supplémentaire. Ils utilisent le même service et le même cache que le site. La découverte de directions, qui peut consommer un appel PRIM, n’est pas exposée. Les départs des arrêts non configurés ne sont pas disponibles par la recherche du catalogue.
+
+Les réponses conservent `mode` (`demo` signifie données fictives), `now`, `paused`, les états des blocs et `trafficKnown`. Un trafic inconnu ne signifie pas qu’il n’y a aucune perturbation. Hors plage active, les départs restent masqués comme sur le site.
+
+Comme le reste de l’application, cet endpoint est destiné à un réseau local de confiance et ne possède pas d’authentification intégrée. Il donne accès aux trajets configurés et aux diagnostics aux clients capables de joindre le serveur. Les requêtes HTTP avec une origine différente sont refusées par le contrôle d’origine existant. Utiliser `POST /mcp` ; `GET` et `DELETE` répondent `405`, car aucun flux SSE persistant ni session à supprimer n’est ouvert.
+
+## Contrats API fournis
+
+Les contrats Swagger sont conservés dans `docs/api/departures.swagger.json` (prochains passages) et `docs/api/traffic.swagger.json` (informations trafic). Les requêtes et leur en-tête sont vérifiés contre ces fichiers par un test. Leurs schémas de réponse se limitent à un objet générique ; le décodage SIRI est donc couvert séparément par des réponses représentatives, et reste à vérifier avec les données réelles du compte.
+
+## Références
+
+- [Identification des objets PRIM](https://prim.iledefrance-mobilites.fr/aide-et-contact/documentation/prise-en-main-des-api/prise-en-main-des-api-prochains-passages/identification-des-objets)
+- [Quotas PRIM](https://prim.iledefrance-mobilites.fr/fr/notre-offre)
+
+Les couleurs officielles des badges de la vue détaillée (fond et texte) sont embarquées dans `resources/line-colors.json`, jointes au catalogue par identifiant de ligne. Elles proviennent du [référentiel des lignes IDFM](https://data.iledefrance-mobilites.fr/explore/dataset/referentiel-des-lignes/) (ODbL), champs `colourweb_hexa` et `textcolourweb_hexa`. Aucun appel PRIM supplémentaire n'est nécessaire. Les lignes sans couleur connue gardent un badge neutre ; la vue épurée reste monochrome.
+
+Pour mettre les couleurs à jour, télécharger l'export JSON du référentiel puis lancer avant reconstruction :
+
+```sh
+npm run catalog:colors -- /chemin/vers/referentiel-des-lignes.json
+```
+
+L'import des couleurs est indépendant de celui des arrêts : remplacer le catalogue des arrêts ne supprime pas les couleurs.
+
+## Licence
+
+Distribué sous licence MIT. Voir [LICENSE](LICENSE).

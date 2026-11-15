@@ -1,0 +1,15 @@
+{
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "createdAt": "2026-10-25T17:41:46.087Z",
+        "reason": "Agent: police système conservée dans la vue épurée pour la compatibilité des navigateurs contraints, sans téléchargement de police ; choix documenté dans DESIGN.md et validé par la revue de fin."
+      }
+    ]
+  }
+}

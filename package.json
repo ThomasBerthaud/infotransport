@@ -1,0 +1,47 @@
+{
+  "name": "infotransport",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"NODE_ENV=development node --env-file-if-exists=.env --import tsx --watch src/server/index.ts\" \"vite --host 127.0.0.1\"",
+    "build": "npm run typecheck && vite build && tsc -p tsconfig.server.json",
+    "start": "NODE_ENV=production node --env-file-if-exists=.env dist/server/server/index.js",
+    "lint": "oxlint src tests vite.config.ts",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "catalog:colors": "node --import tsx scripts/import-line-colors.ts",
+    "catalog:import": "node --import tsx scripts/import-catalog.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/node": "^2.1.2",
+    "@modelcontextprotocol/server": "^2.4.0",
+    "@prometheus-io/client": "^0.16.1",
+    "@tanstack/react-query": "^5.104.5",
+    "express": "^5.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@modelcontextprotocol/client": "^2.4.0",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.6",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

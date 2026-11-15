@@ -1,0 +1,33 @@
+# Stack de collecte séparée, à connecter au Grafana standalone existant.
+services:
+  prometheus:
+    build:
+      context: ./prometheus
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      APP_PORT: ${APP_PORT:-3000}
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - |
+        sed "s/APP_PORT/$${APP_PORT}/g" /etc/prometheus/prometheus.yml.template > /tmp/prometheus.yml
+        exec /bin/prometheus --config.file=/tmp/prometheus.yml --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=15d --storage.tsdb.retention.size=2GB
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    volumes:
+      - prometheus_data:/prometheus
+    ports:
+      # 9092 par défaut pour éviter un conflit avec un Prometheus existant sur 9090.
+      - '${PROMETHEUS_PORT:-9092}:9090'
+    networks: [infotransport]
+
+networks:
+  infotransport:
+    external: true
+    name: infotransport_default
+
+volumes:
+  prometheus_data:

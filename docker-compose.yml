@@ -1,0 +1,21 @@
+services:
+  infotransport:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    ports:
+      - '${PORT:-3000}:${PORT:-3000}'
+    environment:
+      PRIM_API_KEY: ${PRIM_API_KEY:-}
+      PORT: ${PORT:-3000}
+      DATA_DIR: /data
+      TZ: Europe/Paris
+    volumes:
+      - infotransport-data:/data
+networks:
+  default:
+    name: infotransport_default
+volumes:
+  infotransport-data:

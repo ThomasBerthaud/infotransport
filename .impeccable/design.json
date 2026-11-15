@@ -1,0 +1,777 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-28T09:41:25.156620+00:00",
+  "title": "Design System: InfoTransport",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "neutral",
+        "displayName": "Encre sombre",
+        "canonical": "#202a2b",
+        "tonalRamp": [
+          "oklch(15.00% 0.01401 203.89)",
+          "oklch(26.43% 0.01401 203.89)",
+          "oklch(37.86% 0.01401 203.89)",
+          "oklch(49.29% 0.01401 203.89)",
+          "oklch(60.71% 0.01401 203.89)",
+          "oklch(72.14% 0.01401 203.89)",
+          "oklch(83.57% 0.01401 203.89)",
+          "oklch(95.00% 0.01401 203.89)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Papier chaud",
+        "canonical": "#f6f5f1",
+        "tonalRamp": [
+          "oklch(15.00% 0.00541 95.10)",
+          "oklch(26.43% 0.00541 95.10)",
+          "oklch(37.86% 0.00541 95.10)",
+          "oklch(49.29% 0.00541 95.10)",
+          "oklch(60.71% 0.00541 95.10)",
+          "oklch(72.14% 0.00541 95.10)",
+          "oklch(83.57% 0.00541 95.10)",
+          "oklch(95.00% 0.00541 95.10)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface claire",
+        "canonical": "#fbfaf7",
+        "tonalRamp": [
+          "oklch(15.00% 0.00411 91.45)",
+          "oklch(26.43% 0.00411 91.45)",
+          "oklch(37.86% 0.00411 91.45)",
+          "oklch(49.29% 0.00411 91.45)",
+          "oklch(60.71% 0.00411 91.45)",
+          "oklch(72.14% 0.00411 91.45)",
+          "oklch(83.57% 0.00411 91.45)",
+          "oklch(95.00% 0.00411 91.45)"
+        ]
+      },
+      "field": {
+        "role": "neutral",
+        "displayName": "Fond de champ",
+        "canonical": "#fffefa",
+        "tonalRamp": [
+          "oklch(15.00% 0.00537 95.10)",
+          "oklch(26.43% 0.00537 95.10)",
+          "oklch(37.86% 0.00537 95.10)",
+          "oklch(49.29% 0.00537 95.10)",
+          "oklch(60.71% 0.00537 95.10)",
+          "oklch(72.14% 0.00537 95.10)",
+          "oklch(83.57% 0.00537 95.10)",
+          "oklch(95.00% 0.00537 95.10)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Texte secondaire",
+        "canonical": "#626d6a",
+        "tonalRamp": [
+          "oklch(15.00% 0.01415 177.59)",
+          "oklch(26.43% 0.01415 177.59)",
+          "oklch(37.86% 0.01415 177.59)",
+          "oklch(49.29% 0.01415 177.59)",
+          "oklch(60.71% 0.01415 177.59)",
+          "oklch(72.14% 0.01415 177.59)",
+          "oklch(83.57% 0.01415 177.59)",
+          "oklch(95.00% 0.01415 177.59)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Filet gris-vert",
+        "canonical": "#d9ded7",
+        "tonalRamp": [
+          "oklch(15.00% 0.01085 136.56)",
+          "oklch(26.43% 0.01085 136.56)",
+          "oklch(37.86% 0.01085 136.56)",
+          "oklch(49.29% 0.01085 136.56)",
+          "oklch(60.71% 0.01085 136.56)",
+          "oklch(72.14% 0.01085 136.56)",
+          "oklch(83.57% 0.01085 136.56)",
+          "oklch(95.00% 0.01085 136.56)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Rouille de repérage",
+        "canonical": "#b94c23",
+        "tonalRamp": [
+          "oklch(15.00% 0.15104 39.61)",
+          "oklch(26.43% 0.15104 39.61)",
+          "oklch(37.86% 0.15104 39.61)",
+          "oklch(49.29% 0.15104 39.61)",
+          "oklch(60.71% 0.15104 39.61)",
+          "oklch(72.14% 0.15104 39.61)",
+          "oklch(83.57% 0.15104 39.61)",
+          "oklch(95.00% 0.15104 39.61)"
+        ]
+      },
+      "green": {
+        "role": "primary",
+        "displayName": "Vert de service",
+        "canonical": "#32674f",
+        "tonalRamp": [
+          "oklch(15.00% 0.06965 162.45)",
+          "oklch(26.43% 0.06965 162.45)",
+          "oklch(37.86% 0.06965 162.45)",
+          "oklch(49.29% 0.06965 162.45)",
+          "oklch(60.71% 0.06965 162.45)",
+          "oklch(72.14% 0.06965 162.45)",
+          "oklch(83.57% 0.06965 162.45)",
+          "oklch(95.00% 0.06965 162.45)"
+        ]
+      },
+      "button-green": {
+        "role": "primary",
+        "displayName": "Vert bouton",
+        "canonical": "#284c39",
+        "tonalRamp": [
+          "oklch(15.00% 0.05336 159.42)",
+          "oklch(26.43% 0.05336 159.42)",
+          "oklch(37.86% 0.05336 159.42)",
+          "oklch(49.29% 0.05336 159.42)",
+          "oklch(60.71% 0.05336 159.42)",
+          "oklch(72.14% 0.05336 159.42)",
+          "oklch(83.57% 0.05336 159.42)",
+          "oklch(95.00% 0.05336 159.42)"
+        ]
+      },
+      "button-hover": {
+        "role": "primary",
+        "displayName": "Vert bouton au survol",
+        "canonical": "#1a3728",
+        "tonalRamp": [
+          "oklch(15.00% 0.04476 159.65)",
+          "oklch(26.43% 0.04476 159.65)",
+          "oklch(37.86% 0.04476 159.65)",
+          "oklch(49.29% 0.04476 159.65)",
+          "oklch(60.71% 0.04476 159.65)",
+          "oklch(72.14% 0.04476 159.65)",
+          "oklch(83.57% 0.04476 159.65)",
+          "oklch(95.00% 0.04476 159.65)"
+        ]
+      },
+      "secondary-hover": {
+        "role": "neutral",
+        "displayName": "Vert pâle de survol",
+        "canonical": "#e6e9e0",
+        "tonalRamp": [
+          "oklch(15.00% 0.01241 121.71)",
+          "oklch(26.43% 0.01241 121.71)",
+          "oklch(37.86% 0.01241 121.71)",
+          "oklch(49.29% 0.01241 121.71)",
+          "oklch(60.71% 0.01241 121.71)",
+          "oklch(72.14% 0.01241 121.71)",
+          "oklch(83.57% 0.01241 121.71)",
+          "oklch(95.00% 0.01241 121.71)"
+        ]
+      },
+      "line-l": {
+        "role": "secondary",
+        "displayName": "Lavande de ligne",
+        "canonical": "#726a9f",
+        "tonalRamp": [
+          "oklch(15.00% 0.08160 290.39)",
+          "oklch(26.43% 0.08160 290.39)",
+          "oklch(37.86% 0.08160 290.39)",
+          "oklch(49.29% 0.08160 290.39)",
+          "oklch(60.71% 0.08160 290.39)",
+          "oklch(72.14% 0.08160 290.39)",
+          "oklch(83.57% 0.08160 290.39)",
+          "oklch(95.00% 0.08160 290.39)"
+        ]
+      },
+      "line-u": {
+        "role": "secondary",
+        "displayName": "Rose de ligne",
+        "canonical": "#a45d76",
+        "tonalRamp": [
+          "oklch(15.00% 0.09713 358.13)",
+          "oklch(26.43% 0.09713 358.13)",
+          "oklch(37.86% 0.09713 358.13)",
+          "oklch(49.29% 0.09713 358.13)",
+          "oklch(60.71% 0.09713 358.13)",
+          "oklch(72.14% 0.09713 358.13)",
+          "oklch(83.57% 0.09713 358.13)",
+          "oklch(95.00% 0.09713 358.13)"
+        ]
+      },
+      "too-close": {
+        "role": "neutral",
+        "displayName": "Départ proche",
+        "canonical": "#626e65",
+        "tonalRamp": [
+          "oklch(15.00% 0.02013 153.21)",
+          "oklch(26.43% 0.02013 153.21)",
+          "oklch(37.86% 0.02013 153.21)",
+          "oklch(49.29% 0.02013 153.21)",
+          "oklch(60.71% 0.02013 153.21)",
+          "oklch(72.14% 0.02013 153.21)",
+          "oklch(83.57% 0.02013 153.21)",
+          "oklch(95.00% 0.02013 153.21)"
+        ]
+      },
+      "cancelled": {
+        "role": "secondary",
+        "displayName": "Rouge de suppression",
+        "canonical": "#aa2929",
+        "tonalRamp": [
+          "oklch(15.00% 0.16573 25.85)",
+          "oklch(26.43% 0.16573 25.85)",
+          "oklch(37.86% 0.16573 25.85)",
+          "oklch(49.29% 0.16573 25.85)",
+          "oklch(60.71% 0.16573 25.85)",
+          "oklch(72.14% 0.16573 25.85)",
+          "oklch(83.57% 0.16573 25.85)",
+          "oklch(95.00% 0.16573 25.85)"
+        ]
+      },
+      "minimal-paper": {
+        "role": "neutral",
+        "displayName": "Blanc épuré",
+        "canonical": "#fff",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 0.00)",
+          "oklch(26.43% 0.00000 0.00)",
+          "oklch(37.86% 0.00000 0.00)",
+          "oklch(49.29% 0.00000 0.00)",
+          "oklch(60.71% 0.00000 0.00)",
+          "oklch(72.14% 0.00000 0.00)",
+          "oklch(83.57% 0.00000 0.00)",
+          "oklch(95.00% 0.00000 0.00)"
+        ]
+      },
+      "minimal-ink": {
+        "role": "neutral",
+        "displayName": "Noir épuré",
+        "canonical": "#000",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 0.00)",
+          "oklch(26.43% 0.00000 0.00)",
+          "oklch(37.86% 0.00000 0.00)",
+          "oklch(49.29% 0.00000 0.00)",
+          "oklch(60.71% 0.00000 0.00)",
+          "oklch(72.14% 0.00000 0.00)",
+          "oklch(83.57% 0.00000 0.00)",
+          "oklch(95.00% 0.00000 0.00)"
+        ]
+      },
+      "minimal-rule": {
+        "role": "neutral",
+        "displayName": "Filet épuré",
+        "canonical": "#111",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 0.00)",
+          "oklch(26.43% 0.00000 0.00)",
+          "oklch(37.86% 0.00000 0.00)",
+          "oklch(49.29% 0.00000 0.00)",
+          "oklch(60.71% 0.00000 0.00)",
+          "oklch(72.14% 0.00000 0.00)",
+          "oklch(83.57% 0.00000 0.00)",
+          "oklch(95.00% 0.00000 0.00)"
+        ]
+      },
+      "minimal-muted": {
+        "role": "neutral",
+        "displayName": "Gris épuré",
+        "canonical": "#737373",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 0.00)",
+          "oklch(26.43% 0.00000 0.00)",
+          "oklch(37.86% 0.00000 0.00)",
+          "oklch(49.29% 0.00000 0.00)",
+          "oklch(60.71% 0.00000 0.00)",
+          "oklch(72.14% 0.00000 0.00)",
+          "oklch(83.57% 0.00000 0.00)",
+          "oklch(95.00% 0.00000 0.00)"
+        ]
+      },
+      "control-ink": {
+        "role": "neutral",
+        "displayName": "Encre des contrôles",
+        "canonical": "#26392e",
+        "tonalRamp": [
+          "oklch(15.00% 0.03142 158.66)",
+          "oklch(26.43% 0.03142 158.66)",
+          "oklch(37.86% 0.03142 158.66)",
+          "oklch(49.29% 0.03142 158.66)",
+          "oklch(60.71% 0.03142 158.66)",
+          "oklch(72.14% 0.03142 158.66)",
+          "oklch(83.57% 0.03142 158.66)",
+          "oklch(95.00% 0.03142 158.66)"
+        ]
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Bordure des contrôles",
+        "canonical": "#bbc8bb",
+        "tonalRamp": [
+          "oklch(15.00% 0.02287 145.36)",
+          "oklch(26.43% 0.02287 145.36)",
+          "oklch(37.86% 0.02287 145.36)",
+          "oklch(49.29% 0.02287 145.36)",
+          "oklch(60.71% 0.02287 145.36)",
+          "oklch(72.14% 0.02287 145.36)",
+          "oklch(83.57% 0.02287 145.36)",
+          "oklch(95.00% 0.02287 145.36)"
+        ]
+      },
+      "field-ink": {
+        "role": "neutral",
+        "displayName": "Encre de saisie",
+        "canonical": "#24352a",
+        "tonalRamp": [
+          "oklch(15.00% 0.02981 155.88)",
+          "oklch(26.43% 0.02981 155.88)",
+          "oklch(37.86% 0.02981 155.88)",
+          "oklch(49.29% 0.02981 155.88)",
+          "oklch(60.71% 0.02981 155.88)",
+          "oklch(72.14% 0.02981 155.88)",
+          "oklch(83.57% 0.02981 155.88)",
+          "oklch(95.00% 0.02981 155.88)"
+        ]
+      },
+      "field-border": {
+        "role": "neutral",
+        "displayName": "Bordure de saisie",
+        "canonical": "#cbd2c7",
+        "tonalRamp": [
+          "oklch(15.00% 0.01679 133.84)",
+          "oklch(26.43% 0.01679 133.84)",
+          "oklch(37.86% 0.01679 133.84)",
+          "oklch(49.29% 0.01679 133.84)",
+          "oklch(60.71% 0.01679 133.84)",
+          "oklch(72.14% 0.01679 133.84)",
+          "oklch(83.57% 0.01679 133.84)",
+          "oklch(95.00% 0.01679 133.84)"
+        ]
+      },
+      "field-label": {
+        "role": "neutral",
+        "displayName": "Libellé de champ",
+        "canonical": "#465448",
+        "tonalRamp": [
+          "oklch(15.00% 0.02632 149.19)",
+          "oklch(26.43% 0.02632 149.19)",
+          "oklch(37.86% 0.02632 149.19)",
+          "oklch(49.29% 0.02632 149.19)",
+          "oklch(60.71% 0.02632 149.19)",
+          "oklch(72.14% 0.02632 149.19)",
+          "oklch(83.57% 0.02632 149.19)",
+          "oklch(95.00% 0.02632 149.19)"
+        ]
+      },
+      "selection-paper": {
+        "role": "neutral",
+        "displayName": "Sélection rouille pâle",
+        "canonical": "#e9c7a9",
+        "tonalRamp": [
+          "oklch(15.00% 0.05579 63.40)",
+          "oklch(26.43% 0.05579 63.40)",
+          "oklch(37.86% 0.05579 63.40)",
+          "oklch(49.29% 0.05579 63.40)",
+          "oklch(60.71% 0.05579 63.40)",
+          "oklch(72.14% 0.05579 63.40)",
+          "oklch(83.57% 0.05579 63.40)",
+          "oklch(95.00% 0.05579 63.40)"
+        ]
+      },
+      "selection-ink": {
+        "role": "neutral",
+        "displayName": "Encre de sélection",
+        "canonical": "#182925",
+        "tonalRamp": [
+          "oklch(15.00% 0.02395 177.93)",
+          "oklch(26.43% 0.02395 177.93)",
+          "oklch(37.86% 0.02395 177.93)",
+          "oklch(49.29% 0.02395 177.93)",
+          "oklch(60.71% 0.02395 177.93)",
+          "oklch(72.14% 0.02395 177.93)",
+          "oklch(83.57% 0.02395 177.93)",
+          "oklch(95.00% 0.02395 177.93)"
+        ]
+      },
+      "budget-passages-ink": {
+        "role": "secondary",
+        "displayName": "Passages · lavande · encre",
+        "canonical": "#3f3974",
+        "tonalRamp": [
+          "oklch(15.00% 0.03910 285.42)",
+          "oklch(26.43% 0.06842 285.42)",
+          "oklch(37.86% 0.08797 285.42)",
+          "oklch(49.29% 0.09774 285.42)",
+          "oklch(60.71% 0.09774 285.42)",
+          "oklch(72.14% 0.08308 285.42)",
+          "oklch(83.57% 0.05864 285.42)",
+          "oklch(95.00% 0.02443 285.42)"
+        ]
+      },
+      "budget-passages-track": {
+        "role": "secondary",
+        "displayName": "Passages · lavande · piste",
+        "canonical": "#dcd7ed",
+        "tonalRamp": [
+          "oklch(15.00% 0.01213 296.19)",
+          "oklch(26.43% 0.02123 296.19)",
+          "oklch(37.86% 0.02730 296.19)",
+          "oklch(49.29% 0.03033 296.19)",
+          "oklch(60.71% 0.03033 296.19)",
+          "oklch(72.14% 0.02578 296.19)",
+          "oklch(83.57% 0.01820 296.19)",
+          "oklch(95.00% 0.00758 296.19)"
+        ]
+      },
+      "budget-passages-muted": {
+        "role": "secondary",
+        "displayName": "Passages · lavande · secondaire",
+        "canonical": "#615b7a",
+        "tonalRamp": [
+          "oklch(15.00% 0.01981 293.36)",
+          "oklch(26.43% 0.03466 293.36)",
+          "oklch(37.86% 0.04457 293.36)",
+          "oklch(49.29% 0.04952 293.36)",
+          "oklch(60.71% 0.04952 293.36)",
+          "oklch(72.14% 0.04209 293.36)",
+          "oklch(83.57% 0.02971 293.36)",
+          "oklch(95.00% 0.01238 293.36)"
+        ]
+      },
+      "budget-messages-ink": {
+        "role": "secondary",
+        "displayName": "Messages · bleu pétrole · encre",
+        "canonical": "#275e70",
+        "tonalRamp": [
+          "oklch(15.00% 0.02572 222.55)",
+          "oklch(26.43% 0.04502 222.55)",
+          "oklch(37.86% 0.05788 222.55)",
+          "oklch(49.29% 0.06431 222.55)",
+          "oklch(60.71% 0.06431 222.55)",
+          "oklch(72.14% 0.05466 222.55)",
+          "oklch(83.57% 0.03859 222.55)",
+          "oklch(95.00% 0.01608 222.55)"
+        ]
+      },
+      "budget-messages-track": {
+        "role": "secondary",
+        "displayName": "Messages · bleu pétrole · piste",
+        "canonical": "#c6dce2",
+        "tonalRamp": [
+          "oklch(15.00% 0.00998 215.92)",
+          "oklch(26.43% 0.01746 215.92)",
+          "oklch(37.86% 0.02245 215.92)",
+          "oklch(49.29% 0.02494 215.92)",
+          "oklch(60.71% 0.02494 215.92)",
+          "oklch(72.14% 0.02120 215.92)",
+          "oklch(83.57% 0.01496 215.92)",
+          "oklch(95.00% 0.00624 215.92)"
+        ]
+      },
+      "budget-messages-muted": {
+        "role": "secondary",
+        "displayName": "Messages · bleu pétrole · secondaire",
+        "canonical": "#446570",
+        "tonalRamp": [
+          "oklch(15.00% 0.01680 220.75)",
+          "oklch(26.43% 0.02940 220.75)",
+          "oklch(37.86% 0.03780 220.75)",
+          "oklch(49.29% 0.04200 220.75)",
+          "oklch(60.71% 0.04200 220.75)",
+          "oklch(72.14% 0.03570 220.75)",
+          "oklch(83.57% 0.02520 220.75)",
+          "oklch(95.00% 0.01050 220.75)"
+        ]
+      },
+      "budget-warning": {
+        "role": "tertiary",
+        "displayName": "Consommation élevée · ambre",
+        "canonical": "#8b4c13",
+        "tonalRamp": [
+          "oklch(15.00% 0.04308 56.76)",
+          "oklch(26.43% 0.07538 56.76)",
+          "oklch(37.86% 0.09692 56.76)",
+          "oklch(49.29% 0.10769 56.76)",
+          "oklch(60.71% 0.10769 56.76)",
+          "oklch(72.14% 0.09154 56.76)",
+          "oklch(83.57% 0.06461 56.76)",
+          "oklch(95.00% 0.02692 56.76)"
+        ]
+      },
+      "budget-critical": {
+        "role": "tertiary",
+        "displayName": "Quota presque atteint · rouge",
+        "canonical": "#a13f31",
+        "tonalRamp": [
+          "oklch(15.00% 0.05330 30.53)",
+          "oklch(26.43% 0.09328 30.53)",
+          "oklch(37.86% 0.11993 30.53)",
+          "oklch(49.29% 0.13326 30.53)",
+          "oklch(60.71% 0.13326 30.53)",
+          "oklch(72.14% 0.11327 30.53)",
+          "oklch(83.57% 0.07996 30.53)",
+          "oklch(95.00% 0.03331 30.53)"
+        ]
+      },
+      "layout-warning-ink": {
+        "role": "tertiary",
+        "displayName": "Débordement · encre brune",
+        "canonical": "#674b2c",
+        "tonalRamp": [
+          "oklch(15.00% 0.05927 68.03)",
+          "oklch(26.43% 0.05927 68.03)",
+          "oklch(37.86% 0.05927 68.03)",
+          "oklch(49.29% 0.05927 68.03)",
+          "oklch(60.71% 0.05927 68.03)",
+          "oklch(72.14% 0.05927 68.03)",
+          "oklch(83.57% 0.05927 68.03)",
+          "oklch(95.00% 0.05927 68.03)"
+        ]
+      },
+      "layout-warning-paper": {
+        "role": "tertiary",
+        "displayName": "Débordement · papier ambre pâle",
+        "canonical": "#f8f0e3",
+        "tonalRamp": [
+          "oklch(15.00% 0.01927 80.12)",
+          "oklch(26.43% 0.01927 80.12)",
+          "oklch(37.86% 0.01927 80.12)",
+          "oklch(49.29% 0.01927 80.12)",
+          "oklch(60.71% 0.01927 80.12)",
+          "oklch(72.14% 0.01927 80.12)",
+          "oklch(83.57% 0.01927 80.12)",
+          "oklch(95.00% 0.01927 80.12)"
+        ]
+      },
+      "layout-warning-border": {
+        "role": "tertiary",
+        "displayName": "Débordement · contour ambre",
+        "canonical": "#dfc9a9",
+        "tonalRamp": [
+          "oklch(15.00% 0.04946 77.19)",
+          "oklch(26.43% 0.04946 77.19)",
+          "oklch(37.86% 0.04946 77.19)",
+          "oklch(49.29% 0.04946 77.19)",
+          "oklch(60.71% 0.04946 77.19)",
+          "oklch(72.14% 0.04946 77.19)",
+          "oklch(83.57% 0.04946 77.19)",
+          "oklch(95.00% 0.04946 77.19)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Titre riche fluide avec approche −0.03em et text-wrap: balance ; mobile à 28px et approche −0.8px."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Interface riche et administration."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Interface riche et administration."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Tableaux riches, détails du carrousel trafic à hauteur de ligne 1.8 et libellés de suggestions à graisse 650 ; taille de 12px conservée."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Libellés, aides contextuelles, métadonnées et détails de suggestions riches à 11px ; aides de formulaires à hauteur de ligne 1.7."
+      },
+      "wait": {
+        "displayName": "Wait",
+        "purpose": "Interface riche et administration."
+      },
+      "minimal-body": {
+        "displayName": "Minimal body",
+        "purpose": "Vue épurée indépendante."
+      },
+      "minimal-station": {
+        "displayName": "Minimal station",
+        "purpose": "Vue épurée indépendante."
+      },
+      "minimal-wait": {
+        "displayName": "Minimal wait",
+        "purpose": "Vue épurée indépendante."
+      },
+      "interface-base": {
+        "displayName": "Base des interfaces riches",
+        "purpose": "Base de la feuille riche ; composants plus compacts selon leur rôle."
+      },
+      "navigation": {
+        "displayName": "Navigation",
+        "purpose": "Liens partagés et titres des API."
+      },
+      "group-title": {
+        "displayName": "Titre de groupe",
+        "purpose": "Titres des groupes de réglages et messages d’erreur."
+      },
+      "budget": {
+        "displayName": "Consommation API",
+        "purpose": "Compteur local à chiffres tabulaires."
+      },
+      "budget-limit": {
+        "displayName": "Plafond API",
+        "purpose": "Plafond à côté de la consommation."
+      }
+    },
+    "shadows": [
+      {
+        "name": "autocomplete-overlay",
+        "value": "0 8px 20px rgb(32 42 43 / 10%)",
+        "purpose": "Menu flottant de suggestions uniquement ; cartes et panneaux restent plats."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-state",
+        "value": "background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease",
+        "purpose": "Contrôles riches, seulement avec prefers-reduced-motion: no-preference."
+      },
+      {
+        "name": "traffic-navigation",
+        "value": "smooth / instant with prefers-reduced-motion: reduce",
+        "purpose": "Défilement horizontal commandé du carrousel riche, sans lecture automatique ; recalage instantané de la diapositive au changement de largeur."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-columns",
+        "value": "1100px"
+      },
+      {
+        "name": "single-column",
+        "value": "800px"
+      },
+      {
+        "name": "wide-container",
+        "value": "1700px"
+      },
+      {
+        "name": "settings-single-column",
+        "value": "500px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Bouton principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Action de sauvegarde.",
+      "html": "<button class=\"ds-primary\">Enregistrer</button>",
+      "css": ".ds-primary{font-family:'Manrope Variable',sans-serif;display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;font-size:12px;font-weight:650;border-radius:5px;cursor:pointer;background:#284c39;color:#fff;border:1px solid #284c39}.ds-primary:hover:not(:disabled){background:#1a3728}.ds-primary:focus-visible{outline:3px solid var(--accent,#b94c23);outline-offset:4px}.ds-primary:disabled{opacity:.45;cursor:default}@media(prefers-reduced-motion:no-preference){.ds-primary{transition:background-color .15s ease,color .15s ease,border-color .15s ease}}"
+    },
+    {
+      "name": "Bouton secondaire",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Action complémentaire.",
+      "html": "<button class=\"ds-secondary\">Prévisualiser</button>",
+      "css": ".ds-secondary{font-family:'Manrope Variable',sans-serif;display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;font-size:12px;font-weight:650;border-radius:5px;cursor:pointer;background:transparent;color:#26392e;border:1px solid #bbc8bb}.ds-secondary:hover:not(:disabled){background:#e6e9e0}.ds-secondary:focus-visible{outline:3px solid var(--accent,#b94c23);outline-offset:4px}.ds-secondary:disabled{opacity:.45;cursor:default}@media(prefers-reduced-motion:no-preference){.ds-secondary{transition:background-color .15s ease,color .15s ease,border-color .15s ease}}"
+    },
+    {
+      "name": "Champ",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Saisie avec libellé explicite et aide liée au contrôle.",
+      "html": "<label class=\"ds-field\"><span id=\"ds-travel-label\">Temps pour rejoindre la gare</span><input type=\"number\" value=\"8\" aria-labelledby=\"ds-travel-label\" aria-describedby=\"ds-travel-help\"><span class=\"ds-field-help\" id=\"ds-travel-help\">Les départs à moins de 8 minutes restent affichés, mais sont atténués.</span></label>",
+      "css": ".ds-field{font-family:'Manrope Variable',sans-serif;display:flex;flex-direction:column;gap:8px;color:#465448;font-size:12px;line-height:1.5}.ds-field input{font:inherit;font-size:12px;min-height:40px;padding:11px 12px;border:1px solid #cbd2c7;border-radius:4px;background:#fffefa;color:#24352a;caret-color:var(--accent,#b94c23)}.ds-field input:focus-visible{outline:3px solid var(--accent,#b94c23);outline-offset:4px}.ds-field-help{font-size:11px;font-weight:400;line-height:1.7;color:var(--muted,#626d6a)}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Navigation riche avec cibles de hauteur minimale 44px et page courante explicite.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Navigation\"><a href=\"#departures\" aria-current=\"page\">Départs</a><a href=\"#settings\">Réglages</a></nav>",
+      "css": ".ds-nav{font-family:'Manrope Variable',sans-serif;display:flex;gap:28px;align-items:center}.ds-nav a{display:inline-flex;align-items:center;gap:4px;min-height:44px;font-size:13px;color:var(--muted,#626d6a);text-decoration:none}.ds-nav a[aria-current]{color:#202a2b;font-weight:800}.ds-nav a:hover{color:var(--accent,#b94c23)}.ds-nav a:focus-visible{outline:3px solid var(--accent,#b94c23);outline-offset:4px}"
+    },
+    {
+      "name": "Carte d’édition",
+      "kind": "card",
+      "refersTo": "editor-card",
+      "description": "Conteneur de configuration.",
+      "html": "<section class=\"ds-card\"><h3>La Défense</h3><p>Ligne L · Paris Saint-Lazare</p></section>",
+      "css": ".ds-card{font-family:'Manrope Variable',sans-serif;background:#fbfaf7;border:1px solid var(--line,#d9ded7);border-radius:8px;padding:24px;color:#202a2b}.ds-card h3{font-size:16px;font-weight:700;margin:0}.ds-card p{font-size:11px;color:var(--muted,#626d6a);margin:5px 0 0}"
+    },
+    {
+      "name": "Badge de ligne",
+      "kind": "chip",
+      "refersTo": "line-badge-l",
+      "description": "Identité de ligne, sans interaction.",
+      "html": "<span class=\"ds-line\">L</span>",
+      "css": ".ds-line{font-family:'Manrope Variable',sans-serif;display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 7px;border-radius:5px;background:#726a9f;color:#fff;font-size:17px;font-weight:750;line-height:1}"
+    },
+    {
+      "name": "Bloc épuré",
+      "kind": "custom",
+      "refersTo": "minimal-departure",
+      "description": "Horaires monochromes passifs.",
+      "html": "<section class=\"ds-minimal\"><div><span class=\"ds-minimal-line\">L</span><h2>La Défense</h2></div><p>Paris Saint-Lazare</p><table><tbody><tr><td class=\"ds-close\"><strong>3<small> min</small></strong><time>07:35</time></td><td><strong>12<small> min</small></strong><time>07:44</time></td><td><strong>22<small> min</small></strong><time>07:54</time></td></tr></tbody></table></section>",
+      "css": ".ds-minimal{font:16px Arial,Helvetica,sans-serif;background:#fff;color:#000;padding:9px 0;border-bottom:1px solid #111}.ds-minimal-line{display:inline-block;padding:3px 8px;border:2px solid currentColor;font-size:1.35em;font-weight:700;line-height:1;vertical-align:middle}.ds-minimal h2{display:inline;font-size:1.45em;font-weight:700;margin:0 10px;vertical-align:middle}.ds-minimal p{margin:9px 0 12px;font-size:1.2em;line-height:1.3;white-space:nowrap}.ds-minimal table{width:100%;table-layout:fixed;border-collapse:collapse}.ds-minimal td{vertical-align:top;padding:2px 6px 0 0}.ds-minimal strong{display:block;font-size:2.7em;line-height:1.15;font-weight:700;white-space:nowrap}.ds-minimal small{font-size:.34em;font-weight:400}.ds-minimal time{display:block;font-size:1.15em;margin-top:7px}.ds-close{color:#737373}"
+    },
+    {
+      "name": "Budget par API",
+      "kind": "custom",
+      "refersTo": "api-budget",
+      "description": "Exemple de compteur local ; données illustratives, distinctes du compte PRIM.",
+      "html": "<section class=\"ds-budget\" data-api=\"stop-monitoring\" data-level=\"normal\"><h3>Prochains passages · requête unitaire</h3><p class=\"ds-budget-value\">100<span> / 1 000</span></p><meter class=\"ds-budget-meter\" min=\"0\" max=\"1000\" value=\"100\" aria-label=\"Prochains passages · requête unitaire\">100 sur 1 000</meter><p class=\"ds-budget-consumption\"><strong>10 % utilisés</strong><span>900 restants</span></p><dl><div><dt>Estimation automatique / jour</dt><dd>218</dd></div><div><dt>Limite automatique / jour</dt><dd>900</dd></div></dl></section>",
+      "css": ".ds-budget {\n  --budget-ink: var(--budget-passages-ink, #3f3974);\n  --budget-track: var(--budget-passages-track, #dcd7ed);\n  --budget-muted: var(--budget-passages-muted, #615b7a);\n  --budget-fill: var(--budget-ink);\n  margin-top: 20px;\n  padding: 18px 0 4px;\n  border-top: 2px solid var(--budget-ink);\n  color: var(--budget-ink);\n}\n.ds-budget[data-api='general-message'] {\n  --budget-ink: var(--budget-messages-ink, #275e70);\n  --budget-track: var(--budget-messages-track, #c6dce2);\n  --budget-muted: var(--budget-messages-muted, #446570);\n}\n.ds-budget[data-level='warning'] {\n  --budget-fill: var(--budget-warning, #8b4c13);\n}\n.ds-budget[data-level='critical'],\n.ds-budget[data-level='exhausted'] {\n  --budget-fill: var(--budget-critical, #a13f31);\n}\n.ds-budget h3 {\n  font-size: 13px;\n  line-height: 1.6;\n  margin: 0;\n}\n.ds-budget .ds-budget-value {\n  font-size: 38px;\n  color: var(--budget-ink);\n  font-weight: 650;\n  line-height: 1.2;\n  margin: 16px 0 4px;\n  font-variant-numeric: tabular-nums;\n}\n.ds-budget-value span {\n  font-size: 18px;\n  color: var(--budget-muted);\n  font-weight: 400;\n}\n.ds-budget-meter {\n  display: block;\n  appearance: none;\n  width: 100%;\n  height: 6px;\n  border: 0;\n  border-radius: 0;\n  background: var(--budget-track);\n  margin: 18px 0 10px;\n}\n.ds-budget-meter::-webkit-meter-bar {\n  height: 6px;\n  border: 0;\n  border-radius: 0;\n  background: var(--budget-track);\n}\n.ds-budget-meter::-webkit-meter-optimum-value {\n  background: var(--budget-fill);\n}\n.ds-budget-meter::-moz-meter-bar {\n  background: var(--budget-fill);\n}\n.ds-budget .ds-budget-consumption {\n  display: flex;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 2px 12px;\n  color: var(--budget-muted);\n  font-size: 11px;\n  line-height: 1.6;\n  margin: 0;\n  font-variant-numeric: tabular-nums;\n}\n.ds-budget-consumption strong {\n  color: var(--budget-fill);\n  font-weight: 700;\n}\n.ds-budget dl {\n  border-top: 1px solid var(--budget-track);\n  padding-top: 16px;\n  margin-top: 16px;\n}\n.ds-budget dt {\n  color: var(--budget-muted);\n}\n.ds-budget dd {\n  color: var(--budget-ink);\n  font-variant-numeric: tabular-nums;\n}\n\n.ds-budget{font-family:'Manrope Variable',sans-serif}.ds-budget dl>div{display:flex;justify-content:space-between;gap:16px;margin-bottom:15px;font-size:11px}.ds-budget dd{margin:0;font-weight:600}.ds-budget .ds-budget-consumption{margin:0}"
+    },
+    {
+      "name": "Mesure de l’écran",
+      "kind": "input",
+      "description": "Option native sous les champs de dimensions ; l’aide explique la mesure sur l’écran cible.",
+      "html": "<div class=\"ds-measurement\"><label class=\"ds-check-label\"><input type=\"checkbox\" aria-describedby=\"ds-screen-help\">Afficher les dimensions réelles</label><p class=\"ds-field-help\" id=\"ds-screen-help\">Relevez les valeurs dans la vue épurée sur l’écran cible, puis reportez-les ci-dessus. L’indicateur apparaît au prochain rafraîchissement après enregistrement.</p></div>",
+      "css": ".ds-measurement {\n  margin-top: 16px;\n}\n.ds-measurement .ds-check-label {\n  min-height: 44px;\n  margin: 0;\n  font-size: 12px;\n  font-weight: 600;\n  cursor: pointer;\n}\n.ds-measurement input {\n  flex: 0 0 16px;\n  width: 16px;\n  height: 16px;\n  margin: 0;\n}\n.ds-measurement .ds-field-help {\n  margin: 0 0 0 24px;\n  max-width: 65ch;\n}\n.ds-measurement{font-family:'Manrope Variable',sans-serif;color:#202a2b}.ds-check-label{display:flex;align-items:center;gap:8px}.ds-measurement input{accent-color:#385e43}.ds-measurement input:focus-visible{outline:3px solid var(--accent,#b94c23);outline-offset:4px}.ds-field-help{font-size:11px;line-height:1.7;color:var(--muted,#626d6a)}"
+    },
+    {
+      "name": "Avertissement de débordement",
+      "kind": "custom",
+      "description": "Alerte non bloquante avec détails repliables ; texte du bloc illustratif.",
+      "html": "<div class=\"ds-layout-warning\"><svg class=\"ds-icon\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M14 4H4v16h10m4-16h2v3m0 10v3h-2M10 12h12m-3-3 3 3-3 3\"/></svg><div class=\"ds-layout-warning-content\"><strong>Risque de débordement sur la vue épurée</strong><p>Vous pouvez enregistrer. La partie hors écran restera inaccessible.</p><details class=\"ds-layout-warning-details\"><summary><svg class=\"ds-icon\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m10 6 6 6-6 6\"/></svg>Voir les limites de cette disposition</summary><ul><li>Le bloc « Gare exemple · L » ne tient pas lisiblement dans l’écran épuré.</li></ul></details></div></div>",
+      "css": ".ds-layout-warning {\n  display: flex;\n  align-items: flex-start;\n  gap: 12px;\n  margin-bottom: 20px;\n  padding: 16px;\n  border: 1px solid #dfc9a9;\n  border-radius: 8px;\n  background: #f8f0e3;\n  color: #674b2c;\n  font-size: 12px;\n  line-height: 1.7;\n  overflow-wrap: anywhere;\n}\n.ds-layout-warning > .ds-icon {\n  margin-top: 1px;\n  color: var(--budget-warning);\n}\n.ds-layout-warning-content {\n  min-width: 0;\n}\n.ds-layout-warning strong {\n  display: block;\n  color: var(--budget-warning);\n  font-size: 14px;\n  line-height: 1.5;\n}\n.ds-layout-warning p {\n  margin: 6px 0 0;\n  max-width: 65ch;\n}\n.ds-layout-warning-details {\n  margin-top: 4px;\n}\n.ds-layout-warning-details summary {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  width: fit-content;\n  min-height: 44px;\n  padding: 8px 0;\n  cursor: pointer;\n  color: var(--budget-warning);\n  font-weight: 650;\n  list-style: none;\n}\n.ds-layout-warning-details summary::-webkit-details-marker {\n  display: none;\n}\n.ds-layout-warning-details summary:hover {\n  text-decoration: underline;\n  text-underline-offset: 3px;\n}\n.ds-layout-warning-details[open] summary .ds-icon {\n  transform: rotate(90deg);\n}\n.ds-layout-warning ul {\n  margin: 0;\n  padding: 12px 0 0 18px;\n  border-top: 1px solid #dfc9a9;\n  max-width: 65ch;\n}\n.ds-layout-warning li + li {\n  margin-top: 8px;\n}\n.ds-layout-warning{font-family:'Manrope Variable',sans-serif}.ds-layout-warning summary:focus-visible{outline:3px solid var(--accent,#b94c23);outline-offset:4px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Tableau de départs de proximité",
+    "overview": "InfoTransport emprunte au carnet d’exploitation : papier clair, encre sombre, filets horizontaux et chiffres précis. La vue riche et l’administration partagent des surfaces calmes ; les couleurs de ligne et de signalement servent la lecture.\n\nLa vue épurée est un support distinct, monochrome et passif. Sa police système fixe préserve la compatibilité des navigateurs anciens ; la lisibilité prime sur la quantité. Les dimensions réelles de l’écran restent à confirmer sur le matériel cible.",
+    "keyCharacteristics": [
+      "Papier clair et encre vert sombre pour les interfaces interactives.",
+      "Blocs autonomes avec ligne, gare, direction et horaires.",
+      "Filets et espacements pour structurer ; ombre réservée aux suggestions flottantes.",
+      "Vue épurée indépendante, monochrome et sans interaction."
+    ],
+    "rules": [
+      {
+        "name": "The Information Color Rule",
+        "body": "La couleur accompagne une identité ou un état ; les libellés et les formes portent aussi l’information.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fixed Minimal Type Rule",
+        "body": "La vue épurée conserve sa base Arial de 16px ; augmenter la hauteur du profil ne grossit pas la police.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Paper Rule",
+        "body": "Les surfaces de page sont séparées par des filets et des variations de fond ; l’ombre est réservée au menu flottant de suggestions.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** conserver une identité gare, ligne et direction dans chaque bloc.",
+      "**Do** garder les départs trop proches dans leur ordre chronologique avec une atténuation lisible.",
+      "**Do** avertir des limites de capacité de la vue épurée sans bloquer la sauvegarde et mesurer la zone utile du navigateur cible.",
+      "**Do** garder les détails et commandes dans les interfaces riches."
+    ],
+    "donts": [
+      "**Don't** réduire automatiquement la police ou ajouter un défilement pour faire tenir la vue épurée. Le débordement hors écran reste inaccessible.",
+      "**Don't** faire dépendre un état de la couleur seule.",
+      "**Don't** étendre la navigation, les animations ou les surfaces colorées à la vue épurée."
+    ]
+  }
+}
