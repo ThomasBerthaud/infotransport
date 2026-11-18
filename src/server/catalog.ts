@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import type { CatalogLine, CatalogPlace } from '../shared/model.js';
 export type CatalogData = {
   source: string;
+  importedAt?: string;
   rowCount: number;
   lines: CatalogLine[];
   stops: Omit<CatalogPlace, 'lines'>[];

@@ -49,6 +49,4 @@ Mesurer la zone réellement disponible en paysage, y compris les éventuelles ba
 
 ## Décisions restantes
 
-Valeur initiale du seuil par défaut et représentation exacte des horaires (minutes seules ou accompagnées de l'heure de départ) à déterminer. Capacité maximale à mesurer sur l’écran cible avec trois blocs ou davantage. Aucun horaire réel n'a encore été reçu de PRIM.
-
-Nombre initial de départs de la vue normale à définir ; son réglage doit être indépendant de la limite de la vue épurée. La quantité effectivement affichable dépend aussi des départs fournis par PRIM.
+Voir la liste unique tenue dans [PRODUCT.md](PRODUCT.md#open-decisions).

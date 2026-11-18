@@ -69,6 +69,7 @@ Lecture rapide sur tout écran cible, avec prise en charge des petits écrans à
 
 - Valeur initiale du seuil de trajet par défaut, avec possibilité de surcharge par tuple.
 - Présentation des horaires : minutes restantes, heures de départ ou les deux.
+- Nombre de départs de la vue détaillée (8 par défaut), réglable indépendamment de la vue épurée.
 - Capacité maximale de blocs sans défilement, à mesurer sur l’écran cible.
 - Compatibilité matérielle : rendu, rafraîchissement, maintien du Wi-Fi et reprise à 5 h.
 - Identifiants PRIM réels et couverture des deux tuples initiaux, à vérifier avant de considérer l'intégration validée.

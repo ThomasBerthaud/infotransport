@@ -1,0 +1,26 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommitsDisabled"],
+  "timezone": "Europe/Paris",
+  "schedule": ["before 6am on monday"],
+  "labels": ["dépendances"],
+  "rangeStrategy": "bump",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on the first day of the month"]
+  },
+  "packageRules": [
+    {
+      "description": "Grouper les mises à jour mineures et correctives des outils de développement",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "outils de développement"
+    },
+    {
+      "description": "Suivre la version de Node.js de l'image et de la CI ensemble",
+      "matchDepNames": ["node"],
+      "groupName": "Node.js"
+    }
+  ],
+  "vulnerabilityAlerts": { "enabled": true, "labels": ["sécurité"] }
+}

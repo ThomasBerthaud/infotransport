@@ -12,7 +12,7 @@
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test tests/*.test.ts",
+    "test": "NODE_ENV=test node --import tsx --test tests/*.test.ts",
     "catalog:colors": "node --import tsx scripts/import-line-colors.ts",
     "catalog:import": "node --import tsx scripts/import-catalog.ts"
   },
@@ -35,7 +35,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "concurrently": "^10.0.6",
-    "oxfmt": "^0.74.0",
+    "oxfmt": "^0.79.0",
     "oxlint": "^1.89.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",

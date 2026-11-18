@@ -1,5 +1,13 @@
 import type { Departure, Discovery, Incident } from '../shared/model.js';
 import type { Budget } from './storage.js';
+import { UnavailableError, UpstreamError } from './errors.js';
+import { log } from './log.js';
+const PRIM_BASE_URL = 'https://prim.iledefrance-mobilites.fr/marketplace/';
+/** Minimum spacing between two PRIM calls, whatever the API. */
+const REQUEST_SPACING_MS = 250;
+const REQUEST_TIMEOUT_MS = 12_000;
+/** Minimum wait after an HTTP 429, even when Retry-After is shorter or absent. */
+const MIN_RATE_LIMIT_WAIT_S = 60;
 type Obj = Record<string, unknown>;
 const obj = (v: unknown): Obj =>
   v && typeof v === 'object' && !Array.isArray(v) ? (v as Obj) : {};
@@ -25,12 +33,13 @@ const iso = (v: unknown) => {
 export function parseDepartures(payload: unknown): Departure[] {
   const delivery = obj(obj(obj(payload).Siri).ServiceDelivery);
   const deliveries = list(delivery.StopMonitoringDelivery);
-  if (!deliveries.length) throw new Error('Réponse PRIM : StopMonitoringDelivery manquant.');
+  if (!deliveries.length)
+    throw new UpstreamError('Réponse PRIM : StopMonitoringDelivery manquant.');
   const result: Departure[] = [];
   for (const raw of deliveries) {
     const d = obj(raw);
     if (d.Status === false || d.ErrorCondition)
-      throw new Error('PRIM ne peut pas fournir les passages de cet arrêt.');
+      throw new UpstreamError('PRIM ne peut pas fournir les passages de cet arrêt.');
     for (const entry of list(d.MonitoredStopVisit)) {
       const visit = obj(entry),
         journey = obj(visit.MonitoredVehicleJourney),
@@ -66,12 +75,13 @@ export function parseDepartures(payload: unknown): Departure[] {
 export function parseIncidents(payload: unknown): Incident[] {
   const delivery = obj(obj(obj(payload).Siri).ServiceDelivery);
   const deliveries = list(delivery.GeneralMessageDelivery);
-  if (!deliveries.length) throw new Error('Réponse PRIM : GeneralMessageDelivery manquant.');
+  if (!deliveries.length)
+    throw new UpstreamError('Réponse PRIM : GeneralMessageDelivery manquant.');
   const incidents: Incident[] = [];
   for (const raw of deliveries) {
     const d = obj(raw);
     if (d.Status === false || d.ErrorCondition)
-      throw new Error('Informations trafic indisponibles.');
+      throw new UpstreamError('Informations trafic indisponibles.');
     for (const item of list(d.InfoMessage)) {
       const m = obj(item),
         content = obj(m.Content);
@@ -128,38 +138,33 @@ export class Prim {
       .catch(() => {})
       .then(async () => {
         if (Date.now() < (this.nextAllowed.get(path) ?? 0))
-          throw new Error('PRIM demande une attente avant le prochain appel.');
-        const spacing = 250 - (Date.now() - this.lastRequest);
+          throw new UnavailableError('PRIM demande une attente avant le prochain appel.');
+        const spacing = REQUEST_SPACING_MS - (Date.now() - this.lastRequest);
         if (spacing > 0) await new Promise((resolve) => setTimeout(resolve, spacing));
         if (!this.key.trim() || !this.canCall())
-          throw new Error('Appels PRIM suspendus : clé absente ou plage inactive.');
+          throw new UnavailableError('Appels PRIM suspendus : clé absente ou plage inactive.');
         this.lastRequest = Date.now();
         await this.budget.reserve(path, automatic);
-        const url = new URL(`https://prim.iledefrance-mobilites.fr/marketplace/${path}`);
+        const url = new URL(path, PRIM_BASE_URL);
         for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
-        console.log(`[PRIM] ${path} — ${JSON.stringify(params)}`);
+        log.debug(`[PRIM] ${path} — ${JSON.stringify(params)}`);
         const response = await fetch(url, {
           headers: {
             apiKey: this.key,
             Accept: 'application/json',
             'Accept-Encoding': 'gzip, deflate',
           },
-          signal: AbortSignal.timeout(12000),
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
         });
-        console.log(`[PRIM] ${path} — HTTP ${response.status}`);
-
+        log.debug(`[PRIM] ${path} — HTTP ${response.status}`);
         if (!response.ok) {
           if (response.status === 429) {
             const retry = Number(response.headers.get('retry-after'));
-            this.nextAllowed.set(
-              path,
-              Date.now() + Math.max(60000, Number.isFinite(retry) ? retry * 1000 : 60000),
-            );
-            console.error(
-              `[PRIM] Rate limité — prochain appel dans ${Math.max(60, Number.isFinite(retry) ? retry : 60)}s`,
-            );
+            const wait = Math.max(MIN_RATE_LIMIT_WAIT_S, Number.isFinite(retry) ? retry : 0);
+            this.nextAllowed.set(path, Date.now() + wait * 1000);
+            log.warn(`[PRIM] ${path} limité (HTTP 429) — prochain appel dans ${wait} s`);
           }
-          throw new Error(
+          throw new UpstreamError(
             `PRIM : HTTP ${response.status}. Vérifiez la clé, les droits et les identifiants dans l’administration.`,
           );
         }

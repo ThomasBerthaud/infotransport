@@ -91,12 +91,28 @@ Le fichier fourni `arrets-lignes.json` a été transformé en catalogue embarqu�
 
 La conversion respecte la granularité : `IDFM:monomodalStopPlace:470549` devient `STIF:StopArea:SP:470549:` ; un identifiant de quai numérique devient `STIF:StopPoint:Q:…:`. Les lignes `IDFM:C…` deviennent `STIF:Line::C…:`. Le catalogue ne contient pas de directions : aucun sens réel n’est déduit de l’ordre des arrêts. En démonstration, les sens portent des références `DEMO:` qui ne peuvent pas servir de filtre de collecte réelle.
 
-Pour remplacer le référentiel puis reconstruire l’image :
+Le référentiel évolue avec l’offre IDFM (nouvelles lignes, arrêts renommés). Le mettre à jour au moins chaque trimestre, ou dès qu’un arrêt manque dans la recherche ; la date d’import est affichée dans `/admin` (« Source des données »).
+
+1. Télécharger depuis la plateforme open data IDFM le jeu « Arrêts et lignes associées » (export JSON, `arrets-lignes.json`) et, pour les couleurs, le « Référentiel des lignes » (export JSON).
+2. Régénérer les fichiers, vérifier, puis reconstruire l’image :
 
 ```sh
 npm run catalog:import -- /chemin/vers/arrets-lignes.json
-npm run build
 ```
+
+```sh
+npm run catalog:colors -- /chemin/vers/referentiel-des-lignes.json
+```
+
+```sh
+npm test
+```
+
+```sh
+docker compose build
+```
+
+Les deux fichiers de `resources/` sont versionnés pour que l’image se construise sans accès réseau.
 
 Les suggestions s’ouvrent pendant la saisie, par nom ou code, dans les contrôles de choix et les champs techniques. Flèches haut/bas, Entrée et Échap sont pris en charge. Choisir un arrêt réinitialise la ligne et les filtres de direction pour éviter de conserver une combinaison incohérente.
 
@@ -127,7 +143,9 @@ De 22 h à 5 h par défaut, les horaires sont masqués et les appels suspendus. 
 - Référentiel local d’arrêts/lignes embarqué dans l’image et disponible hors plage sans consommer de crédit. La découverte des sens reste mise en cache 3 minutes et soumise au budget et aux horaires actifs.
 - Les heures périmées sont retirées de l'affichage. Les diagnostics sont dans `/admin`.
 
-Les fichiers `config.json`, `cache.json` et `budget.json` se trouvent dans `DATA_DIR` (`/data` en Docker). Écritures atomiques, instance unique par volume. Une configuration ou un compteur corrompu bloque le démarrage plutôt que réinitialiser silencieusement les limites. Ne pas supprimer le compteur pour contourner le quota.
+Les fichiers `config.json`, `cache.json` et `budget.json` se trouvent dans `DATA_DIR` (`/data` en Docker). Écritures atomiques, instance unique par volume. Un compteur corrompu bloque le démarrage plutôt que réinitialiser silencieusement les limites ; ne pas supprimer le compteur pour contourner le quota. Une configuration illisible ou devenue invalide ne bloque pas le démarrage : elle est conservée sous `config.json.invalid-<date>`, la configuration initiale est utilisée et `/admin` affiche l’erreur jusqu’au prochain enregistrement.
+
+Les erreurs de l’API utilisent des statuts distincts : `400` entrée invalide, `403` origine refusée, `502`/`504` PRIM en échec ou sans réponse, `503` appel empêché localement (budget, pause, attente après limitation), `500` erreur inattendue. Les tableaux Grafana séparent ainsi les erreurs du service de celles de PRIM.
 
 L'estimation dans l'admin est prudente et inclut une heure de marge pour le changement d'heure. Elle dépend des ressources configurées et ne remplace pas les compteurs effectifs. Les quotas et droits réels restent ceux du compte PRIM.
 
@@ -162,7 +180,11 @@ npm run build
 npm start
 ```
 
-`npm start` sert le build de production. `PORT`, `DATA_DIR` et `PRIM_API_KEY` sont configurables par environnement ; `.env` est chargé au démarrage local. Le code source est en TypeScript strict ; seuls les builds produisent du JavaScript. React et l'admin sont compilés avec Vite ; aucun serveur Vite n'est requis en production.
+`npm start` sert le build de production. `PORT`, `DATA_DIR`, `PRIM_API_KEY` et `LOG_LEVEL` (`debug`, `info` par défaut, `warn`, `error`, `silent`) sont configurables par environnement ; `.env` est chargé au démarrage local. Les requêtes HTTP et le détail de chaque collecte ne sont journalisés qu’en `debug`.
+
+La CI (`.github/workflows/check.yaml`, lue par Gitea Actions comme par GitHub Actions) exécute lint, format, tests et build. Renovate (`renovate.json`) propose chaque lundi les mises à jour de dépendances, groupées pour les outils de développement.
+
+Documentation du dépôt : [ARCHITECTURE.md](ARCHITECTURE.md) (choix techniques et organisation du code), [PRODUCT.md](PRODUCT.md) (finalité, principes et décisions ouvertes), [UI-BRIEF.md](UI-BRIEF.md) (exigences par écran), [DESIGN.md](DESIGN.md) (système visuel). Le code source est en TypeScript strict ; seuls les builds produisent du JavaScript. React et l'admin sont compilés avec Vite ; aucun serveur Vite n'est requis en production.
 
 ## Accès IA par MCP
 

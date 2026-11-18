@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import '@fontsource-variable/manrope';
@@ -29,11 +29,6 @@ function App() {
     queryFn: ({ signal }) => api<Dashboard>('/api/dashboard', { signal }),
     refetchInterval: (q) => (q.state.data ? q.state.data.refreshSeconds * 1000 : 30000),
   });
-  useEffect(() => {
-    if (query.error) {
-      console.error('[DASHBOARD] Erreur affichée :', query.error.message);
-    }
-  }, [query.error]);
   return (
     <>
       <header className="app-header">

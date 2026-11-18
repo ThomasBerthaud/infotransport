@@ -1,3 +1,5 @@
+# Single workflow for Gitea Actions and GitHub Actions: Gitea reads .github/workflows
+# when no .gitea/workflows directory exists, so do not add one.
 name: Quality
 on: [push, pull_request]
 jobs:

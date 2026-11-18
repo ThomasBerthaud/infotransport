@@ -47,57 +47,38 @@ export const configSchema = z
     },
   }));
 export type Config = z.infer<typeof configSchema>;
+const defaultSettings: Settings = {
+  walkMinutes: 14,
+  minimalCount: 3,
+  richCount: 8,
+  pollSeconds: 600,
+  start: '05:00',
+  end: '22:00',
+  days: [1, 2, 3, 4, 5, 6, 7],
+};
+const demoBlock = (id: string, line: string, direction: string, lineRef: string): Block => ({
+  id,
+  station: 'La Défense',
+  line,
+  direction,
+  monitoringRef: '',
+  lineRef,
+  directionRef: '',
+  destinationRef: '',
+  span: 2,
+  overrides: {},
+});
 export const initialConfig: Config = {
   version: 1,
-  defaults: {
-    walkMinutes: 14,
-    minimalCount: 3,
-    richCount: 8,
-    pollSeconds: 600,
-    start: '05:00',
-    end: '22:00',
-    days: [1, 2, 3, 4, 5, 6, 7],
-  },
+  defaults: defaultSettings,
   screen: { width: 800, height: 600, refreshSeconds: 60, columns: 2, rows: 2 },
   blocks: [],
 };
 export const demoConfig: Config = {
-  version: 1,
-  defaults: {
-    walkMinutes: 14,
-    minimalCount: 3,
-    richCount: 8,
-    pollSeconds: 600,
-    start: '05:00',
-    end: '22:00',
-    days: [1, 2, 3, 4, 5, 6, 7],
-  },
-  screen: { width: 800, height: 600, refreshSeconds: 60, columns: 2, rows: 2 },
+  ...initialConfig,
   blocks: [
-    {
-      id: 'la-defense-l',
-      station: 'La Défense',
-      line: 'L',
-      direction: 'Paris Saint-Lazare',
-      monitoringRef: '',
-      lineRef: 'STIF:Line::C01740:',
-      directionRef: '',
-      destinationRef: '',
-      span: 2,
-      overrides: {},
-    },
-    {
-      id: 'la-defense-u',
-      station: 'La Défense',
-      line: 'U',
-      direction: 'La Verrière',
-      monitoringRef: '',
-      lineRef: 'STIF:Line::C01741:',
-      directionRef: '',
-      destinationRef: '',
-      span: 2,
-      overrides: {},
-    },
+    demoBlock('la-defense-l', 'L', 'Paris Saint-Lazare', 'STIF:Line::C01740:'),
+    demoBlock('la-defense-u', 'U', 'La Verrière', 'STIF:Line::C01741:'),
   ],
 };
 export function settings(config: Config, block: Block): Settings {
@@ -270,14 +251,18 @@ export function estimatedCallsByApi(config: Config): Record<PrimApi, number> {
 export function estimatedCalls(config: Config) {
   return Object.values(estimatedCallsByApi(config)).reduce((a, b) => a + b, 0);
 }
+/** A configuration that is well-formed but breaks a business rule. */
+export class ConfigError extends Error {
+  override name = 'ConfigError';
+}
 export function validateConfig(input: unknown): Config {
   const c = configSchema.parse(input);
   if (new Set(c.blocks.map((b) => b.id)).size !== c.blocks.length)
-    throw new Error('Chaque bloc doit avoir un identifiant unique.');
+    throw new ConfigError('Chaque bloc doit avoir un identifiant unique.');
   const estimates = estimatedCallsByApi(c);
   for (const quota of primQuotas) {
     if (estimates[quota.api] > quota.automaticLimit)
-      throw new Error(
+      throw new ConfigError(
         `${quota.label} : collecte estimée à ${estimates[quota.api]} appels/jour pour une limite automatique de ${quota.automaticLimit}. ${quota.api === 'stop-monitoring' ? 'Augmentez l’intervalle de collecte.' : 'Réduisez le nombre de lignes suivies.'}`,
       );
   }

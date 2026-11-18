@@ -11,6 +11,7 @@ services:
       PRIM_API_KEY: ${PRIM_API_KEY:-}
       PORT: ${PORT:-3000}
       DATA_DIR: /data
+      LOG_LEVEL: ${LOG_LEVEL:-info}
       TZ: Europe/Paris
     volumes:
       - infotransport-data:/data

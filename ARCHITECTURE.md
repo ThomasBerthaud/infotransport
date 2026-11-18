@@ -13,7 +13,23 @@ Clé PRIM fournie par `PRIM_API_KEY` côté serveur, jamais envoyée au navigate
 - `/minimal` : vue épurée construite avec des composants React rendus en HTML côté Node.js/Express, sans hydratation React nécessaire sur l’écran cible. Tous les blocs et leurs horaires tiennent simultanément dans l'écran, sans scroll ni interaction. Rafraîchissement complet simple, à vérifier sur l'appareil. Les éventuels scripts de rafraîchissement doivent rester compatibles avec le navigateur cible ; pas de dépendance aux modules JavaScript modernes pour lire les départs.
 - `/admin` : interface React interactive sur ordinateur pour les blocs autonomes (gare, ligne, direction), leur disposition, les valeurs par défaut et les surcharges par bloc. Recherche et prévisualisation utilisent le même client PRIM et le même budget que la collecte.
 - `/health` : état du processus. L'administration montre séparément l'état PRIM, la fraîcheur des données et le budget.
+- `/metrics` : métriques Prometheus ; `/mcp` : accès MCP en lecture seule (voir README).
 - Un ordonnanceur dans le processus collecte les données, indépendamment des consultations de pages. Replanification après modification des réglages.
+
+## Organisation du code
+
+- `src/server/index.ts` : point d'entrée ; crée le service, l'application et écoute le port.
+- `src/server/app.ts` : `createApp(service, options)` construit l'application Express (routes, en-têtes, contrôle d'origine, gestion d'erreurs) sans effet de bord, ce qui permet de la tester sur un port éphémère.
+- `src/server/service.ts` : configuration, cache, ordonnanceur et vues ; `demo.ts` contient les données fictives du mode démonstration.
+- `src/server/prim.ts` : client et analyse SIRI ; `storage.ts` : fichiers persistants et budget ; `catalog.ts` : référentiel local.
+- `src/server/errors.ts` : erreurs typées et correspondance avec les statuts HTTP ; `log.ts` : journal à niveaux.
+- `src/client/admin.tsx` assemble l'administration à partir de `src/client/admin/` : champs communs, éditeur de bloc, recherche (`useBlockLookup`), aperçu, réglages d'écran et barre latérale. Les fonctions pures de l'éditeur sont dans `admin/blocks.tsx` et testées sans DOM.
+
+## Erreurs et journaux
+
+Les réponses d'erreur de l'API distinguent les causes : `400` pour une entrée invalide (Zod, règle de configuration), `403` pour une origine refusée, `502` ou `504` quand PRIM échoue ou ne répond pas, `503` quand une règle locale empêche l'appel (budget atteint, pause nocturne, attente après HTTP 429), `500` pour une erreur inattendue. Un `500` renvoie un message générique ; le détail et la pile restent dans les journaux.
+
+Le journal écrit une ligne horodatée par événement sur la sortie standard, filtrée par `LOG_LEVEL` (`debug`, `info` par défaut, `warn`, `error`, `silent`). Les requêtes HTTP et le détail des collectes sont au niveau `debug` ; `/health` et `/metrics` ne sont jamais journalisés. Les tests utilisent le niveau `error`.
 
 ## Frontend et outillage
 
@@ -37,7 +53,7 @@ Clé PRIM fournie par `PRIM_API_KEY` côté serveur, jamais envoyée au navigate
 
 Configuration : `defaults` contient les réglages héritables (seuil de trajet, nombre de départs, plages actives et intervalle de collecte) ; chaque entrée de `blocks` contient un identifiant stable, le tuple, son placement et ses `overrides`. Une propriété absente dans `overrides` hérite dynamiquement de la valeur globale : ne pas recopier les valeurs par défaut à la création. Résoudre et valider les réglages effectifs avant planification. Le rafraîchissement complet de la page reste un réglage global de l'écran ; les intervalles de collecte peuvent varier par bloc dans la limite du budget commun. La configuration initiale ne contient aucun bloc ; en mode démonstration, deux blocs sont fournis pour illustrer l'interface.
 
-Écritures sérialisées et remplacement atomique via fichier temporaire dans le même volume. Le serveur recharge ces fichiers au démarrage. Si le compteur est corrompu, suspendre les appels et exposer l'erreur plutôt que repartir artificiellement à zéro. Les réservations d'appels sont persistées avant émission, y compris pour les erreurs et les nouvelles tentatives. Une seule instance peut écrire le volume.
+Écritures sérialisées et remplacement atomique via fichier temporaire dans le même volume. Le serveur recharge ces fichiers au démarrage. Si le compteur est corrompu, le démarrage échoue plutôt que de repartir artificiellement à zéro. Une configuration illisible ou devenue invalide (règle de quota resserrée, modification manuelle) est renommée en `config.json.invalid-<date>` et remplacée par la configuration initiale ; l'administration affiche l'erreur jusqu'au prochain enregistrement. Le cache ne conserve que les arrêts et lignes des blocs configurés, plus les découvertes de directions de moins de trois minutes. Les réservations d'appels sont persistées avant émission, y compris pour les erreurs et les nouvelles tentatives. Une seule instance peut écrire le volume.
 
 ## PRIM et budget
 
@@ -55,27 +71,31 @@ Estimation : somme, pour chaque ressource, du nombre de collectes sur les plages
 
 Exemple indicatif pour une configuration avec deux blocs : 17 h actives (5 h–22 h), deux ressources de départs toutes les trois minutes = 680 appels ; une requête de perturbations toutes les quinze minutes = 68 ; total 748. La configuration initiale ne contient aucun bloc, donc zéro appel jusqu'à ce que l'utilisateur en ajoute.
 
-L'administration affiche le coût prévu et refuse une fréquence trop élevée, en proposant l'intervalle minimal compatible. Le rafraîchissement de la page ne déclenche aucun appel PRIM. Le seuil automatique et le plafond global empêchent la consommation incontrôlée ; aucune garantie de fraîcheur après épuisement du budget.
+L'administration affiche le coût prévu et refuse une fréquence trop élevée, en proposant l'intervalle minimal compatible. `GET /api/discover` peut consommer du quota : comme les écritures, elle refuse les requêtes envoyées par un autre site (`Sec-Fetch-Site` ou `Origin` différents). Le rafraîchissement de la page ne déclenche aucun appel PRIM. Le seuil automatique et le plafond global empêchent la consommation incontrôlée ; aucune garantie de fraîcheur après épuisement du budget.
 
 ## Nuit et incidents
 
-Plages hebdomadaires, dont plages traversant minuit ; réglage par défaut : service actif de 5 h à 22 h, pause de 22 h à 5 h, en `Europe/Paris`. Arrêt des collectes hors plage effective de chaque bloc ; aucun appel réseau PRIM pendant la pause commune, y compris depuis les consultations et prévisualisations. À la sortie de la plage d'écran, masquer les horaires devenus inutilisables, conserver les identités des blocs et programmer une unique navigation à la reprise, sans rechargements périodiques nocturnes et sans ajouter de texte de reprise sur l'affichage principal. Cela suppose un navigateur et un Wi-Fi actifs : le site seul ne garantit pas le réveil matériel de l’appareil cible.
+Plages hebdomadaires, dont plages traversant minuit ; réglage par défaut : service actif de 5 h à 22 h, pause de 22 h à 5 h, en `Europe/Paris`. Arrêt des collectes hors plage effective de chaque bloc ; aucun appel réseau PRIM pendant la pause commune, y compris depuis les consultations et prévisualisations. Si la pause commence pendant une collecte, les ressources restantes sont abandonnées et les données déjà reçues sont enregistrées. À la sortie de la plage d'écran, masquer les horaires devenus inutilisables, conserver les identités des blocs et programmer une unique navigation à la reprise, sans rechargements périodiques nocturnes et sans ajouter de texte de reprise sur l'affichage principal. Cela suppose un navigateur et un Wi-Fi actifs : le site seul ne garantit pas le réveil matériel de l’appareil cible.
 
 Cache ancien conservé en cas de panne avec état de fraîcheur interne. Ne pas présenter un départ passé comme encore disponible. Distinguer fin de service planifiée, aucun départ annoncé, API indisponible, budget atteint et perturbations inconnues dans l'administration. Sur la vue principale, utiliser un indicateur minimal ou remplacer les horaires périmés par des tirets ; pas d'horodatage de dernière mise à jour ni de diagnostic en texte continu.
 
-## Contraintes UI encore à résoudre
+## Disposition des vues
 
-Première configuration : la configuration initiale ne contient aucun bloc. L'utilisateur ajoute les blocs depuis `/admin`. En mode démonstration, deux blocs sont fournis par défaut : La Défense, ligne L vers Paris Saint-Lazare et ligne U vers La Verrière. Trois départs par bloc. Premier contexte de validation : petit écran en paysage, alimenté en permanence ; aucun modèle d'appareil imposé.
+La configuration initiale ne contient aucun bloc ; l'utilisateur les ajoute depuis `/admin`. En mode démonstration, deux blocs sont fournis : La Défense, ligne L vers Paris Saint-Lazare et ligne U vers La Verrière.
 
-Chaque tuple répète sa gare, sa ligne, sa direction et ses trois horaires. Blocs pleine largeur empilés par défaut ; ordre et largeur dans une grille modifiables depuis l'administration. Prévoir l'extension à trois blocs ou davantage, tous visibles sans défilement dans la limite mesurée du matériel ; réduire indéfiniment la police ne constitue pas une solution. Aucun titre mutualisé, pied de page de diagnostic ou texte décoratif.
+Chaque bloc répète sa gare, sa ligne, sa direction et ses horaires, sans titre mutualisé, pied de page de diagnostic ni texte décoratif. La vue épurée place les blocs sur une grille de 1 à 12 colonnes et lignes ; chaque bloc choisit sa largeur et peut être masqué de cette vue. Les cellules sont positionnées en absolu, sans dépendre de CSS Grid.
 
-La contrainte d'écran unique est impérative pour `/minimal`, y compris avec les noms longs et les états dégradés. Prévisualiser la disposition pour les dimensions utiles configurées et refuser une configuration qui dépasse la capacité vérifiée, plutôt que cacher les derniers blocs avec `overflow: hidden`, ajouter une pagination ou imposer une action sur l’écran cible. Le navigateur classique utilise une composition adaptée à son espace ; sa richesse ne doit pas alourdir les assets de la vue épurée. Mesurer la capacité réelle sur appareil avant de la présenter comme garantie.
+La vue épurée tient sur un seul écran, sans défilement ni pagination. L'administration prévisualise la disposition aux dimensions configurées, mesure le texte qui déborde dans l'aperçu et avertit sans bloquer l'enregistrement. Seul l'essai sur l'appareil cible garantit la capacité réelle.
 
-Le seuil de trajet atténue les départs trop proches tout en gardant un contraste utilisable. Réglage indépendant par tuple, avec héritage du seuil par défaut global si non surchargé. Sa valeur initiale reste à confirmer. Les suppressions annoncées doivent rester distinctes d'un départ simplement trop proche.
+Le seuil de trajet atténue les départs trop proches tout en gardant un contraste utilisable ; il est réglable par bloc avec héritage de la valeur commune. Les suppressions annoncées restent distinctes d'un départ simplement trop proche.
 
-## Vérification prévue lors de l'implémentation
+Les décisions produit encore ouvertes sont tenues à jour dans [PRODUCT.md](PRODUCT.md#open-decisions).
 
-Tests utiles : héritage dynamique et surcharges par bloc, budget conservé après redémarrage et erreurs, déduplication, plages traversant minuit et changement d'heure, données périmées, filtrage des directions et seuils. Vérification HTTP du conteneur et essai réel sur l’écran cible : rendu, rafraîchissement, Wi-Fi, veille et reprise matinale.
+## Tests et vérification
+
+`npm test` couvre l'héritage et les surcharges par bloc, le budget après redémarrage et erreurs, la déduplication des collectes, les plages traversant minuit et les changements d'heure, les données périmées, le filtrage des directions, l'analyse SIRI conforme aux contrats Swagger, les routes HTTP (statuts d'erreur, contrôle d'origine, vue épurée), la reprise après une configuration invalide, la purge du cache, MCP, les métriques et les fonctions de l'éditeur de blocs.
+
+Restent manuels : l'essai réel avec une clé PRIM et l'essai sur l'écran cible (rendu, rafraîchissement, Wi-Fi, veille et reprise matinale).
 
 ## Sources techniques
 

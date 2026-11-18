@@ -1,11 +1,17 @@
 import { primQuotas } from '../shared/model.js';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { UnavailableError } from './errors.js';
+const DAY_MS = 86_400_000;
 export class Store {
   private queue: Promise<void> = Promise.resolve();
+  private ready?: Promise<unknown>;
   constructor(readonly directory: string) {}
+  private ensureDirectory() {
+    return (this.ready ??= mkdir(this.directory, { recursive: true }));
+  }
   async read<T>(name: string, fallback: T): Promise<T> {
-    await mkdir(this.directory, { recursive: true });
+    await this.ensureDirectory();
     try {
       return JSON.parse(await readFile(join(this.directory, name), 'utf8')) as T;
     } catch (error) {
@@ -16,12 +22,25 @@ export class Store {
   write(name: string, data: unknown) {
     const content = JSON.stringify(data, null, 2);
     const work = this.queue.then(async () => {
-      await mkdir(this.directory, { recursive: true });
+      await this.ensureDirectory();
       const tmp = join(this.directory, `${name}.tmp`);
       await writeFile(tmp, content, { mode: 0o600 });
       await rename(tmp, join(this.directory, name));
     });
     this.queue = work.catch(() => {});
+    return work;
+  }
+  /** Moves an unusable file aside so it can be inspected; returns the new name. */
+  quarantine(name: string, now = new Date()) {
+    const target = `${name}.invalid-${now.toISOString().replace(/[:.]/g, '-')}`;
+    const work = this.queue.then(async () => {
+      await rename(join(this.directory, name), join(this.directory, target));
+      return target;
+    });
+    this.queue = work.then(
+      () => {},
+      () => {},
+    );
     return work;
   }
 }
@@ -43,7 +62,7 @@ export class Budget {
   }
   counts(now = Date.now()) {
     // Sliding 24h window: never assume the provider's reset timezone.
-    const recent = this.state.reservations.filter((r) => r.at > now - 86400000);
+    const recent = this.state.reservations.filter((r) => r.at > now - DAY_MS);
     const apis = primQuotas.map((quota) => {
       const calls = recent.filter((r) => r.api === quota.api);
       return { ...quota, used: calls.length, automatic: calls.filter((r) => r.automatic).length };
@@ -62,11 +81,11 @@ export class Budget {
       const counts = this.counts(now).apis.find((quota) => quota.api === api);
       if (!counts) throw new Error(`API PRIM sans quota configuré : ${api}.`);
       if (counts.used >= counts.limit || (automatic && counts.automatic >= counts.automaticLimit))
-        throw new Error(
+        throw new UnavailableError(
           `Budget PRIM atteint pour ${counts.label}. Les dernières données restent en cache.`,
         );
       const reservations = [
-        ...this.state.reservations.filter((r) => r.at > now - 86400000),
+        ...this.state.reservations.filter((r) => r.at > now - DAY_MS),
         { at: now, api, automatic },
       ];
       const next = { reservations };
