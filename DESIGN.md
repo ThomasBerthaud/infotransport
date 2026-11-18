@@ -13,10 +13,19 @@ colors:
   button-green: '#284c39'
   button-hover: '#1a3728'
   secondary-hover: '#e6e9e0'
-  line-l: '#726a9f'
-  line-u: '#a45d76'
+  line-fallback: '#595b64'
+  signal: '#a14d24'
   too-close: '#626e65'
   cancelled: '#aa2929'
+  paused: '#8a7665'
+  error-ink: '#943f36'
+  error-border: '#ae5148'
+  danger: '#9f4b3e'
+  action-ink: '#385e43'
+  add-ink: '#3f6247'
+  tag-ink: '#42624b'
+  demo-ink: '#4a583f'
+  placeholder: '#737d70'
   control-ink: '#26392e'
   control-border: '#bbc8bb'
   field-ink: '#24352a'
@@ -46,6 +55,23 @@ typography:
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: '-0.03em'
+  headline-compact:
+    fontFamily: 'Manrope Variable, sans-serif'
+    fontSize: '28px'
+    fontWeight: 700
+    letterSpacing: '-0.8px'
+  wordmark:
+    fontFamily: 'Manrope Variable, sans-serif'
+    fontSize: '19px'
+    fontWeight: 800
+    letterSpacing: '-0.5px'
+  clock:
+    fontFamily: 'Manrope Variable, sans-serif'
+    fontSize: '24px'
+    fontFeature: 'tnum'
+  settings-heading:
+    fontFamily: 'Manrope Variable, sans-serif'
+    fontSize: '19px'
   title:
     fontFamily: 'Manrope Variable, sans-serif'
     fontSize: '20px'
@@ -56,6 +82,15 @@ typography:
     fontSize: '16px'
     fontWeight: 700
     letterSpacing: '-0.3px'
+  empty-title:
+    fontFamily: 'Manrope Variable, sans-serif'
+    fontSize: '15px'
+    lineHeight: 1.5
+  line-letter:
+    fontFamily: 'Manrope Variable, sans-serif'
+    fontSize: '17px'
+    fontWeight: 750
+    lineHeight: 1
   body:
     fontFamily: 'Manrope Variable, sans-serif'
     fontSize: '12px'
@@ -65,6 +100,10 @@ typography:
   wait:
     fontFamily: 'Manrope Variable, sans-serif'
     fontSize: '22px'
+    fontWeight: 700
+  wait-compact:
+    fontFamily: 'Manrope Variable, sans-serif'
+    fontSize: '19px'
     fontWeight: 700
   interface-base:
     fontFamily: 'Manrope Variable, sans-serif'
@@ -134,12 +173,20 @@ components:
     padding: '24px'
   navigation:
     textColor: '{colors.muted}'
-  line-badge-l:
-    backgroundColor: '{colors.line-l}'
+  line-badge:
+    backgroundColor: '{colors.line-fallback}'
     textColor: '#fff'
+    typography: '{typography.line-letter}'
     rounded: '{rounded.control}'
     padding: '0 7px'
     height: '30px'
+  button-text:
+    textColor: '{colors.action-ink}'
+    typography: '{typography.label}'
+    padding: '10px 8px'
+  error-box:
+    textColor: '{colors.error-ink}'
+    padding: '24px'
   api-budget:
     textColor: '{colors.budget-passages-ink}'
     typography: '{typography.budget}'
@@ -186,8 +233,10 @@ Le papier chaud et l’encre sombre accueillent un accent rouille et des verts f
 
 ### Secondary
 
-- **Lavande de ligne** (`line-l`) et **rose de ligne** (`line-u`) : badges des lignes L et U ; leur lettre reste visible.
+- **Couleurs officielles des lignes** : chaque badge reprend la couleur et la couleur de texte publiées par IDFM pour la ligne (`resources/line-colors.json`, transmises par `lineAppearance`). Sans couleur connue, le badge prend l’**ardoise de repli** (`line-fallback`) et une lettre blanche.
+- **Rouille de signalement** (`signal`, variable CSS `--signal`) : triangle de perturbation sur les blocs et dans l’encart « Infos trafic », et retard annoncé (« +2 min »). Plus sombre que la rouille de repérage, elle signale un état plutôt qu’une interaction.
 - **Rouge de suppression** (`cancelled`) : mention explicite « Supprimé ».
+- **Rouge d’erreur** (`error-ink`, `error-border`) : texte et contour des encarts d’erreur riches ; **rouge d’action destructive** (`danger`) pour les commandes de suppression de l’administration.
 - **Ambre de débordement** (`layout-warning-paper`, `layout-warning-border`, `layout-warning-ink`) : fond, contour et texte de l’avertissement de disposition dans l’administration ; son titre reprend l’ambre du budget.
 
 ### Neutral
@@ -197,6 +246,9 @@ Le papier chaud et l’encre sombre accueillent un accent rouille et des verts f
 - **Sélection de texte** (`selection-paper`, `selection-ink`) : fond rouille pâle et encre sombre, distincts du focus clavier.
 - **Contrôles et budget** (`control-*`, `field-*`, `budget-*`) : bordures de saisie, texte fonctionnel et piste de jauge ; ces nuances prolongent les neutres existants.
 - **Départ proche** (`too-close`) : atténuation des horaires et indications associées dans la vue riche.
+- **Encres vertes fonctionnelles** (`action-ink`, `add-ink`, `tag-ink`, `demo-ink`) : actions textuelles, bouton pointillé d’ajout de bloc, étiquette « Local » et bandeau de démonstration. Elles prolongent le vert de service à des contrastes adaptés à leur fond.
+- **Texte indicatif** (`placeholder`) : contenu d’exemple des champs, distinct du texte saisi.
+- **Pause** (`paused`) : témoin de suivi brun-gris hors des plages actives, accompagné de son libellé.
 - **Blanc, noir et gris épurés** (`minimal-*`) : système monochrome indépendant ; le gris atténue les départs trop proches et signale le trafic inconnu.
 
 **The Information Color Rule.** La couleur accompagne une identité ou un état ; les libellés et les formes portent aussi l’information.
@@ -210,12 +262,15 @@ Le papier chaud et l’encre sombre accueillent un accent rouille et des verts f
 
 ### Hierarchy
 
-- **Headline** : titre principal fluide, avec approche relative de −0.03em et composition équilibrée (`text-wrap: balance`) ; sur écran de 800px ou moins, taille fixe de 28px et approche de −0.8px.
+- **Headline** : titre principal fluide, avec approche relative de −0.03em et composition équilibrée (`text-wrap: balance`) ; sur écran de 800px ou moins, il passe au **headline-compact**.
+- **Wordmark** : nom « InfoTransport » de l’en-tête, la graisse la plus forte du système.
+- **Clock** : horloge de l’introduction, à chiffres tabulaires.
 - **Title** : gare ; descend à 18px sur petit écran.
-- **Section** : titres latéraux, rubriques et éditeurs.
+- **Section** : titres latéraux, rubriques et éditeurs ; les titres de sections de réglages utilisent **settings-heading**.
+- **Empty title** : titre d’un état vide, comme « Aucune perturbation signalée ».
 - **Body** : lignes de tableau et texte d’incident ; les paragraphes du carrousel d’incident utilisent une hauteur de ligne de 1.8 et une largeur maximale de 70ch. Les descriptions d’administration utilisent 1.8 et une largeur maximale de 65ch, après application de la dernière règle de la feuille de style.
 - **Label** : aides contextuelles et métadonnées à 11px ; les libellés des champs utilisent le corps de 12px / 1.5 ; les aides des champs, groupes de réglages et exceptions utilisent une hauteur de ligne de 1.7 ; les métadonnées secondaires et détails de suggestions utilisent également 11px dans les interfaces riches.
-- **Wait** : attente riche ; descend à 19px sur petit écran. L’heure de départ est de 16px puis 14px.
+- **Wait** : attente riche ; passe au **wait-compact** sur petit écran. L’heure de départ est de 16px puis 14px.
 - **Budget** : consommation à 38px / 1.2, graisse 650 et chiffres tabulaires ; plafond à 18px, graisse 400. Le titre de chaque API reste à 13px / 1.6.
 - **Minimal** : station à 1.45em, direction à 1.2em / 1.3, attente à 2.7em / 1.15, heure à 1.15em ; unité minute à 0.34em de l’attente.
 
@@ -269,11 +324,11 @@ Liens de 13px avec hauteur minimale de 44px et texte secondaire au repos, encre 
 
 ### Line badges
 
-Lettre blanche dans un rectangle coloré compact, hauteur de 30px et lettre de 17px ; variante de 23px dans les incidents. La vue épurée remplace le fond coloré par un contour monochrome et garde la lettre.
+Lettre dans un rectangle compact aux couleurs officielles de la ligne, hauteur de 30px et lettre **line-letter** ; variante de 23px dans les incidents. La couleur du texte suit celle publiée par IDFM, par exemple une lettre noire sur le mauve clair de la ligne L. La vue épurée remplace le fond coloré par un contour monochrome et garde la lettre.
 
 ### Traffic carousel
 
-L’encart « Infos trafic » montre une seule information par position de défilement horizontal. Le défilement natif utilise un ancrage obligatoire sur chaque diapositive et ne change jamais automatiquement de message. L’indicateur SVG et les badges de lignes précèdent une zone de détail haute de 150px, défilable verticalement : titre complet, texte, période et lien source restent consultables. Le titre fait 14px avec une hauteur de ligne de 1.5 ; le texte conserve le corps de 12px, avec une hauteur de ligne de 1.8. Les libellés longs reviennent à la ligne.
+L’encart « Infos trafic » montre une seule information par position de défilement horizontal. Le défilement natif utilise un ancrage obligatoire sur chaque diapositive et ne change jamais automatiquement de message. L’indicateur SVG et les badges de lignes partagent leur rangée avec l’échéance, alignée à droite en 11px, graisse 650 et chiffres tabulaires : « Jusqu’à 23:00 », « Jusqu’à demain 02:13 », « Jusqu’au ven. 27 nov., 03:00 », « Jusqu’à nouvel ordre » ou « En cours ». Elle reste visible sans défilement et revient à la ligne si la colonne est étroite. Le titre omet le préfixe de ligne déjà porté par le badge et sépare les gares par un tiret demi-cadratin. Une zone de détail haute de 150px, défilable verticalement, contient le titre complet, le texte et le lien source. L’en-tête compte les perturbations « en cours ». Le titre fait 14px avec une hauteur de ligne de 1.5 ; le texte conserve le corps de 12px, avec une hauteur de ligne de 1.8. Les libellés longs reviennent à la ligne.
 
 Avec plusieurs messages, deux boutons carrés de 44px, de petit rayon, bordés et transparents permettent de reculer ou avancer. Ils reprennent le survol vert pâle et l’opacité de désactivation existants ; les chevrons sont en SVG. Un compteur de 11px à chiffres tabulaires annonce la position courante. Ces commandes disparaissent pour un seul message. Les diapositives non affichées sont inertes pour ne pas exposer leurs liens au parcours clavier. La région et ses détails sont nommés et accessibles au clavier : flèches gauche/droite pour changer de message, défilement vertical pour lire le détail. Les focus de ces régions sont décalés vers l’intérieur de 3px. La source demeure hors de la zone défilante.
 
@@ -287,7 +342,7 @@ Les sections techniques et exceptions repliables offrent 12px de retrait vertica
 
 ### Budget PRIM
 
-Chaque API dispose de son groupe sur le fond neutre de la page, sans aplat coloré : lavande pour les chiffres et repères des prochains passages, bleu pétrole pour ceux des messages. Le titre, la consommation et le filet supérieur de 2px reprennent l’encre de la catégorie ; les libellés secondaires restent teintés dans la même famille. Les groupes ont 20px de marge supérieure, 18px de retrait en haut et 4px en bas, sans retrait latéral ni angles arrondis. Les budgets conservent l’aspect épuré du site ; la couleur se limite aux textes, filets et jauges. Aucun effet d’ombre n’est ajouté.
+Chaque API dispose de son groupe sur le fond neutre de la page, sans aplat coloré : lavande pour les chiffres et repères des prochains passages, bleu pétrole pour ceux des messages info trafic. Le titre, la consommation et le filet supérieur de 2px reprennent l’encre de la catégorie ; les libellés secondaires restent teintés dans la même famille. Les groupes ont 20px de marge supérieure, 18px de retrait en haut et 4px en bas, sans retrait latéral ni angles arrondis. Les budgets conservent l’aspect épuré du site ; la couleur se limite aux textes, filets et jauges. Aucun effet d’ombre n’est ajouté.
 
 La consommation et son plafond précèdent une jauge native `meter` de 6px de haut, sans rayon ni bordure. Le pourcentage utilisé et le nombre d’appels restants sont indiqués en texte, puis un filet sépare l’estimation et la limite automatique. La jauge et son libellé passent à l’ambre à partir de 80 % (« Consommation élevée »), puis au rouge à partir de 90 % (« Quota presque atteint ») et jusqu’à épuisement (« Quota atteint »). Les couleurs de catégorie restent sur les titres et les compteurs ; la couleur d’alerte désigne la consommation. Les indications peuvent revenir à la ligne sur petit écran.
 

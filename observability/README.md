@@ -9,7 +9,7 @@ le **Grafana standalone existant**. Aucun conteneur Grafana supplémentaire.
 - Disponibilité de `/metrics` et temps de fonctionnement du processus.
 - CPU Node.js (100 % = un cœur), RAM résidente, heap utilisé/alloué et retard de la boucle événementielle.
 - Requêtes HTTP par seconde et par route, statuts, erreurs 4xx/5xx, requêtes en cours et latences p50/p95/p99.
-- Quotas PRIM par API (`stop-monitoring`, `general-message`) : appels utilisés,
+- Quotas PRIM par API (`stop-monitoring`, `line-reports`) : appels utilisés,
   pourcentage consommé, limites et appels restants, avec budget automatique distinct.
 
 CPU et RAM concernent le processus applicatif, pas toute la machine ni les autres

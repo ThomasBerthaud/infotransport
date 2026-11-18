@@ -28,9 +28,7 @@ const block = (id: string, stop: string, line: string): Block => ({
   overrides: {},
 });
 const emptyStop = { Siri: { ServiceDelivery: { StopMonitoringDelivery: [{ Status: true }] } } };
-const emptyTraffic = {
-  Siri: { ServiceDelivery: { GeneralMessageDelivery: [{ Status: true, InfoMessage: [] }] } },
-};
+const emptyTraffic = { disruptions: [], line_reports: [] };
 const allDay = (blocks: Block[]) => {
   const c = structuredClone(initialConfig);
   c.defaults.start = c.defaults.end = '00:00';

@@ -134,7 +134,7 @@ De 22 h à 5 h par défaut, les horaires sont masqués et les appels suspendus. 
 
 ## Budget, cache et pannes
 
-- Deux quotas indépendants de **1 000 appels par API sur 24 heures glissantes** : prochains passages (requête unitaire, `stop-monitoring`) et messages affichés sur les écrans (`general-message`). Les autres API du compte ne sont pas utilisées et leurs quotas ne sont pas mutualisés.
+- Deux quotas indépendants de **1 000 appels par API sur 24 heures glissantes** : prochains passages (requête unitaire, `stop-monitoring`) et messages info trafic par ligne (`line-reports`, API Navitia v2). Les autres API du compte ne sont pas utilisées et leurs quotas ne sont pas mutualisés.
 - Collecte automatique limitée à **900 par API**. La découverte manuelle des directions consomme le quota des passages. L’estimation et la validation des réglages vérifient chaque API séparément.
 - Les compteurs locaux conservent les réservations existantes et ne connaissent pas les appels faits par d’autres applications avec le même compte PRIM. La fenêtre glissante reste prudente, sans supposer le fuseau de remise à zéro du fournisseur.
 - Réservation persistée avant chaque appel, même s'il échoue. Requêtes sérialisées, timeout, prise en compte des limitations HTTP 429 et attente entre nouvelles tentatives.
@@ -222,7 +222,7 @@ Comme le reste de l’application, cet endpoint est destiné à un réseau local
 
 ## Contrats API fournis
 
-Les contrats Swagger sont conservés dans `docs/api/departures.swagger.json` (prochains passages) et `docs/api/traffic.swagger.json` (informations trafic). Les requêtes et leur en-tête sont vérifiés contre ces fichiers par un test. Leurs schémas de réponse se limitent à un objet générique ; le décodage SIRI est donc couvert séparément par des réponses représentatives, et reste à vérifier avec les données réelles du compte.
+Les contrats Swagger sont conservés dans `docs/api/departures.swagger.json` (prochains passages) et `docs/api/line-reports.swagger.json` (informations trafic, API Navitia `idfm-navitia-line_reports-v2`, extrait limité aux objets lus). Les requêtes et leur en-tête sont vérifiés contre ces fichiers par un test. Leurs schémas de réponse se limitent à un objet générique ; les décodages SIRI et Navitia sont donc couverts séparément par des réponses représentatives, et restent à vérifier avec les données réelles du compte.
 
 ## Références
 

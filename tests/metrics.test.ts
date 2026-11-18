@@ -15,7 +15,7 @@ test('metrics expose persisted sliding quotas and bounded HTTP labels without co
     reservations: [
       { api: 'stop-monitoring', automatic: true, at: now },
       { api: 'stop-monitoring', automatic: false, at: now },
-      { api: 'general-message', automatic: true, at: now - 86400001 },
+      { api: 'line-reports', automatic: true, at: now - 86400001 },
     ],
   });
   const budget = new Budget(
@@ -42,9 +42,9 @@ test('metrics expose persisted sliding quotas and bounded HTTP labels without co
       const body = await response.text();
       assert.match(body, /infotransport_prim_quota_used\{api="stop-monitoring"\} 2/);
       assert.match(body, /infotransport_prim_quota_automatic_used\{api="stop-monitoring"\} 1/);
-      assert.match(body, /infotransport_prim_quota_used\{api="general-message"\} 0/);
-      assert.match(body, /infotransport_prim_quota_limit\{api="general-message"\} 1000/);
-      assert.match(body, /infotransport_prim_quota_automatic_limit\{api="general-message"\} 900/);
+      assert.match(body, /infotransport_prim_quota_used\{api="line-reports"\} 0/);
+      assert.match(body, /infotransport_prim_quota_limit\{api="line-reports"\} 1000/);
+      assert.match(body, /infotransport_prim_quota_automatic_limit\{api="line-reports"\} 900/);
       assert.match(
         body,
         /infotransport_http_requests_total\{method="GET",route="\/api\/stops",status_code="400"\} 1/,
@@ -64,10 +64,10 @@ test('metrics expose persisted sliding quotas and bounded HTTP labels without co
     }
     assert.deepEqual(budget.counts(), before);
     // Collect-time gauges reflect new reservations rather than a cached startup snapshot.
-    await budget.reserve('general-message', true);
+    await budget.reserve('line-reports', true);
     assert.match(
       await metrics.registry.metrics(),
-      /infotransport_prim_quota_used\{api="general-message"\} 1/,
+      /infotransport_prim_quota_used\{api="line-reports"\} 1/,
     );
   } finally {
     server.closeAllConnections();

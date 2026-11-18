@@ -1,0 +1,447 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Calculateur Île-de-France Mobilités – Messages Info Trafic (v2)",
+    "version": "1.0.1",
+    "description": "Extrait du contrat PRIM idfm-navitia-line_reports-v2 : chemins complets, définitions limitées aux objets lus par InfoTransport."
+  },
+  "host": "prim.iledefrance-mobilites.fr",
+  "basePath": "/marketplace/v2/navitia/line_reports",
+  "schemes": ["https"],
+  "securityDefinitions": {
+    "APIKeyHeader": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "apikey"
+    }
+  },
+  "security": {
+    "APIKeyHeader": []
+  },
+  "paths": {
+    "/line_reports": {
+      "get": {
+        "description": "",
+        "operationId": "get_coverage__region__line_reports",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "description": "The depth of your object",
+            "format": "int32",
+            "required": false,
+            "in": "query",
+            "name": "depth",
+            "type": "integer"
+          },
+          {
+            "description": "Number of objects per page",
+            "format": "int32",
+            "required": false,
+            "in": "query",
+            "name": "count",
+            "type": "integer"
+          },
+          {
+            "description": "The current page",
+            "format": "int32",
+            "required": false,
+            "in": "query",
+            "name": "start_page",
+            "type": "integer"
+          },
+          {
+            "description": "forbidden uris",
+            "required": false,
+            "items": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "forbidden_uris[]",
+            "type": "array"
+          },
+          {
+            "description": "remove geojson from the response",
+            "required": false,
+            "in": "query",
+            "name": "disable_geojson",
+            "type": "boolean"
+          },
+          {
+            "description": "use disruptions valid after this date",
+            "required": false,
+            "in": "query",
+            "name": "since",
+            "type": "string"
+          },
+          {
+            "description": "use disruptions valid before this date",
+            "required": false,
+            "in": "query",
+            "name": "until",
+            "type": "string"
+          },
+          {
+            "description": "If filled, will restrain the search within the given disruption tags",
+            "required": false,
+            "items": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "tags[]",
+            "type": "array"
+          },
+          {
+            "description": "if filled, will traduce disruptions. French by default",
+            "required": false,
+            "in": "query",
+            "name": "language",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/{uri}/line_reports": {
+      "get": {
+        "description": "",
+        "operationId": "get_coverage__region__uri__line_reports",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "description": "The depth of your object",
+            "format": "int32",
+            "required": false,
+            "in": "query",
+            "name": "depth",
+            "type": "integer"
+          },
+          {
+            "description": "Number of objects per page",
+            "format": "int32",
+            "required": false,
+            "in": "query",
+            "name": "count",
+            "type": "integer"
+          },
+          {
+            "description": "The current page",
+            "format": "int32",
+            "required": false,
+            "in": "query",
+            "name": "start_page",
+            "type": "integer"
+          },
+          {
+            "description": "forbidden uris",
+            "required": false,
+            "items": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "forbidden_uris[]",
+            "type": "array"
+          },
+          {
+            "description": "remove geojson from the response",
+            "required": false,
+            "in": "query",
+            "name": "disable_geojson",
+            "type": "boolean"
+          },
+          {
+            "description": "use disruptions valid after this date",
+            "required": false,
+            "in": "query",
+            "name": "since",
+            "type": "string"
+          },
+          {
+            "description": "use disruptions valid before this date",
+            "required": false,
+            "in": "query",
+            "name": "until",
+            "type": "string"
+          },
+          {
+            "description": "If filled, will restrain the search within the given disruption tags",
+            "required": false,
+            "items": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "tags[]",
+            "type": "array"
+          },
+          {
+            "description": "if filled, will traduce disruptions. French by default",
+            "required": false,
+            "in": "query",
+            "name": "language",
+            "type": "string"
+          },
+          {
+            "description": "First part of the uri, Ex: {uri} = lines/line:IDFM:C01374 (Metro 4) or  {uri} = physical_modes/physical_mode:RapidTransit (RER)",
+            "required": true,
+            "in": "path",
+            "name": "uri",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Disruption": {
+      "required": ["contributor", "id", "cause"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["past", "active", "future"]
+        },
+        "category": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/Severity"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "messages": {
+          "items": {
+            "$ref": "#/definitions/Message"
+          },
+          "type": "array"
+        },
+        "application_periods": {
+          "items": {
+            "$ref": "#/definitions/Period"
+          },
+          "type": "array"
+        },
+        "impact_id": {
+          "type": "string"
+        },
+        "disruption_id": {
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "navitia-date-time",
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "impacted_objects": {
+          "items": {
+            "$ref": "#/definitions/Impacted"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "disruption_uri": {
+          "type": "string"
+        },
+        "contributor": {
+          "type": "string"
+        },
+        "cause": {
+          "type": "string"
+        },
+        "properties": {
+          "items": {
+            "$ref": "#/definitions/DisruptionProperty"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "Message": {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "channel": {
+          "$ref": "#/definitions/Channel"
+        }
+      },
+      "type": "object"
+    },
+    "Channel": {
+      "required": ["id", "content_type", "name"],
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "types": {
+          "items": {
+            "type": "string",
+            "enum": [
+              "web",
+              "sms",
+              "email",
+              "mobile",
+              "notification",
+              "twitter",
+              "facebook",
+              "unknown_type",
+              "title",
+              "beacon"
+            ]
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Period": {
+      "properties": {
+        "begin": {
+          "format": "navitia-date-time",
+          "type": "string"
+        },
+        "end": {
+          "format": "navitia-date-time",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Impacted": {
+      "properties": {
+        "impacted_stops": {
+          "items": {
+            "$ref": "#/definitions/ImpactedStop"
+          },
+          "type": "array"
+        },
+        "pt_object": {
+          "$ref": "#/definitions/PtObject"
+        },
+        "impacted_section": {
+          "$ref": "#/definitions/ImpactedSection"
+        }
+      },
+      "type": "object"
+    },
+    "ImpactedSection": {
+      "properties": {
+        "routes": {
+          "items": {
+            "$ref": "#/definitions/Route"
+          },
+          "type": "array"
+        },
+        "to": {
+          "$ref": "#/definitions/PtObject"
+        },
+        "from": {
+          "$ref": "#/definitions/PtObject"
+        }
+      },
+      "type": "object"
+    },
+    "Severity": {
+      "properties": {
+        "color": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "NO_SERVICE",
+            "REDUCED_SERVICE",
+            "SIGNIFICANT_DELAYS",
+            "DETOUR",
+            "ADDITIONAL_SERVICE",
+            "MODIFIED_SERVICE",
+            "OTHER_EFFECT",
+            "UNKNOWN_EFFECT",
+            "STOP_MOVED"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "Pagination": {
+      "required": ["items_per_page", "items_on_page", "start_page", "total_result"],
+      "properties": {
+        "start_page": {
+          "type": "integer"
+        },
+        "items_on_page": {
+          "type": "integer"
+        },
+        "items_per_page": {
+          "type": "integer"
+        },
+        "total_result": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "LineReport": {
+      "required": ["pt_objects"],
+      "properties": {
+        "line": {
+          "$ref": "#/definitions/Line"
+        },
+        "pt_objects": {
+          "items": {
+            "$ref": "#/definitions/PtObject"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "DisruptionProperty": {
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

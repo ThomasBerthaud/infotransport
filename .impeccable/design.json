@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-28T09:41:25.156620+00:00",
+  "generatedAt": "2026-11-18T21:29:51.655093+00:00",
   "title": "Design System: InfoTransport",
   "extensions": {
     "colorMeta": {
@@ -9,14 +9,14 @@
         "displayName": "Encre sombre",
         "canonical": "#202a2b",
         "tonalRamp": [
-          "oklch(15.00% 0.01401 203.89)",
-          "oklch(26.43% 0.01401 203.89)",
-          "oklch(37.86% 0.01401 203.89)",
-          "oklch(49.29% 0.01401 203.89)",
-          "oklch(60.71% 0.01401 203.89)",
-          "oklch(72.14% 0.01401 203.89)",
-          "oklch(83.57% 0.01401 203.89)",
-          "oklch(95.00% 0.01401 203.89)"
+          "oklch(15.00% 0.00789 203.89)",
+          "oklch(26.43% 0.00964 203.89)",
+          "oklch(37.86% 0.01139 203.89)",
+          "oklch(49.29% 0.01313 203.89)",
+          "oklch(60.71% 0.01313 203.89)",
+          "oklch(72.14% 0.01139 203.89)",
+          "oklch(83.57% 0.00964 203.89)",
+          "oklch(95.00% 0.00789 203.89)"
         ]
       },
       "paper": {
@@ -24,29 +24,29 @@
         "displayName": "Papier chaud",
         "canonical": "#f6f5f1",
         "tonalRamp": [
-          "oklch(15.00% 0.00541 95.10)",
-          "oklch(26.43% 0.00541 95.10)",
-          "oklch(37.86% 0.00541 95.10)",
-          "oklch(49.29% 0.00541 95.10)",
-          "oklch(60.71% 0.00541 95.10)",
-          "oklch(72.14% 0.00541 95.10)",
-          "oklch(83.57% 0.00541 95.10)",
-          "oklch(95.00% 0.00541 95.10)"
+          "oklch(15.00% 0.00305 95.10)",
+          "oklch(26.43% 0.00372 95.10)",
+          "oklch(37.86% 0.00440 95.10)",
+          "oklch(49.29% 0.00507 95.10)",
+          "oklch(60.71% 0.00507 95.10)",
+          "oklch(72.14% 0.00440 95.10)",
+          "oklch(83.57% 0.00372 95.10)",
+          "oklch(95.00% 0.00305 95.10)"
         ]
       },
       "surface": {
         "role": "neutral",
-        "displayName": "Surface claire",
+        "displayName": "Surface de bloc",
         "canonical": "#fbfaf7",
         "tonalRamp": [
-          "oklch(15.00% 0.00411 91.45)",
-          "oklch(26.43% 0.00411 91.45)",
-          "oklch(37.86% 0.00411 91.45)",
-          "oklch(49.29% 0.00411 91.45)",
-          "oklch(60.71% 0.00411 91.45)",
-          "oklch(72.14% 0.00411 91.45)",
-          "oklch(83.57% 0.00411 91.45)",
-          "oklch(95.00% 0.00411 91.45)"
+          "oklch(15.00% 0.00231 91.45)",
+          "oklch(26.43% 0.00283 91.45)",
+          "oklch(37.86% 0.00334 91.45)",
+          "oklch(49.29% 0.00385 91.45)",
+          "oklch(60.71% 0.00385 91.45)",
+          "oklch(72.14% 0.00334 91.45)",
+          "oklch(83.57% 0.00283 91.45)",
+          "oklch(95.00% 0.00231 91.45)"
         ]
       },
       "field": {
@@ -54,14 +54,14 @@
         "displayName": "Fond de champ",
         "canonical": "#fffefa",
         "tonalRamp": [
-          "oklch(15.00% 0.00537 95.10)",
-          "oklch(26.43% 0.00537 95.10)",
-          "oklch(37.86% 0.00537 95.10)",
-          "oklch(49.29% 0.00537 95.10)",
-          "oklch(60.71% 0.00537 95.10)",
-          "oklch(72.14% 0.00537 95.10)",
-          "oklch(83.57% 0.00537 95.10)",
-          "oklch(95.00% 0.00537 95.10)"
+          "oklch(15.00% 0.00303 95.10)",
+          "oklch(26.43% 0.00370 95.10)",
+          "oklch(37.86% 0.00437 95.10)",
+          "oklch(49.29% 0.00504 95.10)",
+          "oklch(60.71% 0.00504 95.10)",
+          "oklch(72.14% 0.00437 95.10)",
+          "oklch(83.57% 0.00370 95.10)",
+          "oklch(95.00% 0.00303 95.10)"
         ]
       },
       "muted": {
@@ -69,29 +69,29 @@
         "displayName": "Texte secondaire",
         "canonical": "#626d6a",
         "tonalRamp": [
-          "oklch(15.00% 0.01415 177.59)",
-          "oklch(26.43% 0.01415 177.59)",
-          "oklch(37.86% 0.01415 177.59)",
-          "oklch(49.29% 0.01415 177.59)",
-          "oklch(60.71% 0.01415 177.59)",
-          "oklch(72.14% 0.01415 177.59)",
-          "oklch(83.57% 0.01415 177.59)",
-          "oklch(95.00% 0.01415 177.59)"
+          "oklch(15.00% 0.00798 177.59)",
+          "oklch(26.43% 0.00974 177.59)",
+          "oklch(37.86% 0.01151 177.59)",
+          "oklch(49.29% 0.01327 177.59)",
+          "oklch(60.71% 0.01327 177.59)",
+          "oklch(72.14% 0.01151 177.59)",
+          "oklch(83.57% 0.00974 177.59)",
+          "oklch(95.00% 0.00798 177.59)"
         ]
       },
       "line": {
         "role": "neutral",
-        "displayName": "Filet gris-vert",
+        "displayName": "Filet",
         "canonical": "#d9ded7",
         "tonalRamp": [
-          "oklch(15.00% 0.01085 136.56)",
-          "oklch(26.43% 0.01085 136.56)",
-          "oklch(37.86% 0.01085 136.56)",
-          "oklch(49.29% 0.01085 136.56)",
-          "oklch(60.71% 0.01085 136.56)",
-          "oklch(72.14% 0.01085 136.56)",
-          "oklch(83.57% 0.01085 136.56)",
-          "oklch(95.00% 0.01085 136.56)"
+          "oklch(15.00% 0.00612 136.56)",
+          "oklch(26.43% 0.00747 136.56)",
+          "oklch(37.86% 0.00882 136.56)",
+          "oklch(49.29% 0.01017 136.56)",
+          "oklch(60.71% 0.01017 136.56)",
+          "oklch(72.14% 0.00882 136.56)",
+          "oklch(83.57% 0.00747 136.56)",
+          "oklch(95.00% 0.00612 136.56)"
         ]
       },
       "accent": {
@@ -99,14 +99,14 @@
         "displayName": "Rouille de repérage",
         "canonical": "#b94c23",
         "tonalRamp": [
-          "oklch(15.00% 0.15104 39.61)",
-          "oklch(26.43% 0.15104 39.61)",
-          "oklch(37.86% 0.15104 39.61)",
-          "oklch(49.29% 0.15104 39.61)",
-          "oklch(60.71% 0.15104 39.61)",
-          "oklch(72.14% 0.15104 39.61)",
-          "oklch(83.57% 0.15104 39.61)",
-          "oklch(95.00% 0.15104 39.61)"
+          "oklch(15.00% 0.08513 39.61)",
+          "oklch(26.43% 0.10396 39.61)",
+          "oklch(37.86% 0.12279 39.61)",
+          "oklch(49.29% 0.14162 39.61)",
+          "oklch(60.71% 0.14162 39.61)",
+          "oklch(72.14% 0.12279 39.61)",
+          "oklch(83.57% 0.10396 39.61)",
+          "oklch(95.00% 0.08513 39.61)"
         ]
       },
       "green": {
@@ -114,14 +114,14 @@
         "displayName": "Vert de service",
         "canonical": "#32674f",
         "tonalRamp": [
-          "oklch(15.00% 0.06965 162.45)",
-          "oklch(26.43% 0.06965 162.45)",
-          "oklch(37.86% 0.06965 162.45)",
-          "oklch(49.29% 0.06965 162.45)",
-          "oklch(60.71% 0.06965 162.45)",
-          "oklch(72.14% 0.06965 162.45)",
-          "oklch(83.57% 0.06965 162.45)",
-          "oklch(95.00% 0.06965 162.45)"
+          "oklch(15.00% 0.03926 162.45)",
+          "oklch(26.43% 0.04794 162.45)",
+          "oklch(37.86% 0.05662 162.45)",
+          "oklch(49.29% 0.06531 162.45)",
+          "oklch(60.71% 0.06531 162.45)",
+          "oklch(72.14% 0.05662 162.45)",
+          "oklch(83.57% 0.04794 162.45)",
+          "oklch(95.00% 0.03926 162.45)"
         ]
       },
       "button-green": {
@@ -129,74 +129,74 @@
         "displayName": "Vert bouton",
         "canonical": "#284c39",
         "tonalRamp": [
-          "oklch(15.00% 0.05336 159.42)",
-          "oklch(26.43% 0.05336 159.42)",
-          "oklch(37.86% 0.05336 159.42)",
-          "oklch(49.29% 0.05336 159.42)",
-          "oklch(60.71% 0.05336 159.42)",
-          "oklch(72.14% 0.05336 159.42)",
-          "oklch(83.57% 0.05336 159.42)",
-          "oklch(95.00% 0.05336 159.42)"
+          "oklch(15.00% 0.03008 159.42)",
+          "oklch(26.43% 0.03673 159.42)",
+          "oklch(37.86% 0.04338 159.42)",
+          "oklch(49.29% 0.05003 159.42)",
+          "oklch(60.71% 0.05003 159.42)",
+          "oklch(72.14% 0.04338 159.42)",
+          "oklch(83.57% 0.03673 159.42)",
+          "oklch(95.00% 0.03008 159.42)"
         ]
       },
       "button-hover": {
         "role": "primary",
-        "displayName": "Vert bouton au survol",
+        "displayName": "Vert bouton survolé",
         "canonical": "#1a3728",
         "tonalRamp": [
-          "oklch(15.00% 0.04476 159.65)",
-          "oklch(26.43% 0.04476 159.65)",
-          "oklch(37.86% 0.04476 159.65)",
-          "oklch(49.29% 0.04476 159.65)",
-          "oklch(60.71% 0.04476 159.65)",
-          "oklch(72.14% 0.04476 159.65)",
-          "oklch(83.57% 0.04476 159.65)",
-          "oklch(95.00% 0.04476 159.65)"
+          "oklch(15.00% 0.02523 159.65)",
+          "oklch(26.43% 0.03081 159.65)",
+          "oklch(37.86% 0.03639 159.65)",
+          "oklch(49.29% 0.04197 159.65)",
+          "oklch(60.71% 0.04197 159.65)",
+          "oklch(72.14% 0.03639 159.65)",
+          "oklch(83.57% 0.03081 159.65)",
+          "oklch(95.00% 0.02523 159.65)"
         ]
       },
       "secondary-hover": {
         "role": "neutral",
-        "displayName": "Vert pâle de survol",
+        "displayName": "Survol secondaire",
         "canonical": "#e6e9e0",
         "tonalRamp": [
-          "oklch(15.00% 0.01241 121.71)",
-          "oklch(26.43% 0.01241 121.71)",
-          "oklch(37.86% 0.01241 121.71)",
-          "oklch(49.29% 0.01241 121.71)",
-          "oklch(60.71% 0.01241 121.71)",
-          "oklch(72.14% 0.01241 121.71)",
-          "oklch(83.57% 0.01241 121.71)",
-          "oklch(95.00% 0.01241 121.71)"
+          "oklch(15.00% 0.00700 121.71)",
+          "oklch(26.43% 0.00854 121.71)",
+          "oklch(37.86% 0.01009 121.71)",
+          "oklch(49.29% 0.01164 121.71)",
+          "oklch(60.71% 0.01164 121.71)",
+          "oklch(72.14% 0.01009 121.71)",
+          "oklch(83.57% 0.00854 121.71)",
+          "oklch(95.00% 0.00700 121.71)"
         ]
       },
-      "line-l": {
+      "line-fallback": {
         "role": "secondary",
-        "displayName": "Lavande de ligne",
-        "canonical": "#726a9f",
+        "displayName": "Ardoise de repli",
+        "canonical": "#595b64",
         "tonalRamp": [
-          "oklch(15.00% 0.08160 290.39)",
-          "oklch(26.43% 0.08160 290.39)",
-          "oklch(37.86% 0.08160 290.39)",
-          "oklch(49.29% 0.08160 290.39)",
-          "oklch(60.71% 0.08160 290.39)",
-          "oklch(72.14% 0.08160 290.39)",
-          "oklch(83.57% 0.08160 290.39)",
-          "oklch(95.00% 0.08160 290.39)"
+          "oklch(15.00% 0.00826 275.84)",
+          "oklch(26.43% 0.01009 275.84)",
+          "oklch(37.86% 0.01191 275.84)",
+          "oklch(49.29% 0.01374 275.84)",
+          "oklch(60.71% 0.01374 275.84)",
+          "oklch(72.14% 0.01191 275.84)",
+          "oklch(83.57% 0.01009 275.84)",
+          "oklch(95.00% 0.00826 275.84)"
         ]
       },
-      "line-u": {
+      "signal": {
         "role": "secondary",
-        "displayName": "Rose de ligne",
-        "canonical": "#a45d76",
+        "displayName": "Rouille de signalement",
+        "canonical": "#a14d24",
         "tonalRamp": [
-          "oklch(15.00% 0.09713 358.13)",
-          "oklch(26.43% 0.09713 358.13)",
-          "oklch(37.86% 0.09713 358.13)",
-          "oklch(49.29% 0.09713 358.13)",
-          "oklch(60.71% 0.09713 358.13)",
-          "oklch(72.14% 0.09713 358.13)",
-          "oklch(83.57% 0.09713 358.13)",
-          "oklch(95.00% 0.09713 358.13)"
+          "oklch(15.00% 0.06977 44.42)",
+          "oklch(26.43% 0.08520 44.42)",
+          "oklch(37.86% 0.10064 44.42)",
+          "oklch(49.29% 0.11607 44.42)",
+          "oklch(60.71% 0.11607 44.42)",
+          "oklch(72.14% 0.10064 44.42)",
+          "oklch(83.57% 0.08520 44.42)",
+          "oklch(95.00% 0.06977 44.42)"
         ]
       },
       "too-close": {
@@ -204,14 +204,14 @@
         "displayName": "Départ proche",
         "canonical": "#626e65",
         "tonalRamp": [
-          "oklch(15.00% 0.02013 153.21)",
-          "oklch(26.43% 0.02013 153.21)",
-          "oklch(37.86% 0.02013 153.21)",
-          "oklch(49.29% 0.02013 153.21)",
-          "oklch(60.71% 0.02013 153.21)",
-          "oklch(72.14% 0.02013 153.21)",
-          "oklch(83.57% 0.02013 153.21)",
-          "oklch(95.00% 0.02013 153.21)"
+          "oklch(15.00% 0.01135 153.21)",
+          "oklch(26.43% 0.01386 153.21)",
+          "oklch(37.86% 0.01637 153.21)",
+          "oklch(49.29% 0.01888 153.21)",
+          "oklch(60.71% 0.01888 153.21)",
+          "oklch(72.14% 0.01637 153.21)",
+          "oklch(83.57% 0.01386 153.21)",
+          "oklch(95.00% 0.01135 153.21)"
         ]
       },
       "cancelled": {
@@ -219,14 +219,419 @@
         "displayName": "Rouge de suppression",
         "canonical": "#aa2929",
         "tonalRamp": [
-          "oklch(15.00% 0.16573 25.85)",
-          "oklch(26.43% 0.16573 25.85)",
-          "oklch(37.86% 0.16573 25.85)",
-          "oklch(49.29% 0.16573 25.85)",
-          "oklch(60.71% 0.16573 25.85)",
-          "oklch(72.14% 0.16573 25.85)",
-          "oklch(83.57% 0.16573 25.85)",
-          "oklch(95.00% 0.16573 25.85)"
+          "oklch(15.00% 0.09341 25.85)",
+          "oklch(26.43% 0.11408 25.85)",
+          "oklch(37.86% 0.13474 25.85)",
+          "oklch(49.29% 0.15540 25.85)",
+          "oklch(60.71% 0.15540 25.85)",
+          "oklch(72.14% 0.13474 25.85)",
+          "oklch(83.57% 0.11408 25.85)",
+          "oklch(95.00% 0.09341 25.85)"
+        ]
+      },
+      "paused": {
+        "role": "neutral",
+        "displayName": "Pause",
+        "canonical": "#8a7665",
+        "tonalRamp": [
+          "oklch(15.00% 0.02000 62.41)",
+          "oklch(26.43% 0.02443 62.41)",
+          "oklch(37.86% 0.02885 62.41)",
+          "oklch(49.29% 0.03327 62.41)",
+          "oklch(60.71% 0.03327 62.41)",
+          "oklch(72.14% 0.02885 62.41)",
+          "oklch(83.57% 0.02443 62.41)",
+          "oklch(95.00% 0.02000 62.41)"
+        ]
+      },
+      "error-ink": {
+        "role": "secondary",
+        "displayName": "Encre d’erreur",
+        "canonical": "#943f36",
+        "tonalRamp": [
+          "oklch(15.00% 0.06580 28.29)",
+          "oklch(26.43% 0.08035 28.29)",
+          "oklch(37.86% 0.09491 28.29)",
+          "oklch(49.29% 0.10946 28.29)",
+          "oklch(60.71% 0.10946 28.29)",
+          "oklch(72.14% 0.09491 28.29)",
+          "oklch(83.57% 0.08035 28.29)",
+          "oklch(95.00% 0.06580 28.29)"
+        ]
+      },
+      "error-border": {
+        "role": "secondary",
+        "displayName": "Contour d’erreur",
+        "canonical": "#ae5148",
+        "tonalRamp": [
+          "oklch(15.00% 0.06968 27.44)",
+          "oklch(26.43% 0.08510 27.44)",
+          "oklch(37.86% 0.10051 27.44)",
+          "oklch(49.29% 0.11592 27.44)",
+          "oklch(60.71% 0.11592 27.44)",
+          "oklch(72.14% 0.10051 27.44)",
+          "oklch(83.57% 0.08510 27.44)",
+          "oklch(95.00% 0.06968 27.44)"
+        ]
+      },
+      "danger": {
+        "role": "secondary",
+        "displayName": "Action destructive",
+        "canonical": "#9f4b3e",
+        "tonalRamp": [
+          "oklch(15.00% 0.06461 30.46)",
+          "oklch(26.43% 0.07890 30.46)",
+          "oklch(37.86% 0.09319 30.46)",
+          "oklch(49.29% 0.10748 30.46)",
+          "oklch(60.71% 0.10748 30.46)",
+          "oklch(72.14% 0.09319 30.46)",
+          "oklch(83.57% 0.07890 30.46)",
+          "oklch(95.00% 0.06461 30.46)"
+        ]
+      },
+      "action-ink": {
+        "role": "neutral",
+        "displayName": "Encre d’action textuelle",
+        "canonical": "#385e43",
+        "tonalRamp": [
+          "oklch(15.00% 0.03509 152.44)",
+          "oklch(26.43% 0.04286 152.44)",
+          "oklch(37.86% 0.05062 152.44)",
+          "oklch(49.29% 0.05838 152.44)",
+          "oklch(60.71% 0.05838 152.44)",
+          "oklch(72.14% 0.05062 152.44)",
+          "oklch(83.57% 0.04286 152.44)",
+          "oklch(95.00% 0.03509 152.44)"
+        ]
+      },
+      "add-ink": {
+        "role": "neutral",
+        "displayName": "Encre d’ajout",
+        "canonical": "#3f6247",
+        "tonalRamp": [
+          "oklch(15.00% 0.03364 150.72)",
+          "oklch(26.43% 0.04108 150.72)",
+          "oklch(37.86% 0.04852 150.72)",
+          "oklch(49.29% 0.05597 150.72)",
+          "oklch(60.71% 0.05597 150.72)",
+          "oklch(72.14% 0.04852 150.72)",
+          "oklch(83.57% 0.04108 150.72)",
+          "oklch(95.00% 0.03364 150.72)"
+        ]
+      },
+      "tag-ink": {
+        "role": "neutral",
+        "displayName": "Encre d’étiquette",
+        "canonical": "#42624b",
+        "tonalRamp": [
+          "oklch(15.00% 0.02981 152.79)",
+          "oklch(26.43% 0.03640 152.79)",
+          "oklch(37.86% 0.04300 152.79)",
+          "oklch(49.29% 0.04959 152.79)",
+          "oklch(60.71% 0.04959 152.79)",
+          "oklch(72.14% 0.04300 152.79)",
+          "oklch(83.57% 0.03640 152.79)",
+          "oklch(95.00% 0.02981 152.79)"
+        ]
+      },
+      "demo-ink": {
+        "role": "neutral",
+        "displayName": "Encre de démonstration",
+        "canonical": "#4a583f",
+        "tonalRamp": [
+          "oklch(15.00% 0.02440 131.78)",
+          "oklch(26.43% 0.02980 131.78)",
+          "oklch(37.86% 0.03520 131.78)",
+          "oklch(49.29% 0.04060 131.78)",
+          "oklch(60.71% 0.04060 131.78)",
+          "oklch(72.14% 0.03520 131.78)",
+          "oklch(83.57% 0.02980 131.78)",
+          "oklch(95.00% 0.02440 131.78)"
+        ]
+      },
+      "placeholder": {
+        "role": "neutral",
+        "displayName": "Texte indicatif",
+        "canonical": "#737d70",
+        "tonalRamp": [
+          "oklch(15.00% 0.01289 138.46)",
+          "oklch(26.43% 0.01574 138.46)",
+          "oklch(37.86% 0.01859 138.46)",
+          "oklch(49.29% 0.02144 138.46)",
+          "oklch(60.71% 0.02144 138.46)",
+          "oklch(72.14% 0.01859 138.46)",
+          "oklch(83.57% 0.01574 138.46)",
+          "oklch(95.00% 0.01289 138.46)"
+        ]
+      },
+      "control-ink": {
+        "role": "neutral",
+        "displayName": "Encre des contrôles",
+        "canonical": "#26392e",
+        "tonalRamp": [
+          "oklch(15.00% 0.01771 158.66)",
+          "oklch(26.43% 0.02162 158.66)",
+          "oklch(37.86% 0.02554 158.66)",
+          "oklch(49.29% 0.02946 158.66)",
+          "oklch(60.71% 0.02946 158.66)",
+          "oklch(72.14% 0.02554 158.66)",
+          "oklch(83.57% 0.02162 158.66)",
+          "oklch(95.00% 0.01771 158.66)"
+        ]
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Bordure des contrôles",
+        "canonical": "#bbc8bb",
+        "tonalRamp": [
+          "oklch(15.00% 0.01289 145.36)",
+          "oklch(26.43% 0.01574 145.36)",
+          "oklch(37.86% 0.01860 145.36)",
+          "oklch(49.29% 0.02145 145.36)",
+          "oklch(60.71% 0.02145 145.36)",
+          "oklch(72.14% 0.01860 145.36)",
+          "oklch(83.57% 0.01574 145.36)",
+          "oklch(95.00% 0.01289 145.36)"
+        ]
+      },
+      "field-ink": {
+        "role": "neutral",
+        "displayName": "Encre de saisie",
+        "canonical": "#24352a",
+        "tonalRamp": [
+          "oklch(15.00% 0.01680 155.88)",
+          "oklch(26.43% 0.02052 155.88)",
+          "oklch(37.86% 0.02423 155.88)",
+          "oklch(49.29% 0.02795 155.88)",
+          "oklch(60.71% 0.02795 155.88)",
+          "oklch(72.14% 0.02423 155.88)",
+          "oklch(83.57% 0.02052 155.88)",
+          "oklch(95.00% 0.01680 155.88)"
+        ]
+      },
+      "field-border": {
+        "role": "neutral",
+        "displayName": "Bordure de saisie",
+        "canonical": "#cbd2c7",
+        "tonalRamp": [
+          "oklch(15.00% 0.00946 133.84)",
+          "oklch(26.43% 0.01156 133.84)",
+          "oklch(37.86% 0.01365 133.84)",
+          "oklch(49.29% 0.01574 133.84)",
+          "oklch(60.71% 0.01574 133.84)",
+          "oklch(72.14% 0.01365 133.84)",
+          "oklch(83.57% 0.01156 133.84)",
+          "oklch(95.00% 0.00946 133.84)"
+        ]
+      },
+      "field-label": {
+        "role": "neutral",
+        "displayName": "Libellé de champ",
+        "canonical": "#465448",
+        "tonalRamp": [
+          "oklch(15.00% 0.01484 149.19)",
+          "oklch(26.43% 0.01812 149.19)",
+          "oklch(37.86% 0.02140 149.19)",
+          "oklch(49.29% 0.02468 149.19)",
+          "oklch(60.71% 0.02468 149.19)",
+          "oklch(72.14% 0.02140 149.19)",
+          "oklch(83.57% 0.01812 149.19)",
+          "oklch(95.00% 0.01484 149.19)"
+        ]
+      },
+      "selection-paper": {
+        "role": "neutral",
+        "displayName": "Sélection rouille pâle",
+        "canonical": "#e9c7a9",
+        "tonalRamp": [
+          "oklch(15.00% 0.03144 63.40)",
+          "oklch(26.43% 0.03840 63.40)",
+          "oklch(37.86% 0.04535 63.40)",
+          "oklch(49.29% 0.05231 63.40)",
+          "oklch(60.71% 0.05231 63.40)",
+          "oklch(72.14% 0.04535 63.40)",
+          "oklch(83.57% 0.03840 63.40)",
+          "oklch(95.00% 0.03144 63.40)"
+        ]
+      },
+      "selection-ink": {
+        "role": "neutral",
+        "displayName": "Encre de sélection",
+        "canonical": "#182925",
+        "tonalRamp": [
+          "oklch(15.00% 0.01350 177.93)",
+          "oklch(26.43% 0.01649 177.93)",
+          "oklch(37.86% 0.01947 177.93)",
+          "oklch(49.29% 0.02246 177.93)",
+          "oklch(60.71% 0.02246 177.93)",
+          "oklch(72.14% 0.01947 177.93)",
+          "oklch(83.57% 0.01649 177.93)",
+          "oklch(95.00% 0.01350 177.93)"
+        ]
+      },
+      "budget-passages-ink": {
+        "role": "secondary",
+        "displayName": "Passages · lavande · encre",
+        "canonical": "#3f3974",
+        "tonalRamp": [
+          "oklch(15.00% 0.05509 285.42)",
+          "oklch(26.43% 0.06727 285.42)",
+          "oklch(37.86% 0.07946 285.42)",
+          "oklch(49.29% 0.09164 285.42)",
+          "oklch(60.71% 0.09164 285.42)",
+          "oklch(72.14% 0.07946 285.42)",
+          "oklch(83.57% 0.06727 285.42)",
+          "oklch(95.00% 0.05509 285.42)"
+        ]
+      },
+      "budget-passages-track": {
+        "role": "secondary",
+        "displayName": "Passages · lavande · piste",
+        "canonical": "#dcd7ed",
+        "tonalRamp": [
+          "oklch(15.00% 0.01709 296.19)",
+          "oklch(26.43% 0.02088 296.19)",
+          "oklch(37.86% 0.02466 296.19)",
+          "oklch(49.29% 0.02844 296.19)",
+          "oklch(60.71% 0.02844 296.19)",
+          "oklch(72.14% 0.02466 296.19)",
+          "oklch(83.57% 0.02088 296.19)",
+          "oklch(95.00% 0.01709 296.19)"
+        ]
+      },
+      "budget-passages-muted": {
+        "role": "secondary",
+        "displayName": "Passages · lavande · secondaire",
+        "canonical": "#615b7a",
+        "tonalRamp": [
+          "oklch(15.00% 0.02791 293.36)",
+          "oklch(26.43% 0.03409 293.36)",
+          "oklch(37.86% 0.04026 293.36)",
+          "oklch(49.29% 0.04644 293.36)",
+          "oklch(60.71% 0.04644 293.36)",
+          "oklch(72.14% 0.04026 293.36)",
+          "oklch(83.57% 0.03409 293.36)",
+          "oklch(95.00% 0.02791 293.36)"
+        ]
+      },
+      "budget-messages-ink": {
+        "role": "secondary",
+        "displayName": "Messages · bleu pétrole · encre",
+        "canonical": "#275e70",
+        "tonalRamp": [
+          "oklch(15.00% 0.03625 222.55)",
+          "oklch(26.43% 0.04426 222.55)",
+          "oklch(37.86% 0.05228 222.55)",
+          "oklch(49.29% 0.06030 222.55)",
+          "oklch(60.71% 0.06030 222.55)",
+          "oklch(72.14% 0.05228 222.55)",
+          "oklch(83.57% 0.04426 222.55)",
+          "oklch(95.00% 0.03625 222.55)"
+        ]
+      },
+      "budget-messages-track": {
+        "role": "secondary",
+        "displayName": "Messages · bleu pétrole · piste",
+        "canonical": "#c6dce2",
+        "tonalRamp": [
+          "oklch(15.00% 0.01406 215.92)",
+          "oklch(26.43% 0.01717 215.92)",
+          "oklch(37.86% 0.02028 215.92)",
+          "oklch(49.29% 0.02339 215.92)",
+          "oklch(60.71% 0.02339 215.92)",
+          "oklch(72.14% 0.02028 215.92)",
+          "oklch(83.57% 0.01717 215.92)",
+          "oklch(95.00% 0.01406 215.92)"
+        ]
+      },
+      "budget-messages-muted": {
+        "role": "secondary",
+        "displayName": "Messages · bleu pétrole · secondaire",
+        "canonical": "#446570",
+        "tonalRamp": [
+          "oklch(15.00% 0.02367 220.75)",
+          "oklch(26.43% 0.02891 220.75)",
+          "oklch(37.86% 0.03415 220.75)",
+          "oklch(49.29% 0.03938 220.75)",
+          "oklch(60.71% 0.03938 220.75)",
+          "oklch(72.14% 0.03415 220.75)",
+          "oklch(83.57% 0.02891 220.75)",
+          "oklch(95.00% 0.02367 220.75)"
+        ]
+      },
+      "budget-warning": {
+        "role": "tertiary",
+        "displayName": "Consommation élevée · ambre",
+        "canonical": "#8b4c13",
+        "tonalRamp": [
+          "oklch(15.00% 0.06070 56.76)",
+          "oklch(26.43% 0.07413 56.76)",
+          "oklch(37.86% 0.08755 56.76)",
+          "oklch(49.29% 0.10098 56.76)",
+          "oklch(60.71% 0.10098 56.76)",
+          "oklch(72.14% 0.08755 56.76)",
+          "oklch(83.57% 0.07413 56.76)",
+          "oklch(95.00% 0.06070 56.76)"
+        ]
+      },
+      "budget-critical": {
+        "role": "tertiary",
+        "displayName": "Quota presque atteint · rouge",
+        "canonical": "#a13f31",
+        "tonalRamp": [
+          "oklch(15.00% 0.07511 30.53)",
+          "oklch(26.43% 0.09172 30.53)",
+          "oklch(37.86% 0.10834 30.53)",
+          "oklch(49.29% 0.12495 30.53)",
+          "oklch(60.71% 0.12495 30.53)",
+          "oklch(72.14% 0.10834 30.53)",
+          "oklch(83.57% 0.09172 30.53)",
+          "oklch(95.00% 0.07511 30.53)"
+        ]
+      },
+      "layout-warning-paper": {
+        "role": "tertiary",
+        "displayName": "Débordement · papier ambre pâle",
+        "canonical": "#f8f0e3",
+        "tonalRamp": [
+          "oklch(15.00% 0.01086 80.12)",
+          "oklch(26.43% 0.01326 80.12)",
+          "oklch(37.86% 0.01567 80.12)",
+          "oklch(49.29% 0.01807 80.12)",
+          "oklch(60.71% 0.01807 80.12)",
+          "oklch(72.14% 0.01567 80.12)",
+          "oklch(83.57% 0.01326 80.12)",
+          "oklch(95.00% 0.01086 80.12)"
+        ]
+      },
+      "layout-warning-border": {
+        "role": "tertiary",
+        "displayName": "Débordement · contour ambre",
+        "canonical": "#dfc9a9",
+        "tonalRamp": [
+          "oklch(15.00% 0.02788 77.19)",
+          "oklch(26.43% 0.03404 77.19)",
+          "oklch(37.86% 0.04021 77.19)",
+          "oklch(49.29% 0.04638 77.19)",
+          "oklch(60.71% 0.04638 77.19)",
+          "oklch(72.14% 0.04021 77.19)",
+          "oklch(83.57% 0.03404 77.19)",
+          "oklch(95.00% 0.02788 77.19)"
+        ]
+      },
+      "layout-warning-ink": {
+        "role": "tertiary",
+        "displayName": "Débordement · encre brune",
+        "canonical": "#674b2c",
+        "tonalRamp": [
+          "oklch(15.00% 0.03341 68.03)",
+          "oklch(26.43% 0.04080 68.03)",
+          "oklch(37.86% 0.04819 68.03)",
+          "oklch(49.29% 0.05557 68.03)",
+          "oklch(60.71% 0.05557 68.03)",
+          "oklch(72.14% 0.04819 68.03)",
+          "oklch(83.57% 0.04080 68.03)",
+          "oklch(95.00% 0.03341 68.03)"
         ]
       },
       "minimal-paper": {
@@ -234,14 +639,14 @@
         "displayName": "Blanc épuré",
         "canonical": "#fff",
         "tonalRamp": [
-          "oklch(15.00% 0.00000 0.00)",
-          "oklch(26.43% 0.00000 0.00)",
-          "oklch(37.86% 0.00000 0.00)",
-          "oklch(49.29% 0.00000 0.00)",
-          "oklch(60.71% 0.00000 0.00)",
-          "oklch(72.14% 0.00000 0.00)",
-          "oklch(83.57% 0.00000 0.00)",
-          "oklch(95.00% 0.00000 0.00)"
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
         ]
       },
       "minimal-ink": {
@@ -264,14 +669,14 @@
         "displayName": "Filet épuré",
         "canonical": "#111",
         "tonalRamp": [
-          "oklch(15.00% 0.00000 0.00)",
-          "oklch(26.43% 0.00000 0.00)",
-          "oklch(37.86% 0.00000 0.00)",
-          "oklch(49.29% 0.00000 0.00)",
-          "oklch(60.71% 0.00000 0.00)",
-          "oklch(72.14% 0.00000 0.00)",
-          "oklch(83.57% 0.00000 0.00)",
-          "oklch(95.00% 0.00000 0.00)"
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
         ]
       },
       "minimal-muted": {
@@ -279,291 +684,37 @@
         "displayName": "Gris épuré",
         "canonical": "#737373",
         "tonalRamp": [
-          "oklch(15.00% 0.00000 0.00)",
-          "oklch(26.43% 0.00000 0.00)",
-          "oklch(37.86% 0.00000 0.00)",
-          "oklch(49.29% 0.00000 0.00)",
-          "oklch(60.71% 0.00000 0.00)",
-          "oklch(72.14% 0.00000 0.00)",
-          "oklch(83.57% 0.00000 0.00)",
-          "oklch(95.00% 0.00000 0.00)"
-        ]
-      },
-      "control-ink": {
-        "role": "neutral",
-        "displayName": "Encre des contrôles",
-        "canonical": "#26392e",
-        "tonalRamp": [
-          "oklch(15.00% 0.03142 158.66)",
-          "oklch(26.43% 0.03142 158.66)",
-          "oklch(37.86% 0.03142 158.66)",
-          "oklch(49.29% 0.03142 158.66)",
-          "oklch(60.71% 0.03142 158.66)",
-          "oklch(72.14% 0.03142 158.66)",
-          "oklch(83.57% 0.03142 158.66)",
-          "oklch(95.00% 0.03142 158.66)"
-        ]
-      },
-      "control-border": {
-        "role": "neutral",
-        "displayName": "Bordure des contrôles",
-        "canonical": "#bbc8bb",
-        "tonalRamp": [
-          "oklch(15.00% 0.02287 145.36)",
-          "oklch(26.43% 0.02287 145.36)",
-          "oklch(37.86% 0.02287 145.36)",
-          "oklch(49.29% 0.02287 145.36)",
-          "oklch(60.71% 0.02287 145.36)",
-          "oklch(72.14% 0.02287 145.36)",
-          "oklch(83.57% 0.02287 145.36)",
-          "oklch(95.00% 0.02287 145.36)"
-        ]
-      },
-      "field-ink": {
-        "role": "neutral",
-        "displayName": "Encre de saisie",
-        "canonical": "#24352a",
-        "tonalRamp": [
-          "oklch(15.00% 0.02981 155.88)",
-          "oklch(26.43% 0.02981 155.88)",
-          "oklch(37.86% 0.02981 155.88)",
-          "oklch(49.29% 0.02981 155.88)",
-          "oklch(60.71% 0.02981 155.88)",
-          "oklch(72.14% 0.02981 155.88)",
-          "oklch(83.57% 0.02981 155.88)",
-          "oklch(95.00% 0.02981 155.88)"
-        ]
-      },
-      "field-border": {
-        "role": "neutral",
-        "displayName": "Bordure de saisie",
-        "canonical": "#cbd2c7",
-        "tonalRamp": [
-          "oklch(15.00% 0.01679 133.84)",
-          "oklch(26.43% 0.01679 133.84)",
-          "oklch(37.86% 0.01679 133.84)",
-          "oklch(49.29% 0.01679 133.84)",
-          "oklch(60.71% 0.01679 133.84)",
-          "oklch(72.14% 0.01679 133.84)",
-          "oklch(83.57% 0.01679 133.84)",
-          "oklch(95.00% 0.01679 133.84)"
-        ]
-      },
-      "field-label": {
-        "role": "neutral",
-        "displayName": "Libellé de champ",
-        "canonical": "#465448",
-        "tonalRamp": [
-          "oklch(15.00% 0.02632 149.19)",
-          "oklch(26.43% 0.02632 149.19)",
-          "oklch(37.86% 0.02632 149.19)",
-          "oklch(49.29% 0.02632 149.19)",
-          "oklch(60.71% 0.02632 149.19)",
-          "oklch(72.14% 0.02632 149.19)",
-          "oklch(83.57% 0.02632 149.19)",
-          "oklch(95.00% 0.02632 149.19)"
-        ]
-      },
-      "selection-paper": {
-        "role": "neutral",
-        "displayName": "Sélection rouille pâle",
-        "canonical": "#e9c7a9",
-        "tonalRamp": [
-          "oklch(15.00% 0.05579 63.40)",
-          "oklch(26.43% 0.05579 63.40)",
-          "oklch(37.86% 0.05579 63.40)",
-          "oklch(49.29% 0.05579 63.40)",
-          "oklch(60.71% 0.05579 63.40)",
-          "oklch(72.14% 0.05579 63.40)",
-          "oklch(83.57% 0.05579 63.40)",
-          "oklch(95.00% 0.05579 63.40)"
-        ]
-      },
-      "selection-ink": {
-        "role": "neutral",
-        "displayName": "Encre de sélection",
-        "canonical": "#182925",
-        "tonalRamp": [
-          "oklch(15.00% 0.02395 177.93)",
-          "oklch(26.43% 0.02395 177.93)",
-          "oklch(37.86% 0.02395 177.93)",
-          "oklch(49.29% 0.02395 177.93)",
-          "oklch(60.71% 0.02395 177.93)",
-          "oklch(72.14% 0.02395 177.93)",
-          "oklch(83.57% 0.02395 177.93)",
-          "oklch(95.00% 0.02395 177.93)"
-        ]
-      },
-      "budget-passages-ink": {
-        "role": "secondary",
-        "displayName": "Passages · lavande · encre",
-        "canonical": "#3f3974",
-        "tonalRamp": [
-          "oklch(15.00% 0.03910 285.42)",
-          "oklch(26.43% 0.06842 285.42)",
-          "oklch(37.86% 0.08797 285.42)",
-          "oklch(49.29% 0.09774 285.42)",
-          "oklch(60.71% 0.09774 285.42)",
-          "oklch(72.14% 0.08308 285.42)",
-          "oklch(83.57% 0.05864 285.42)",
-          "oklch(95.00% 0.02443 285.42)"
-        ]
-      },
-      "budget-passages-track": {
-        "role": "secondary",
-        "displayName": "Passages · lavande · piste",
-        "canonical": "#dcd7ed",
-        "tonalRamp": [
-          "oklch(15.00% 0.01213 296.19)",
-          "oklch(26.43% 0.02123 296.19)",
-          "oklch(37.86% 0.02730 296.19)",
-          "oklch(49.29% 0.03033 296.19)",
-          "oklch(60.71% 0.03033 296.19)",
-          "oklch(72.14% 0.02578 296.19)",
-          "oklch(83.57% 0.01820 296.19)",
-          "oklch(95.00% 0.00758 296.19)"
-        ]
-      },
-      "budget-passages-muted": {
-        "role": "secondary",
-        "displayName": "Passages · lavande · secondaire",
-        "canonical": "#615b7a",
-        "tonalRamp": [
-          "oklch(15.00% 0.01981 293.36)",
-          "oklch(26.43% 0.03466 293.36)",
-          "oklch(37.86% 0.04457 293.36)",
-          "oklch(49.29% 0.04952 293.36)",
-          "oklch(60.71% 0.04952 293.36)",
-          "oklch(72.14% 0.04209 293.36)",
-          "oklch(83.57% 0.02971 293.36)",
-          "oklch(95.00% 0.01238 293.36)"
-        ]
-      },
-      "budget-messages-ink": {
-        "role": "secondary",
-        "displayName": "Messages · bleu pétrole · encre",
-        "canonical": "#275e70",
-        "tonalRamp": [
-          "oklch(15.00% 0.02572 222.55)",
-          "oklch(26.43% 0.04502 222.55)",
-          "oklch(37.86% 0.05788 222.55)",
-          "oklch(49.29% 0.06431 222.55)",
-          "oklch(60.71% 0.06431 222.55)",
-          "oklch(72.14% 0.05466 222.55)",
-          "oklch(83.57% 0.03859 222.55)",
-          "oklch(95.00% 0.01608 222.55)"
-        ]
-      },
-      "budget-messages-track": {
-        "role": "secondary",
-        "displayName": "Messages · bleu pétrole · piste",
-        "canonical": "#c6dce2",
-        "tonalRamp": [
-          "oklch(15.00% 0.00998 215.92)",
-          "oklch(26.43% 0.01746 215.92)",
-          "oklch(37.86% 0.02245 215.92)",
-          "oklch(49.29% 0.02494 215.92)",
-          "oklch(60.71% 0.02494 215.92)",
-          "oklch(72.14% 0.02120 215.92)",
-          "oklch(83.57% 0.01496 215.92)",
-          "oklch(95.00% 0.00624 215.92)"
-        ]
-      },
-      "budget-messages-muted": {
-        "role": "secondary",
-        "displayName": "Messages · bleu pétrole · secondaire",
-        "canonical": "#446570",
-        "tonalRamp": [
-          "oklch(15.00% 0.01680 220.75)",
-          "oklch(26.43% 0.02940 220.75)",
-          "oklch(37.86% 0.03780 220.75)",
-          "oklch(49.29% 0.04200 220.75)",
-          "oklch(60.71% 0.04200 220.75)",
-          "oklch(72.14% 0.03570 220.75)",
-          "oklch(83.57% 0.02520 220.75)",
-          "oklch(95.00% 0.01050 220.75)"
-        ]
-      },
-      "budget-warning": {
-        "role": "tertiary",
-        "displayName": "Consommation élevée · ambre",
-        "canonical": "#8b4c13",
-        "tonalRamp": [
-          "oklch(15.00% 0.04308 56.76)",
-          "oklch(26.43% 0.07538 56.76)",
-          "oklch(37.86% 0.09692 56.76)",
-          "oklch(49.29% 0.10769 56.76)",
-          "oklch(60.71% 0.10769 56.76)",
-          "oklch(72.14% 0.09154 56.76)",
-          "oklch(83.57% 0.06461 56.76)",
-          "oklch(95.00% 0.02692 56.76)"
-        ]
-      },
-      "budget-critical": {
-        "role": "tertiary",
-        "displayName": "Quota presque atteint · rouge",
-        "canonical": "#a13f31",
-        "tonalRamp": [
-          "oklch(15.00% 0.05330 30.53)",
-          "oklch(26.43% 0.09328 30.53)",
-          "oklch(37.86% 0.11993 30.53)",
-          "oklch(49.29% 0.13326 30.53)",
-          "oklch(60.71% 0.13326 30.53)",
-          "oklch(72.14% 0.11327 30.53)",
-          "oklch(83.57% 0.07996 30.53)",
-          "oklch(95.00% 0.03331 30.53)"
-        ]
-      },
-      "layout-warning-ink": {
-        "role": "tertiary",
-        "displayName": "Débordement · encre brune",
-        "canonical": "#674b2c",
-        "tonalRamp": [
-          "oklch(15.00% 0.05927 68.03)",
-          "oklch(26.43% 0.05927 68.03)",
-          "oklch(37.86% 0.05927 68.03)",
-          "oklch(49.29% 0.05927 68.03)",
-          "oklch(60.71% 0.05927 68.03)",
-          "oklch(72.14% 0.05927 68.03)",
-          "oklch(83.57% 0.05927 68.03)",
-          "oklch(95.00% 0.05927 68.03)"
-        ]
-      },
-      "layout-warning-paper": {
-        "role": "tertiary",
-        "displayName": "Débordement · papier ambre pâle",
-        "canonical": "#f8f0e3",
-        "tonalRamp": [
-          "oklch(15.00% 0.01927 80.12)",
-          "oklch(26.43% 0.01927 80.12)",
-          "oklch(37.86% 0.01927 80.12)",
-          "oklch(49.29% 0.01927 80.12)",
-          "oklch(60.71% 0.01927 80.12)",
-          "oklch(72.14% 0.01927 80.12)",
-          "oklch(83.57% 0.01927 80.12)",
-          "oklch(95.00% 0.01927 80.12)"
-        ]
-      },
-      "layout-warning-border": {
-        "role": "tertiary",
-        "displayName": "Débordement · contour ambre",
-        "canonical": "#dfc9a9",
-        "tonalRamp": [
-          "oklch(15.00% 0.04946 77.19)",
-          "oklch(26.43% 0.04946 77.19)",
-          "oklch(37.86% 0.04946 77.19)",
-          "oklch(49.29% 0.04946 77.19)",
-          "oklch(60.71% 0.04946 77.19)",
-          "oklch(72.14% 0.04946 77.19)",
-          "oklch(83.57% 0.04946 77.19)",
-          "oklch(95.00% 0.04946 77.19)"
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
         ]
       }
     },
     "typographyMeta": {
       "headline": {
         "displayName": "Headline",
-        "purpose": "Titre riche fluide avec approche −0.03em et text-wrap: balance ; mobile à 28px et approche −0.8px."
+        "purpose": "Titre riche fluide avec approche −0.03em et text-wrap: balance ; headline-compact à 800px ou moins."
+      },
+      "headline-compact": {
+        "displayName": "Headline compact",
+        "purpose": "Titre principal à 800px ou moins."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "Nom InfoTransport dans l’en-tête."
+      },
+      "clock": {
+        "displayName": "Clock",
+        "purpose": "Horloge de l’introduction, chiffres tabulaires."
+      },
+      "settings-heading": {
+        "displayName": "Settings heading",
+        "purpose": "Titres des sections de réglages."
       },
       "title": {
         "displayName": "Title",
@@ -572,6 +723,14 @@
       "section": {
         "displayName": "Section",
         "purpose": "Interface riche et administration."
+      },
+      "empty-title": {
+        "displayName": "Empty title",
+        "purpose": "Titre d’un état vide."
+      },
+      "line-letter": {
+        "displayName": "Line letter",
+        "purpose": "Lettre ou numéro du badge de ligne."
       },
       "body": {
         "displayName": "Body",
@@ -585,17 +744,9 @@
         "displayName": "Wait",
         "purpose": "Interface riche et administration."
       },
-      "minimal-body": {
-        "displayName": "Minimal body",
-        "purpose": "Vue épurée indépendante."
-      },
-      "minimal-station": {
-        "displayName": "Minimal station",
-        "purpose": "Vue épurée indépendante."
-      },
-      "minimal-wait": {
-        "displayName": "Minimal wait",
-        "purpose": "Vue épurée indépendante."
+      "wait-compact": {
+        "displayName": "Wait compact",
+        "purpose": "Attente riche sur petit écran."
       },
       "interface-base": {
         "displayName": "Base des interfaces riches",
@@ -616,6 +767,18 @@
       "budget-limit": {
         "displayName": "Plafond API",
         "purpose": "Plafond à côté de la consommation."
+      },
+      "minimal-body": {
+        "displayName": "Minimal body",
+        "purpose": "Vue épurée indépendante."
+      },
+      "minimal-station": {
+        "displayName": "Minimal station",
+        "purpose": "Vue épurée indépendante."
+      },
+      "minimal-wait": {
+        "displayName": "Minimal wait",
+        "purpose": "Vue épurée indépendante."
       }
     },
     "shadows": [
@@ -700,10 +863,10 @@
     {
       "name": "Badge de ligne",
       "kind": "chip",
-      "refersTo": "line-badge-l",
-      "description": "Identité de ligne, sans interaction.",
-      "html": "<span class=\"ds-line\">L</span>",
-      "css": ".ds-line{font-family:'Manrope Variable',sans-serif;display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 7px;border-radius:5px;background:#726a9f;color:#fff;font-size:17px;font-weight:750;line-height:1}"
+      "refersTo": "line-badge",
+      "description": "Identité de ligne aux couleurs officielles IDFM ; ardoise de repli sans couleur connue.",
+      "html": "<span class=\"ds-line\" style=\"--line-color:#c4a4cc;--line-text-color:#000\">L</span> <span class=\"ds-line\">U</span>",
+      "css": ".ds-line{font-family:'Manrope Variable',sans-serif;display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 7px;border-radius:5px;background:var(--line-color,#595b64);color:var(--line-text-color,#fff);font-size:17px;font-weight:750;line-height:1}"
     },
     {
       "name": "Bloc épuré",
@@ -722,18 +885,18 @@
       "css": ".ds-budget {\n  --budget-ink: var(--budget-passages-ink, #3f3974);\n  --budget-track: var(--budget-passages-track, #dcd7ed);\n  --budget-muted: var(--budget-passages-muted, #615b7a);\n  --budget-fill: var(--budget-ink);\n  margin-top: 20px;\n  padding: 18px 0 4px;\n  border-top: 2px solid var(--budget-ink);\n  color: var(--budget-ink);\n}\n.ds-budget[data-api='general-message'] {\n  --budget-ink: var(--budget-messages-ink, #275e70);\n  --budget-track: var(--budget-messages-track, #c6dce2);\n  --budget-muted: var(--budget-messages-muted, #446570);\n}\n.ds-budget[data-level='warning'] {\n  --budget-fill: var(--budget-warning, #8b4c13);\n}\n.ds-budget[data-level='critical'],\n.ds-budget[data-level='exhausted'] {\n  --budget-fill: var(--budget-critical, #a13f31);\n}\n.ds-budget h3 {\n  font-size: 13px;\n  line-height: 1.6;\n  margin: 0;\n}\n.ds-budget .ds-budget-value {\n  font-size: 38px;\n  color: var(--budget-ink);\n  font-weight: 650;\n  line-height: 1.2;\n  margin: 16px 0 4px;\n  font-variant-numeric: tabular-nums;\n}\n.ds-budget-value span {\n  font-size: 18px;\n  color: var(--budget-muted);\n  font-weight: 400;\n}\n.ds-budget-meter {\n  display: block;\n  appearance: none;\n  width: 100%;\n  height: 6px;\n  border: 0;\n  border-radius: 0;\n  background: var(--budget-track);\n  margin: 18px 0 10px;\n}\n.ds-budget-meter::-webkit-meter-bar {\n  height: 6px;\n  border: 0;\n  border-radius: 0;\n  background: var(--budget-track);\n}\n.ds-budget-meter::-webkit-meter-optimum-value {\n  background: var(--budget-fill);\n}\n.ds-budget-meter::-moz-meter-bar {\n  background: var(--budget-fill);\n}\n.ds-budget .ds-budget-consumption {\n  display: flex;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 2px 12px;\n  color: var(--budget-muted);\n  font-size: 11px;\n  line-height: 1.6;\n  margin: 0;\n  font-variant-numeric: tabular-nums;\n}\n.ds-budget-consumption strong {\n  color: var(--budget-fill);\n  font-weight: 700;\n}\n.ds-budget dl {\n  border-top: 1px solid var(--budget-track);\n  padding-top: 16px;\n  margin-top: 16px;\n}\n.ds-budget dt {\n  color: var(--budget-muted);\n}\n.ds-budget dd {\n  color: var(--budget-ink);\n  font-variant-numeric: tabular-nums;\n}\n\n.ds-budget{font-family:'Manrope Variable',sans-serif}.ds-budget dl>div{display:flex;justify-content:space-between;gap:16px;margin-bottom:15px;font-size:11px}.ds-budget dd{margin:0;font-weight:600}.ds-budget .ds-budget-consumption{margin:0}"
     },
     {
-      "name": "Mesure de l’écran",
-      "kind": "input",
-      "description": "Option native sous les champs de dimensions ; l’aide explique la mesure sur l’écran cible.",
-      "html": "<div class=\"ds-measurement\"><label class=\"ds-check-label\"><input type=\"checkbox\" aria-describedby=\"ds-screen-help\">Afficher les dimensions réelles</label><p class=\"ds-field-help\" id=\"ds-screen-help\">Relevez les valeurs dans la vue épurée sur l’écran cible, puis reportez-les ci-dessus. L’indicateur apparaît au prochain rafraîchissement après enregistrement.</p></div>",
-      "css": ".ds-measurement {\n  margin-top: 16px;\n}\n.ds-measurement .ds-check-label {\n  min-height: 44px;\n  margin: 0;\n  font-size: 12px;\n  font-weight: 600;\n  cursor: pointer;\n}\n.ds-measurement input {\n  flex: 0 0 16px;\n  width: 16px;\n  height: 16px;\n  margin: 0;\n}\n.ds-measurement .ds-field-help {\n  margin: 0 0 0 24px;\n  max-width: 65ch;\n}\n.ds-measurement{font-family:'Manrope Variable',sans-serif;color:#202a2b}.ds-check-label{display:flex;align-items:center;gap:8px}.ds-measurement input{accent-color:#385e43}.ds-measurement input:focus-visible{outline:3px solid var(--accent,#b94c23);outline-offset:4px}.ds-field-help{font-size:11px;line-height:1.7;color:var(--muted,#626d6a)}"
-    },
-    {
       "name": "Avertissement de débordement",
       "kind": "custom",
       "description": "Alerte non bloquante avec détails repliables ; texte du bloc illustratif.",
       "html": "<div class=\"ds-layout-warning\"><svg class=\"ds-icon\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M14 4H4v16h10m4-16h2v3m0 10v3h-2M10 12h12m-3-3 3 3-3 3\"/></svg><div class=\"ds-layout-warning-content\"><strong>Risque de débordement sur la vue épurée</strong><p>Vous pouvez enregistrer. La partie hors écran restera inaccessible.</p><details class=\"ds-layout-warning-details\"><summary><svg class=\"ds-icon\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m10 6 6 6-6 6\"/></svg>Voir les limites de cette disposition</summary><ul><li>Le bloc « Gare exemple · L » ne tient pas lisiblement dans l’écran épuré.</li></ul></details></div></div>",
       "css": ".ds-layout-warning {\n  display: flex;\n  align-items: flex-start;\n  gap: 12px;\n  margin-bottom: 20px;\n  padding: 16px;\n  border: 1px solid #dfc9a9;\n  border-radius: 8px;\n  background: #f8f0e3;\n  color: #674b2c;\n  font-size: 12px;\n  line-height: 1.7;\n  overflow-wrap: anywhere;\n}\n.ds-layout-warning > .ds-icon {\n  margin-top: 1px;\n  color: var(--budget-warning);\n}\n.ds-layout-warning-content {\n  min-width: 0;\n}\n.ds-layout-warning strong {\n  display: block;\n  color: var(--budget-warning);\n  font-size: 14px;\n  line-height: 1.5;\n}\n.ds-layout-warning p {\n  margin: 6px 0 0;\n  max-width: 65ch;\n}\n.ds-layout-warning-details {\n  margin-top: 4px;\n}\n.ds-layout-warning-details summary {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  width: fit-content;\n  min-height: 44px;\n  padding: 8px 0;\n  cursor: pointer;\n  color: var(--budget-warning);\n  font-weight: 650;\n  list-style: none;\n}\n.ds-layout-warning-details summary::-webkit-details-marker {\n  display: none;\n}\n.ds-layout-warning-details summary:hover {\n  text-decoration: underline;\n  text-underline-offset: 3px;\n}\n.ds-layout-warning-details[open] summary .ds-icon {\n  transform: rotate(90deg);\n}\n.ds-layout-warning ul {\n  margin: 0;\n  padding: 12px 0 0 18px;\n  border-top: 1px solid #dfc9a9;\n  max-width: 65ch;\n}\n.ds-layout-warning li + li {\n  margin-top: 8px;\n}\n.ds-layout-warning{font-family:'Manrope Variable',sans-serif}.ds-layout-warning summary:focus-visible{outline:3px solid var(--accent,#b94c23);outline-offset:4px}"
+    },
+    {
+      "name": "Information trafic",
+      "kind": "custom",
+      "description": "Diapositive de l’encart « Infos trafic » : signalement, badge, échéance visible sans défilement, puis titre et détail défilable.",
+      "html": "<article class=\"ds-incident\"><div class=\"ds-incident-top\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-label=\"Perturbation en cours\"><path d=\"M12 3 22 21H2Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linejoin=\"round\"/><path d=\"M12 9v5\" stroke=\"currentColor\" stroke-width=\"2\"/><circle cx=\"12\" cy=\"17.5\" r=\"1\" fill=\"currentColor\"/></svg><span class=\"ds-incident-line\">U</span><time class=\"ds-incident-until\">Jusqu’à demain 02:13</time></div><section class=\"ds-incident-content\" tabindex=\"0\"><h3>La Défense – La Verrière en semaine de soirée</h3><p>Le trafic est interrompu entre La Défense et La Verrière.\n\nDernier train de La Défense pour La Verrière : le VERI de 21h15.</p></section></article>",
+      "css": ".ds-incident{font-family:'Manrope Variable',sans-serif;max-width:260px;padding:20px;background:#fbfaf7;border-top:2px solid #26392e;color:#202a2b}.ds-incident-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px;color:#a14d24}.ds-incident-line{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;border-radius:4px;background:#b6134c;color:#fff;font-size:13px;font-weight:750}.ds-incident-until{margin-left:auto;color:#202a2b;font-size:11px;font-weight:650;line-height:1.4;text-align:right;font-variant-numeric:tabular-nums}.ds-incident-content{height:150px;overflow-y:auto;padding-right:8px}.ds-incident-content:focus-visible{outline:3px solid #b94c23;outline-offset:-3px}.ds-incident-content h3{margin:0 0 10px;font-size:14px;font-weight:700;line-height:1.5}.ds-incident-content p{margin:0;color:#626d6a;font-size:12px;line-height:1.8;white-space:pre-line;max-width:70ch}"
     }
   ],
   "narrative": {

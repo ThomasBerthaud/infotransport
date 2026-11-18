@@ -17,7 +17,13 @@ import {
 } from '../src/shared/model.js';
 import { Budget, Store } from '../src/server/storage.js';
 import { Service } from '../src/server/service.js';
-import { parseDepartures, parseIncidents, Prim } from '../src/server/prim.js';
+import {
+  lineReportsPath,
+  navitiaDate,
+  parseDepartures,
+  parseLineReports,
+  Prim,
+} from '../src/server/prim.js';
 const clone = () => structuredClone(initialConfig);
 const withDirectory = async (fn: (directory: string) => Promise<void>) => {
   const dir = await mkdtemp(join(tmpdir(), 'infotransport-'));
@@ -148,7 +154,7 @@ test('estimates above 900 combined calls are accepted when each API stays within
   };
   c.defaults.pollSeconds = 300;
   c.blocks = Array.from({ length: 3 }, (_, i) => ({ ...base, id: String(i) }));
-  assert.deepEqual(estimatedCallsByApi(c), { 'stop-monitoring': 651, 'general-message': 219 });
+  assert.deepEqual(estimatedCallsByApi(c), { 'stop-monitoring': 651, 'line-reports': 219 });
   c.blocks.push({ ...base, id: '3' });
   assert.ok(estimatedCalls(c) > 900);
   assert.doesNotThrow(() => validateConfig(c));
@@ -171,7 +177,7 @@ test('traffic estimates enforce their own automatic quota', () => {
     overrides: {},
   };
   c.blocks = Array.from({ length: 9 }, (_, i) => ({ ...base, id: String(i) }));
-  assert.throws(() => validateConfig(c), /Messages affichés.*900/);
+  assert.throws(() => validateConfig(c), /Messages info trafic.*900/);
 });
 test('exhausting one API leaves the other quota available, including after restart', async () =>
   withDirectory(async (dir) => {
@@ -185,7 +191,7 @@ test('exhausting one API leaves the other quota available, including after resta
       })),
     });
     await assert.rejects(() => budget.reserve('stop-monitoring', false, now), /Prochains passages/);
-    await budget.reserve('general-message', true, now);
+    await budget.reserve('line-reports', true, now);
     const reopened = new Budget(store, await store.read('budget.json', { reservations: [] }));
     assert.deepEqual(
       reopened.counts(now).apis.map((api) => api.used),
@@ -233,7 +239,7 @@ test('automatic calls leave a margin and corrupt counters fail closed', async ()
     });
     await assert.rejects(() => budget.reserve('stop-monitoring', true, now));
     await budget.reserve('stop-monitoring', false, now);
-    await budget.reserve('general-message', true, now);
+    await budget.reserve('line-reports', true, now);
     assert.deepEqual(
       budget.counts(now).apis.map((api) => api.used),
       [901, 1],
@@ -281,38 +287,68 @@ test('SIRI parser handles references, cancellation, estimates and missing struct
     parseDepartures({ Siri: { ServiceDelivery: { StopMonitoringDelivery: [{ Status: false }] } } }),
   );
 });
-test('traffic parser prefers full text, strips external markup, retains validity and refs', () => {
-  const input = {
-    Siri: {
-      ServiceDelivery: {
-        GeneralMessageDelivery: [
-          {
-            InfoMessage: [
-              {
-                ItemIdentifier: 'i',
-                ValidUntilTime: '2026-10-27T00:00:00Z',
-                Content: {
-                  LineRef: [{ value: 'STIF:Line::C01740:' }],
-                  Message: [
-                    { MessageType: 'SHORT_MESSAGE', MessageText: { value: 'Incident' } },
-                    {
-                      MessageType: 'TEXT_ONLY',
-                      MessageText: { value: '<b>Texte complet</b><br>Suite' },
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        ],
-      },
+test('line_reports parser keeps current disruptions, web text, title and Paris validity', () => {
+  // Shapes taken from real IDFM responses (November 2026).
+  const messages = [
+    {
+      text: 'Ligne L : Paris <> Nanterre',
+      channel: { id: 't', name: 'titre', content_type: 'text/plain', types: ['title'] },
     },
+    {
+      text: '<p>Texte <b>complet</b><br>Suite&nbsp;l&#39;axe.</p><p>Particularit&#233;</p>',
+      channel: { id: 'w', name: 'moteur', content_type: 'text/html', types: ['web'] },
+    },
+  ];
+  const line = [{ pt_object: { embedded_type: 'line', id: 'line:IDFM:C01740' } }];
+  const input = {
+    disruptions: [
+      {
+        id: 'd1',
+        status: 'active',
+        tags: [],
+        application_periods: [{ begin: '20261117T050000', end: '20261117T230000' }],
+        messages,
+        impacted_objects: line,
+      },
+      // Same notice split by IDFM into another disruption with other periods.
+      {
+        id: 'd2',
+        status: 'active',
+        application_periods: [{ begin: '20261118T050000', end: '20261118T230000' }],
+        messages,
+        impacted_objects: line,
+      },
+      {
+        id: 'lift',
+        status: 'active',
+        tags: ['Ascenseur'],
+        messages: [{ text: 'Ascenseur indisponible', channel: { types: ['web'] } }],
+        impacted_objects: [{ pt_object: { embedded_type: 'stop_area', id: 'stop_area:IDFM:1' } }],
+      },
+      { id: 'old', status: 'past', messages: [{ text: 'Fini', channel: { types: ['web'] } }] },
+      { id: 'empty', status: 'active', messages: [] },
+    ],
+    line_reports: [],
   };
-  const [i] = parseIncidents(input);
-  assert.equal(i.title, 'Incident');
-  assert.equal(i.text, 'Texte complet\nSuite');
+  const now = Date.parse('2026-11-18T10:00:00Z');
+  const incidents = parseLineReports(input, 'STIF:Line::C01741:', now);
+  assert.equal(incidents.length, 1);
+  const [i] = incidents;
+  assert.equal(i.id, 'd1');
+  assert.equal(i.title, 'Paris – Nanterre');
+  assert.equal(i.text, 'Texte complet\nSuite l’axe.\n\nParticularité');
   assert.deepEqual(i.lineRefs, ['STIF:Line::C01740:']);
-  assert.ok(i.ends);
+  // Winter time: 05:00 in Paris is 04:00 UTC; the period covering `now` is chosen.
+  assert.equal(i.starts, '2026-11-18T04:00:00.000Z');
+  assert.equal(i.ends, '2026-11-18T22:00:00.000Z');
+  assert.equal(navitiaDate('20260701T120000'), '2026-07-01T10:00:00.000Z');
+  assert.deepEqual(parseLineReports({ line_reports: [] }, 'STIF:Line::C01740:'), []);
+  assert.throws(() => parseLineReports({ error: { message: 'unknown object' } }, 'x'), /unknown/);
+  assert.throws(() => parseLineReports({}, 'x'), /disruptions/);
+  assert.equal(
+    lineReportsPath('STIF:Line::C01740:'),
+    'v2/navitia/line_reports/lines/line:IDFM:C01740/line_reports',
+  );
 });
 test('no-key demo never calls upstream; configuration persists and pause removes times', async () =>
   withDirectory(async (dir) => {
@@ -411,7 +447,7 @@ test('PRIM errors still reserve budget and API key stays in headers', async () =
       assert.equal(budget.counts().used, 1);
       await assert.rejects(() => prim.request('stop-monitoring', {}), /attente/);
       assert.equal(budget.counts().used, 1);
-      await assert.rejects(() => prim.request('general-message', {}), /429/);
+      await assert.rejects(() => prim.request('line-reports', {}), /429/);
       assert.deepEqual(
         budget.counts().apis.map((api) => api.used),
         [1, 1],
@@ -504,17 +540,11 @@ test('collector deduplicates stop requests across blocks and respects next colle
     const calls: string[] = [];
     service.prim.request = async (path) => {
       calls.push(path);
-      return path === 'stop-monitoring'
-        ? stopPayload()
-        : {
-            Siri: {
-              ServiceDelivery: { GeneralMessageDelivery: [{ Status: true, InfoMessage: [] }] },
-            },
-          };
+      return path === 'stop-monitoring' ? stopPayload() : { disruptions: [], line_reports: [] };
     };
     await service.tick();
     assert.equal(calls.filter((c) => c === 'stop-monitoring').length, 1);
-    assert.equal(calls.filter((c) => c === 'general-message').length, 2);
+    assert.equal(calls.filter((c) => c === 'line-reports').length, 2);
     await service.tick();
     service.dashboard();
     service.dashboard();
@@ -536,7 +566,7 @@ test('PRIM requests match the supplied departures and traffic Swagger contracts'
       securityDefinitions: Record<string, { in: string; name: string }>;
     };
     const contracts = await Promise.all(
-      ['departures', 'traffic'].map(
+      ['departures', 'line-reports'].map(
         async (name) =>
           JSON.parse(
             await readFile(new URL(`../docs/api/${name}.swagger.json`, import.meta.url), 'utf8'),
@@ -549,8 +579,12 @@ test('PRIM requests match the supplied departures and traffic Swagger contracts'
       const contract = contracts[index++];
       const url = new URL(String(input));
       assert.equal(url.hostname, contract.host);
+      assert.ok(url.pathname.startsWith(contract.basePath));
       const path = url.pathname.slice(contract.basePath.length);
-      const operation = contract.paths[path]?.get;
+      const template = Object.keys(contract.paths).find((t) =>
+        new RegExp(`^${t.replace(/\{[^}]+\}/g, '.+')}$`).test(path),
+      );
+      const operation = template && contract.paths[template].get;
       assert.ok(operation, `GET ${path} must be documented`);
       const query = operation.parameters.filter((p) => p.in === 'query');
       for (const key of url.searchParams.keys())
@@ -569,7 +603,12 @@ test('PRIM requests match the supplied departures and traffic Swagger contracts'
       const store = new Store(dir);
       const prim = new Prim('test-key', new Budget(store, { reservations: [] }));
       await prim.request('stop-monitoring', { MonitoringRef: 'STIF:StopArea:SP:123:' });
-      await prim.request('general-message', { LineRef: 'STIF:Line::C01740:' });
+      await prim.request(
+        'line-reports',
+        { disable_geojson: 'true' },
+        true,
+        lineReportsPath('STIF:Line::C01740:'),
+      );
       assert.equal(index, 2);
     } finally {
       globalThis.fetch = original;

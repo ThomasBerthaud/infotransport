@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Dashboard, Incident } from '../shared/model.js';
 import { Icon } from '../components/Icon.js';
 import { IncidentIcon, Line } from '../components/Block.js';
+import { incidentUntil } from './incident-until.js';
 
 function IncidentCarousel({ incidents, data }: { incidents: Incident[]; data: Dashboard }) {
   const track = useRef<HTMLElement>(null);
@@ -80,6 +81,9 @@ function IncidentCarousel({ incidents, data }: { incidents: Incident[]; data: Da
                   appearance={view.lineAppearance}
                 />
               ))}
+              <time className="incident-until" dateTime={incident.ends}>
+                {incidentUntil(incident.ends, new Date(data.now))}
+              </time>
             </div>
             <section
               className="incident-content"
@@ -88,18 +92,6 @@ function IncidentCarousel({ incidents, data }: { incidents: Incident[]; data: Da
             >
               <h3>{incident.title}</h3>
               <p>{incident.text}</p>
-              {incident.starts && (
-                <p className="incident-period">
-                  À partir du{' '}
-                  {new Date(incident.starts).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}
-                </p>
-              )}
-              {incident.ends && (
-                <p className="incident-period">
-                  Jusqu’au{' '}
-                  {new Date(incident.ends).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}
-                </p>
-              )}
               {incident.url && /^https?:\/\//.test(incident.url) && (
                 <a href={incident.url} target="_blank" rel="noreferrer">
                   Consulter l’information source <Icon name="external" size={14} />
@@ -151,9 +143,7 @@ export function TrafficPanel({ data }: { data: Dashboard }) {
     <aside className="traffic-panel" aria-labelledby="traffic-title">
       <div className="section-heading">
         <h2 id="traffic-title">Infos trafic</h2>
-        <span>
-          {incidents.length} information{incidents.length > 1 ? 's' : ''}
-        </span>
+        {incidents.length > 0 && <span>{incidents.length} en cours</span>}
       </div>
       {incidents.length ? (
         <IncidentCarousel

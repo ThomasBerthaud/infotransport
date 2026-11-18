@@ -217,8 +217,8 @@ export const primQuotas = [
     automaticLimit: 900,
   },
   {
-    api: 'general-message',
-    label: 'Messages affichés sur les écrans',
+    api: 'line-reports',
+    label: 'Messages info trafic (Navitia)',
     limit: 1000,
     automaticLimit: 900,
   },
@@ -245,7 +245,7 @@ export function estimatedCallsByApi(config: Config): Record<PrimApi, number> {
   }
   return {
     'stop-monitoring': [...stops.values()].reduce((a, b) => a + b, 0),
-    'general-message': lines.size * (Math.ceil((activeMinutes(config.defaults) + 60) / 15) + 1),
+    'line-reports': lines.size * (Math.ceil((activeMinutes(config.defaults) + 60) / 15) + 1),
   };
 }
 export function estimatedCalls(config: Config) {

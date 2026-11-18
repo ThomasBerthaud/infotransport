@@ -17,7 +17,7 @@ import {
   type Incident,
 } from '../shared/model.js';
 import { Budget, Store } from './storage.js';
-import { discover, parseDepartures, parseIncidents, Prim } from './prim.js';
+import { discover, lineReportsPath, parseDepartures, parseLineReports, Prim } from './prim.js';
 import { demoDepartures, demoDiscovery, demoIncidents } from './demo.js';
 import { toHttpError, UnavailableError } from './errors.js';
 import { log } from './log.js';
@@ -250,7 +250,15 @@ export class Service {
             TRAFFIC_INTERVAL_MS,
             TRAFFIC_INTERVAL_MS,
             async () =>
-              parseIncidents(await this.prim.request('general-message', { LineRef: ref })),
+              parseLineReports(
+                await this.prim.request(
+                  'line-reports',
+                  { disable_geojson: 'true' },
+                  true,
+                  lineReportsPath(ref),
+                ),
+                ref,
+              ),
           )) || dirty;
       }
       dirty = this.prune(Date.now()) || dirty;

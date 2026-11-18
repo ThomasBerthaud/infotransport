@@ -7,6 +7,7 @@
   --muted: #626d6a;
   --line: #d9ded7;
   --accent: #b94c23;
+  --signal: #a14d24;
   --green: #32674f;
   --budget-passages-ink: #3f3974;
   --budget-passages-track: #dcd7ed;
@@ -231,7 +232,7 @@ h1 {
   font-size: 12px;
 }
 .traffic-warning {
-  color: #a65022;
+  color: var(--signal);
   margin-left: auto;
 }
 .traffic-unknown {
@@ -312,7 +313,7 @@ table {
   font-size: 11px;
 }
 .service-delay {
-  color: #a34d25;
+  color: var(--signal);
   font-size: 11px;
 }
 .service-cancelled {
@@ -379,7 +380,7 @@ table {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #a14d24;
+  color: var(--signal);
   margin-bottom: 18px;
 }
 .incident-top .line-symbol {
@@ -401,8 +402,15 @@ table {
   white-space: pre-line;
   max-width: 70ch;
 }
-.incident .incident-period {
+/* Expected end of the disruption, readable without scrolling the detail. */
+.incident-top .incident-until {
+  margin-left: auto;
+  color: #202a2b;
   font-size: 11px;
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 .incident a {
   font-size: 11px;
@@ -771,7 +779,7 @@ input[type='checkbox'] {
   border-top: 2px solid var(--budget-ink);
   color: var(--budget-ink);
 }
-.api-budget[data-api='general-message'] {
+.api-budget[data-api='line-reports'] {
   --budget-ink: var(--budget-messages-ink);
   --budget-track: var(--budget-messages-track);
   --budget-muted: var(--budget-messages-muted);
@@ -1234,6 +1242,7 @@ dd {
   scroll-snap-stop: always;
 }
 .incident-slide .incident-top {
+  flex-wrap: wrap;
   margin-bottom: 12px;
 }
 .incident-content {
