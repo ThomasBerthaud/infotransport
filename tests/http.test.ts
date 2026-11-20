@@ -67,6 +67,9 @@ test('health, dashboard and minimal view respond with the expected headers', asy
     const dashboard = await fetch(`${base}/api/dashboard`);
     assert.equal(dashboard.headers.get('cache-control'), 'no-store');
     assert.equal(((await dashboard.json()) as { mode: string }).mode, 'demo');
+    const preview = await fetch(`${base}/api/dashboard?preview=1`);
+    assert.equal(preview.status, 200);
+    assert.equal(((await preview.json()) as { mode: string }).mode, 'demo');
     const minimal = await fetch(`${base}/minimal`);
     assert.equal(minimal.status, 200);
     const html = await minimal.text();

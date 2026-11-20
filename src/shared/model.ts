@@ -1,9 +1,11 @@
 import { z } from 'zod';
 
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
+const MAX_WALK_MINUTES = 120;
+const MAX_MINIMAL_COUNT = 5;
 export const settingsSchema = z.object({
-  walkMinutes: z.number().int().min(0).max(120),
-  minimalCount: z.number().int().min(1).max(5),
+  walkMinutes: z.number().int().min(0).max(MAX_WALK_MINUTES),
+  minimalCount: z.number().int().min(1).max(MAX_MINIMAL_COUNT),
   richCount: z.number().int().min(3).max(30),
   pollSeconds: z.number().int().min(60).max(3600),
   start: time,
@@ -339,3 +341,40 @@ export const hour = (time: string) =>
     hour: '2-digit',
     minute: '2-digit',
   });
+/** A departure can still be caught when it leaves at least `walkMinutes` from now. */
+export const isReachable = (time: string, now: string, walkMinutes: number) =>
+  minutesUntil(time, now) >= walkMinutes;
+/**
+ * Departures a block needs: at least `richCount` for the detailed view, extended until
+ * `minimalCount` reachable ones are included for the minimal view.
+ */
+export function departureWindow<T extends Pick<Departure, 'time'>>(
+  departures: readonly T[],
+  now: string,
+  effective: Pick<Settings, 'richCount' | 'minimalCount' | 'walkMinutes'>,
+): T[] {
+  let reachable = 0;
+  let end = 0;
+  while (
+    end < departures.length &&
+    (end < effective.richCount || reachable < effective.minimalCount)
+  ) {
+    if (isReachable(departures[end].time, now, effective.walkMinutes)) reachable++;
+    end++;
+  }
+  return departures.slice(0, end);
+}
+/**
+ * Settings used to size the departure window of the admin preview: the draft may raise
+ * the walking threshold or the minimal count before saving, so the window covers the
+ * largest values the schema allows.
+ */
+export function previewWindowSettings(
+  effective: Pick<Settings, 'richCount'>,
+): Pick<Settings, 'richCount' | 'minimalCount' | 'walkMinutes'> {
+  return {
+    richCount: effective.richCount,
+    minimalCount: MAX_MINIMAL_COUNT,
+    walkMinutes: MAX_WALK_MINUTES,
+  };
+}

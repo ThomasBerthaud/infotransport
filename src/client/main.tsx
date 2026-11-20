@@ -25,8 +25,10 @@ const client = new QueryClient({
 function App() {
   const admin = location.pathname === '/admin';
   const query = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: ({ signal }) => api<Dashboard>('/api/dashboard', { signal }),
+    // The admin preview needs a wider departure window to apply draft settings.
+    queryKey: ['dashboard', admin],
+    queryFn: ({ signal }) =>
+      api<Dashboard>(admin ? '/api/dashboard?preview=1' : '/api/dashboard', { signal }),
     refetchInterval: (q) => (q.state.data ? q.state.data.refreshSeconds * 1000 : 30000),
   });
   return (

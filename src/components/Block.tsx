@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { BlockView } from '../shared/model.js';
-import { hour, minutesUntil } from '../shared/model.js';
+import { hour, isReachable, minutesUntil } from '../shared/model.js';
 export function IncidentIcon({ unknown = false }: { unknown?: boolean }) {
   return (
     <svg
@@ -75,11 +75,17 @@ export function BlockHeading({ view, colored = false }: { view: BlockView; color
   );
 }
 export function MinimalBlock({ view, now }: { view: BlockView; now: string }) {
-  const departures = view.departures.slice(0, view.effective.minimalCount);
+  // Departures that leave too soon to be caught are hidden; the threshold is the one
+  // the detailed view uses to grey them out.
+  const reachable = view.departures.filter((d) =>
+    isReachable(d.time, now, view.effective.walkMinutes),
+  );
+  const departures = reachable.slice(0, view.effective.minimalCount);
+  const hidden = view.departures.length - reachable.length > 0;
   return (
     <section
       className="minimal-block"
-      aria-label={`${view.block.station}, ligne ${view.block.line}, direction ${view.block.direction}`}
+      aria-label={`${view.block.station}, ligne ${view.block.line}, direction ${view.block.direction}${hidden ? ', départs trop proches masqués' : ''}`}
     >
       <BlockHeading view={view} />
       <table className="minimal-times">
@@ -87,19 +93,22 @@ export function MinimalBlock({ view, now }: { view: BlockView; now: string }) {
           <tr>
             {Array.from({ length: view.effective.minimalCount }, (_, i) => {
               const d = departures[i];
-              const close = d && minutesUntil(d.time, now) < view.effective.walkMinutes;
+              const marker = hidden && i === 0 && (
+                <span className="minimal-hidden-marker" aria-hidden="true" />
+              );
               return (
-                <td key={d?.id ?? i} className={close ? 'too-close' : ''}>
+                <td key={d?.id ?? i}>
                   {d ? (
                     <>
                       <strong>
+                        {marker}
                         {d.cancelled ? 'SUP.' : minutesUntil(d.time, now)}
                         {!d.cancelled && <small> min</small>}
                       </strong>
                       <time dateTime={d.time}>{hour(d.time)}</time>
                     </>
                   ) : (
-                    <strong>—</strong>
+                    <strong>{marker}—</strong>
                   )}
                 </td>
               );

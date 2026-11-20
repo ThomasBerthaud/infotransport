@@ -249,7 +249,7 @@ Le papier chaud et l’encre sombre accueillent un accent rouille et des verts f
 - **Encres vertes fonctionnelles** (`action-ink`, `add-ink`, `tag-ink`, `demo-ink`) : actions textuelles, bouton pointillé d’ajout de bloc, étiquette « Local » et bandeau de démonstration. Elles prolongent le vert de service à des contrastes adaptés à leur fond.
 - **Texte indicatif** (`placeholder`) : contenu d’exemple des champs, distinct du texte saisi.
 - **Pause** (`paused`) : témoin de suivi brun-gris hors des plages actives, accompagné de son libellé.
-- **Blanc, noir et gris épurés** (`minimal-*`) : système monochrome indépendant ; le gris atténue les départs trop proches et signale le trafic inconnu.
+- **Blanc, noir et gris épurés** (`minimal-*`) : système monochrome indépendant ; le gris signale les départs masqués et le trafic inconnu.
 
 **The Information Color Rule.** La couleur accompagne une identité ou un état ; les libellés et les formes portent aussi l’information.
 
@@ -364,7 +364,7 @@ La mesure correspond à la zone utile du navigateur en pixels CSS et suit les re
 
 ### Minimal departure block
 
-Chaque bloc répète sa gare, sa ligne et sa direction. Les départs sont disposés en colonnes de tableau égales. Une suppression s’écrit « SUP. » ; un départ absent utilise un tiret. Les perturbations ont un triangle SVG, avec une distinction sémantique pour le trafic inconnu. Cette surface n’a ni commande ni animation.
+Chaque bloc répète sa gare, sa ligne et sa direction. Les départs sont disposés en colonnes de tableau égales. Une suppression s’écrit « SUP. » ; un départ absent utilise un tiret. Les départs qui partent avant le seuil de trajet effectif du bloc (le même que pour l’atténuation de la vue riche) sont masqués : le premier départ affiché est le premier atteignable, et les colonnes restent remplies par les départs atteignables suivants. Quand au moins un départ est masqué, un repère muet le signale : triangle plein pointé vers la gauche de 0.18 × 0.32em (proportionnel aux chiffres, soit environ 8 × 14px à la taille par défaut), en gris épuré (`minimal-muted`), dessiné en bordures CSS (sans glyphe), placé en position absolue dans la marge gauche du premier horaire à 0.12em des chiffres et centré sur leur hauteur, sans texte, sans nombre et sans décaler les chiffres ni la grille. Il n’apparaît pas en pause, sans données ou lorsque le seuil vaut 0 ; si tous les départs sont masqués, il précède les tirets. Le nom accessible du bloc précise alors « départs trop proches masqués ». Les perturbations ont un triangle SVG, avec une distinction sémantique pour le trafic inconnu. Cette surface n’a ni commande ni animation.
 
 Les transitions des contrôles riches durent 0.15s en ease pour fond, texte et bordure, uniquement lorsque la préférence de mouvement réduit ne les exclut pas.
 
@@ -373,7 +373,7 @@ Les transitions des contrôles riches durent 0.15s en ease pour fond, texte et b
 ### Do:
 
 - **Do** conserver une identité gare, ligne et direction dans chaque bloc.
-- **Do** garder les départs trop proches dans leur ordre chronologique avec une atténuation lisible.
+- **Do** garder, dans la vue riche, les départs trop proches dans leur ordre chronologique avec une atténuation lisible ; dans la vue épurée, les masquer et le signaler par le repère gris muet.
 - **Do** avertir des limites de capacité de la vue épurée sans bloquer la sauvegarde et mesurer la zone utile du navigateur cible.
 - **Do** garder les détails et commandes dans les interfaces riches.
 

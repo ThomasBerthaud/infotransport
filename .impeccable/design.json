@@ -873,8 +873,8 @@
       "kind": "custom",
       "refersTo": "minimal-departure",
       "description": "Horaires monochromes passifs.",
-      "html": "<section class=\"ds-minimal\"><div><span class=\"ds-minimal-line\">L</span><h2>La Défense</h2></div><p>Paris Saint-Lazare</p><table><tbody><tr><td class=\"ds-close\"><strong>3<small> min</small></strong><time>07:35</time></td><td><strong>12<small> min</small></strong><time>07:44</time></td><td><strong>22<small> min</small></strong><time>07:54</time></td></tr></tbody></table></section>",
-      "css": ".ds-minimal{font:16px Arial,Helvetica,sans-serif;background:#fff;color:#000;padding:9px 0;border-bottom:1px solid #111}.ds-minimal-line{display:inline-block;padding:3px 8px;border:2px solid currentColor;font-size:1.35em;font-weight:700;line-height:1;vertical-align:middle}.ds-minimal h2{display:inline;font-size:1.45em;font-weight:700;margin:0 10px;vertical-align:middle}.ds-minimal p{margin:9px 0 12px;font-size:1.2em;line-height:1.3;white-space:nowrap}.ds-minimal table{width:100%;table-layout:fixed;border-collapse:collapse}.ds-minimal td{vertical-align:top;padding:2px 6px 0 0}.ds-minimal strong{display:block;font-size:2.7em;line-height:1.15;font-weight:700;white-space:nowrap}.ds-minimal small{font-size:.34em;font-weight:400}.ds-minimal time{display:block;font-size:1.15em;margin-top:7px}.ds-close{color:#737373}"
+      "html": "<section class=\"ds-minimal\"><div><span class=\"ds-minimal-line\">L</span><h2>La Défense</h2></div><p>Paris Saint-Lazare</p><table><tbody><tr><td><strong><span class=\"ds-hidden\" aria-hidden=\"true\"></span>12<small> min</small></strong><time>07:44</time></td><td><strong>22<small> min</small></strong><time>07:54</time></td><td><strong>31<small> min</small></strong><time>08:03</time></td></tr></tbody></table></section>",
+      "css": ".ds-minimal{font:16px Arial,Helvetica,sans-serif;background:#fff;color:#000;padding:9px 0;border-bottom:1px solid #111}.ds-minimal-line{display:inline-block;padding:3px 8px;border:2px solid currentColor;font-size:1.35em;font-weight:700;line-height:1;vertical-align:middle}.ds-minimal h2{display:inline;font-size:1.45em;font-weight:700;margin:0 10px;vertical-align:middle}.ds-minimal p{margin:9px 0 12px;font-size:1.2em;line-height:1.3;white-space:nowrap}.ds-minimal table{width:100%;table-layout:fixed;border-collapse:collapse}.ds-minimal td{vertical-align:top;padding:2px 6px 0 0}.ds-minimal strong{position:relative;display:block;font-size:2.7em;line-height:1.15;font-weight:700;white-space:nowrap}.ds-minimal small{font-size:.34em;font-weight:400}.ds-minimal time{display:block;font-size:1.15em;margin-top:7px}.ds-hidden{position:absolute;left:-.3em;top:.46em;width:0;height:0;border-top:.16em solid transparent;border-bottom:.16em solid transparent;border-right:.18em solid #737373}"
     },
     {
       "name": "Budget par API",
@@ -927,7 +927,7 @@
     ],
     "dos": [
       "**Do** conserver une identité gare, ligne et direction dans chaque bloc.",
-      "**Do** garder les départs trop proches dans leur ordre chronologique avec une atténuation lisible.",
+      "**Do** garder, dans la vue riche, les départs trop proches dans leur ordre chronologique avec une atténuation lisible ; dans la vue épurée, les masquer et le signaler par le repère gris muet.",
       "**Do** avertir des limites de capacité de la vue épurée sans bloquer la sauvegarde et mesurer la zone utile du navigateur cible.",
       "**Do** garder les détails et commandes dans les interfaces riches."
     ],

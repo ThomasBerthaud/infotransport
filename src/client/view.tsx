@@ -1,5 +1,5 @@
 import type { Dashboard } from '../shared/model.js';
-import { hour, minutesUntil } from '../shared/model.js';
+import { hour, isReachable, minutesUntil } from '../shared/model.js';
 import { BlockHeading } from '../components/Block.js';
 import { TrafficPanel } from './TrafficPanel.js';
 const statusLabel = {
@@ -49,7 +49,7 @@ export function DashboardView({ data }: { data: Dashboard }) {
                   </thead>
                   <tbody>
                     {view.departures.slice(0, view.effective.richCount).map((d, i) => {
-                      const close = minutesUntil(d.time, data.now) < view.effective.walkMinutes;
+                      const close = !isReachable(d.time, data.now, view.effective.walkMinutes);
                       const delay = d.aimedTime
                         ? Math.round((Date.parse(d.time) - Date.parse(d.aimedTime)) / 60000)
                         : 0;

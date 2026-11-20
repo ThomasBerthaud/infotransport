@@ -88,6 +88,7 @@ body {
   padding: 2px 6px 0 0;
 }
 .minimal-times strong {
+  position: relative;
   display: block;
   font-size: 2.7em;
   line-height: 1.15;
@@ -103,8 +104,20 @@ body {
   font-size: 1.15em;
   margin-top: 7px;
 }
-.too-close {
-  color: #737373;
+/* Muted marker: some departures were hidden because they leave too soon to be caught.
+   Drawn with borders (no glyph) so it survives old browsers, e-ink and missing fonts.
+   Absolutely placed in the cell gutter: it never shifts the digits or the grid.
+   Sized in em so it follows the digits; centred on their cap height (Arial digits span
+   0.27em to 0.98em of this 1.15 line box), not on the line box. */
+.minimal-hidden-marker {
+  position: absolute;
+  left: -0.3em;
+  top: 0.46em;
+  width: 0;
+  height: 0;
+  border-top: 0.16em solid transparent;
+  border-bottom: 0.16em solid transparent;
+  border-right: 0.18em solid #737373;
 }
 .traffic-unknown {
   color: #737373;

@@ -87,7 +87,7 @@ Chaque bloc répète sa gare, sa ligne, sa direction et ses horaires, sans titre
 
 La vue épurée tient sur un seul écran, sans défilement ni pagination. L'administration prévisualise la disposition aux dimensions configurées, mesure le texte qui déborde dans l'aperçu et avertit sans bloquer l'enregistrement. Seul l'essai sur l'appareil cible garantit la capacité réelle.
 
-Le seuil de trajet atténue les départs trop proches tout en gardant un contraste utilisable ; il est réglable par bloc avec héritage de la valeur commune. Les suppressions annoncées restent distinctes d'un départ simplement trop proche.
+Le seuil de trajet atténue les départs trop proches dans la vue détaillée, tout en gardant un contraste utilisable, et les masque dans la vue épurée (`isReachable`). Le serveur fournit au moins `richCount` départs, prolongés jusqu'à `minimalCount` départs atteignables (`departureWindow`). L'administration demande `/api/dashboard?preview=1`, dont la fenêtre couvre les valeurs maximales du schéma (`previewWindowSettings`) : l'aperçu applique ainsi un brouillon de seuil ou de nombre de départs plus élevé sans manquer de départs ; il est réglable par bloc avec héritage de la valeur commune. Les suppressions annoncées restent distinctes d'un départ simplement trop proche.
 
 Les décisions produit encore ouvertes sont tenues à jour dans [PRODUCT.md](PRODUCT.md#open-decisions).
 

@@ -4,7 +4,7 @@
 
 InfoTransport est un tableau de départs personnel, en français, à héberger chez soi et à consulter sur son réseau local. Il rassemble les prochains passages des transports que vous choisissez en Île-de-France et les informations trafic associées, à partir de PRIM, la plateforme de données d’Île-de-France Mobilités.
 
-Par exemple, vous pouvez suivre la ligne L de La Défense vers Paris Saint-Lazare et la ligne U vers La Verrière sur un même écran. Vous voyez les temps d’attente, les heures de départ et les retards ou suppressions annoncés. En indiquant votre temps de trajet jusqu’à la gare, les départs trop proches sont atténués pour repérer plus facilement ceux que vous pouvez rejoindre.
+Par exemple, vous pouvez suivre la ligne L de La Défense vers Paris Saint-Lazare et la ligne U vers La Verrière sur un même écran. Vous voyez les temps d’attente, les heures de départ et les retards ou suppressions annoncés. En indiquant votre temps de trajet jusqu’à la gare, les départs trop proches sont atténués dans la vue détaillée et masqués dans la vue épurée, pour repérer plus facilement ceux que vous pouvez rejoindre.
 
 ## Ce que permet le projet
 

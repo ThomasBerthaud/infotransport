@@ -61,7 +61,9 @@ export function createApp(service: Service, { production }: AppOptions) {
   app.get('/health', (_req, res) => res.json({ ok: true }));
   app.get('/metrics', metrics.handler);
   app.use('/mcp', createMcpRouter(service));
-  app.get('/api/dashboard', (_req, res) => res.json(service.dashboard()));
+  app.get('/api/dashboard', (req, res) =>
+    res.json(service.dashboard(new Date(), { preview: req.query.preview === '1' })),
+  );
   app.get('/api/config', (_req, res) => res.json(service.config));
   app.put('/api/config', async (req, res) => {
     res.json(await service.save(req.body));

@@ -37,7 +37,7 @@ Afficher les temps d'attente et signaler les perturbations des transports sélec
 - Chaque tuple (gare, ligne, direction) constitue un bloc autonome, configuré depuis l'administration.
 - Disposition modifiable dans l'administration : blocs pleine largeur, empilés verticalement par défaut ; ordre et occupation de la grille modifiables.
 - Réglages indépendants par bloc, hérités de valeurs par défaut globales sauf surcharge explicite. Modifier une valeur par défaut affecte les blocs qui en héritent ; une action permet de rétablir l'héritage.
-- Seuil de trajet configurable en minutes : conserver les trains trop proches mais les atténuer visuellement.
+- Seuil de trajet configurable en minutes : dans la vue détaillée, conserver les trains trop proches en les atténuant ; dans la vue épurée, les masquer pour n'afficher que les trains atteignables.
 - Sur la vue épurée, signaler les perturbations par une icône. Sur la vue normale, afficher les informations complètes disponibles sur les incidents en cours pertinents pour les blocs suivis.
 - Rafraîchissement automatique de la page configurable.
 - Pause de rafraîchissement et des appels PRIM de 22 h à 5 h, heure de Paris, tous les jours par défaut. Plages modifiables dans l'administration. Mécanisme de reprise à tester sur l’écran cible.
@@ -63,7 +63,7 @@ Interface épurée, en français. Sur l’écran cible, limiter le contenu aux i
 
 ## Accessibility & Inclusion
 
-Lecture rapide sur tout écran cible, avec prise en charge des petits écrans à encre électronique. Les départs trop proches restent lisibles malgré leur atténuation. Les informations essentielles et les perturbations doivent être compréhensibles sans couleur. Toute disposition configurable doit préserver la lisibilité et tenir dans la zone réellement disponible du navigateur cible.
+Lecture rapide sur tout écran cible, avec prise en charge des petits écrans à encre électronique. Dans la vue détaillée, les départs trop proches restent lisibles malgré leur atténuation ; dans la vue épurée, ils sont masqués et un repère gris sans texte le signale. Les informations essentielles et les perturbations doivent être compréhensibles sans couleur. Toute disposition configurable doit préserver la lisibilité et tenir dans la zone réellement disponible du navigateur cible.
 
 ## Open Decisions
 

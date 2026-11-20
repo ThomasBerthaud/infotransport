@@ -3,6 +3,8 @@ import { loadCatalog, type Catalog } from './catalog.js';
 import {
   active,
   ConfigError,
+  departureWindow,
+  previewWindowSettings,
   demoConfig,
   initialConfig,
   refreshDelay,
@@ -298,7 +300,11 @@ export class Service {
     this.mutation = work;
     return work;
   }
-  dashboard(now = new Date()): Dashboard {
+  /**
+   * `preview` widens each block's departure window so the admin preview can apply a draft
+   * walking threshold or minimal count that is higher than the saved one.
+   */
+  dashboard(now = new Date(), { preview = false }: { preview?: boolean } = {}): Dashboard {
     const config = this.config;
     const paused = !active(config.defaults, now);
     const blocks = config.blocks.map((block, index): BlockView => {
@@ -311,11 +317,22 @@ export class Service {
       const view = { block, effective, lineAppearance };
       if (isPaused)
         return { ...view, departures: [], incidents: [], status: 'paused', trafficKnown: false };
-      const count = Math.max(effective.richCount, effective.minimalCount);
+      const at = now.toISOString();
+      const window = preview ? previewWindowSettings(effective) : effective;
       if (this.mode === 'demo')
         return {
           ...view,
-          departures: demoDepartures(block, index, now, count),
+          // Demo trains leave at least one minute apart, so this many always covers the window.
+          departures: departureWindow(
+            demoDepartures(
+              block,
+              index,
+              now,
+              window.richCount + window.minimalCount + window.walkMinutes,
+            ),
+            at,
+            window,
+          ),
           incidents: demoIncidents(block, index),
           status: 'ok',
           trafficKnown: true,
@@ -329,16 +346,18 @@ export class Service {
       const trafficKnown =
         !!traffic && !traffic.error && now.getTime() - traffic.at < TRAFFIC_FRESH_MS;
       const departures = fresh
-        ? entry.data
-            .filter(
+        ? departureWindow(
+            entry.data.filter(
               (d) =>
                 d.lineRef === block.lineRef &&
                 Date.parse(d.time) >= now.getTime() - PAST_GRACE_MS &&
                 (block.directionRef
                   ? d.directionRef === block.directionRef
                   : d.destinationRef === block.destinationRef),
-            )
-            .slice(0, count)
+            ),
+            at,
+            window,
+          )
         : [];
       const incidents = trafficKnown
         ? traffic.data.filter(

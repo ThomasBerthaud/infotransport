@@ -12,7 +12,7 @@ export const numericFields: NumericField[] = [
   {
     key: 'walkMinutes',
     label: 'Temps pour rejoindre la gare',
-    help: 'Les départs trop proches sont grisés. Incluez votre marge pour rejoindre le quai.',
+    help: 'Les départs trop proches sont grisés dans la vue détaillée et masqués dans la vue épurée. Incluez votre marge pour rejoindre le quai.',
     min: 0,
     max: 120,
     unit: 'min',

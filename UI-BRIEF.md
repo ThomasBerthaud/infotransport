@@ -16,7 +16,7 @@ Un encart « Infos trafic » apparaît à côté des départs sur grand écran e
 
 ## Vue épurée `/minimal`
 
-Sur l'écran cible en paysage : deux blocs pleine largeur empilés par défaut. Chaque tuple est autonome et porte ses quatre informations : gare, ligne, direction, horaires. La gare est répétée dans chaque bloc, même si les blocs partagent La Défense. Trois départs par bloc. Le premier départ reste dans sa position chronologique même s'il est trop proche ; il est atténué plutôt que masqué.
+Sur l'écran cible en paysage : deux blocs pleine largeur empilés par défaut. Chaque tuple est autonome et porte ses quatre informations : gare, ligne, direction, horaires. La gare est répétée dans chaque bloc, même si les blocs partagent La Défense. Trois départs par bloc. Les départs trop proches pour être attrapés (sous le seuil de trajet du bloc) sont masqués : seuls les départs atteignables sont affichés, et un petit triangle gris muet devant le premier horaire signale qu'il y en a de masqués.
 
 Aucun titre commun, date de dernière mise à jour, pied de page ni texte inutile. Icône de perturbation près de la ligne lorsque nécessaire. Pas de navigation d'administration occupant l'espace principal, pas de défilement ni d'animation. Texte et formes restent compréhensibles en monochrome. L'administration permet de modifier l'ordre et la largeur des blocs dans une grille, dont une disposition en colonnes si souhaitée.
 
@@ -25,7 +25,7 @@ Exigence absolue : tous les blocs de l'écran et leurs trois départs doivent ê
 ## États de la vue épurée
 
 - Fonctionnement normal : trois départs par bloc lorsque disponibles.
-- Trop proche : atténuation lisible, sans changer l'ordre ni ajouter de texte explicatif permanent.
+- Trop proche : masqué dans la vue épurée, signalé par un triangle gris sans texte ; atténuation lisible dans la vue détaillée, sans changer l'ordre.
 - Perturbation connue : icône près de la ligne ; pas de message long en V1.
 - État trafic inconnu : signe distinct d'un état normal.
 - Train supprimé annoncé par la source : mention explicite, jamais seulement grisée.
@@ -45,7 +45,7 @@ Autocomplétion dans les choix de gare, de ligne et de sens, ainsi que dans les 
 
 ## Vérification matérielle
 
-Mesurer la zone réellement disponible en paysage, y compris les éventuelles barres du navigateur. Confirmer la lisibilité des trois départs, des noms de direction et de l'atténuation ; tester rafraîchissement et reprise après une nuit. L'alimentation permanente ne prouve pas que la veille ou la coupure Wi-Fi sont désactivées.
+Mesurer la zone réellement disponible en paysage, y compris les éventuelles barres du navigateur. Confirmer la lisibilité des trois départs, des noms de direction et du repère de départs masqués ; tester rafraîchissement et reprise après une nuit. L'alimentation permanente ne prouve pas que la veille ou la coupure Wi-Fi sont désactivées.
 
 ## Décisions restantes
 
