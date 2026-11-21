@@ -9,6 +9,13 @@ export type Diagnostic = {
   error?: string;
   configError?: string;
   catalog?: { source: string; importedAt?: string; rowCount: number };
+  timetables?: {
+    state: 'missing' | 'invalid' | 'expired' | 'ok';
+    importedAt?: string;
+    validUntil?: string;
+    uncovered: string[];
+    error?: string;
+  };
   stops: { ref: string; at: number; next: number; error?: string }[];
   traffic: { ref: string; at: number; next: number; error?: string }[];
 };
@@ -26,6 +33,40 @@ const parisDate = (value: string | number, withTime = true) =>
     timeZone: 'Europe/Paris',
     ...(withTime ? {} : { dateStyle: 'long' }),
   });
+
+function TimetablesStatus({ timetables }: { timetables: NonNullable<Diagnostic['timetables']> }) {
+  const problem =
+    timetables.state === 'missing'
+      ? 'Aucun horaire théorique importé : hors connexion, seuls les horaires mémorisés seront affichés.'
+      : timetables.state === 'invalid'
+        ? timetables.error
+        : timetables.state === 'expired'
+          ? `Horaires théoriques expirés depuis le ${parisDate(timetables.validUntil!)}. Relancez l’import.`
+          : undefined;
+  return (
+    <div className="timetables-status">
+      <h3>Horaires théoriques hors connexion</h3>
+      {problem ? (
+        <p className="field-error">{problem}</p>
+      ) : (
+        <p className="field-help">
+          Importés le {parisDate(timetables.importedAt!)}, valables jusqu’au{' '}
+          {parisDate(timetables.validUntil!)}.
+        </p>
+      )}
+      {timetables.state !== 'missing' && timetables.uncovered.length > 0 && (
+        <>
+          <p className="field-error">Blocs sans horaire théorique, relancez l’import :</p>
+          <ul>
+            {timetables.uncovered.map((label) => (
+              <li key={label}>{label}</li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
 
 export function AdminSidebar({
   dashboard,
@@ -127,6 +168,7 @@ export function AdminSidebar({
           Mises à jour de {dashboard.config.defaults.start} à {dashboard.config.defaults.end}, heure
           de Paris, les jours sélectionnés.
         </p>
+        {status.data?.timetables && <TimetablesStatus timetables={status.data.timetables} />}
         {status.data?.catalog?.importedAt && (
           <p className="field-help">
             Référentiel des arrêts importé le {parisDate(status.data.catalog.importedAt, false)}.

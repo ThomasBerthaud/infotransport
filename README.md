@@ -149,6 +149,42 @@ Les erreurs de l’API utilisent des statuts distincts : `400` entrée invalide,
 
 L'estimation dans l'admin est prudente et inclut une heure de marge pour le changement d'heure. Elle dépend des ressources configurées et ne remplace pas les compteurs effectifs. Les quotas et droits réels restent ceux du compte PRIM.
 
+## Application installable et mode hors ligne
+
+La vue riche `/` s’installe comme une application (PWA) sur téléphone ou ordinateur : menu du navigateur, « Installer l’application » ou « Sur l’écran d’accueil » sur iOS. Le service worker n’est actif que **sur une adresse HTTPS** (ou `localhost`) ; sans HTTPS, le site fonctionne normalement mais sans mode hors ligne. `/minimal` (écrans à encre électronique) et `/admin` n’ont ni service worker ni mode hors ligne.
+
+Quand le serveur est injoignable :
+
+1. l’interface se charge depuis le cache du navigateur ;
+2. les derniers départs temps réel reçus par **cet appareil** s’affichent avec la mention « Mémorisé » et un bandeau « Hors connexion · horaires mémorisés le JJ/MM à HH:MM ». Aucun retard n’est affiché, les suppressions restent signalées. Un départ disparaît 30 s après son heure, et l’ensemble est ignoré **2 heures** après son enregistrement ;
+3. au-delà, si des horaires théoriques ont été importés, les départs suivants s’affichent avec la mention « Théorique » (sans retard ni suppression possibles) ;
+4. au retour du serveur, le temps réel revient sans action, au plus tard 30 s après. Les plages de pause restent respectées et aucun appel PRIM supplémentaire n’est fait.
+
+Les données hors ligne sont conservées dans IndexedDB, par navigateur. iOS peut effacer les données d’une application web inutilisée pendant plusieurs semaines : il faut alors la rouvrir une fois connecté.
+
+Tester le service worker demande le build de production (il n’est pas enregistré par `npm run dev`) : `npm run build && npm start`, ouvrir `http://localhost:3000`, recharger une fois, puis arrêter le serveur et recharger.
+
+### Horaires théoriques (GTFS IDFM)
+
+Source : jeu de données [« Horaires prévus sur les lignes de transport en commun d’Île-de-France (GTFS Datahub) »](https://data.iledefrance-mobilites.fr/explore/dataset/offre-horaires-tc-gtfs-idfm/), sous Licence Mobilités. Il couvre les 30 prochains jours de toutes les lignes franciliennes et est republié chaque jour (8 h pour la SNCF, 13 h en semaine pour les autres opérateurs). Les horaires RATP bus et tram n’intègrent pas les adaptations pour travaux.
+
+L’import est manuel et ne garde que les blocs configurés, sur au plus **14 jours**. Il lit `config.json` et `cache.json` dans `DATA_DIR` et écrit `timetables.json` ; le serveur le prend en compte sans redémarrage. Seuls `calendar.txt`, `calendar_dates.txt`, `trips.txt` et `stop_times.txt` sont lus. Le zip n’est pas lu directement : le décompresser d’abord.
+
+```sh
+# Docker : copier le zip téléchargé dans le volume, décompresser, importer, nettoyer.
+docker compose cp IDFM-gtfs.zip infotransport:/data/IDFM-gtfs.zip
+docker compose exec infotransport unzip -o /data/IDFM-gtfs.zip calendar.txt calendar_dates.txt trips.txt stop_times.txt -d /data/gtfs
+docker compose exec infotransport node dist/server/server/import-timetables.js /data/gtfs
+docker compose exec infotransport rm -rf /data/gtfs /data/IDFM-gtfs.zip
+
+# Développement
+npm run timetables:import -- /chemin/vers/gtfs-decompresse
+```
+
+Relancer l’import après l’ajout ou la modification d’un bloc, et avant la fin de validité. L’administration signale un fichier absent, expiré ou des blocs sans horaire théorique.
+
+Correspondance des identifiants : `STIF:StopPoint:Q:<n>:` ↔ `IDFM:<n>` (bus, tram, métro), `STIF:StopArea:SP:<n>:` ↔ `IDFM:monomodalStopPlace:<n>` (RER, Transilien), `STIF:Line::C<n>:` ↔ `IDFM:C<n>`. Une course est retenue quand son terminus correspond à la destination du bloc, ou quand son `trip_headsign` porte le nom d’une destination annoncée par PRIM pour ce sens. Un import lancé juste après des collectes temps réel couvre donc mieux les blocs suivis par sens. Un arrêt de bus configuré au niveau de la zone d’arrêts (`StopArea:SP`) n’est pas couvert.
+
 ## Monitoring Grafana
 
 Le serveur expose `/metrics` au format Prometheus : CPU/RAM du processus Node.js,

@@ -1,4 +1,4 @@
-import type { Dashboard } from '../shared/model.js';
+import type { Dashboard, Departure } from '../shared/model.js';
 import { hour, isReachable, minutesUntil } from '../shared/model.js';
 import { BlockHeading } from '../components/Block.js';
 import { TrafficPanel } from './TrafficPanel.js';
@@ -10,6 +10,14 @@ const statusLabel = {
   error: 'La dernière collecte a échoué.',
   ok: '',
 };
+function DepartureState({ departure: d, delay }: { departure: Departure; delay: number }) {
+  if (d.cancelled) return <span className="service-cancelled">Supprimé</span>;
+  // Saved and scheduled times are never shown with a delay: nothing confirms it still holds.
+  if (d.source === 'snapshot') return <span className="service-saved">Mémorisé</span>;
+  if (d.source === 'scheduled') return <span className="service-scheduled">Théorique</span>;
+  if (delay > 0) return <span className="service-delay">+{delay} min</span>;
+  return <span className="service-ok">{d.realtime ? 'Prévu' : 'Horaire prévu (PRIM)'}</span>;
+}
 export function DashboardView({ data }: { data: Dashboard }) {
   return (
     <>
@@ -21,12 +29,16 @@ export function DashboardView({ data }: { data: Dashboard }) {
           <p>Un coup d’œil avant de partir.</p>
         </div>
         <div className="live-state">
-          <span className={`status-dot ${data.paused ? 'paused' : ''}`} />
+          <span
+            className={`status-dot ${data.paused ? 'paused' : data.offline ? 'offline' : ''}`}
+          />
           {data.paused
             ? 'En pause jusqu’à la prochaine plage'
-            : data.mode === 'demo'
-              ? 'Aperçu de votre tableau'
-              : 'Suivi des départs'}
+            : data.offline
+              ? 'Hors connexion'
+              : data.mode === 'demo'
+                ? 'Aperçu de votre tableau'
+                : 'Suivi des départs'}
           <span className="clock">{hour(data.now)}</span>
         </div>
       </div>
@@ -72,15 +84,7 @@ export function DashboardView({ data }: { data: Dashboard }) {
                             <span className="platform">{d.platform || '—'}</span>
                           </td>
                           <td>
-                            {d.cancelled ? (
-                              <span className="service-cancelled">Supprimé</span>
-                            ) : delay > 0 ? (
-                              <span className="service-delay">+{delay} min</span>
-                            ) : (
-                              <span className="service-ok">
-                                {d.realtime ? 'Prévu' : 'Théorique'}
-                              </span>
-                            )}
+                            <DepartureState departure={d} delay={delay} />
                             {close && !d.cancelled && (
                               <span className="unreachable">Trop proche</span>
                             )}
@@ -91,7 +95,13 @@ export function DashboardView({ data }: { data: Dashboard }) {
                   </tbody>
                 </table>
               </div>
-              {view.status !== 'ok' && <p className="block-empty">{statusLabel[view.status]}</p>}
+              {view.status !== 'ok' && (
+                <p className="block-empty">
+                  {data.offline && view.status === 'empty'
+                    ? 'Plus d’horaires mémorisés utilisables.'
+                    : statusLabel[view.status]}
+                </p>
+              )}
             </section>
           ))}
         </div>

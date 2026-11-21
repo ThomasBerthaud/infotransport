@@ -23,6 +23,7 @@ import { discover, lineReportsPath, parseDepartures, parseLineReports, Prim } fr
 import { demoDepartures, demoDiscovery, demoIncidents } from './demo.js';
 import { toHttpError, UnavailableError } from './errors.js';
 import { log } from './log.js';
+import { Timetables } from './timetables.js';
 
 const SECOND_MS = 1000;
 const MINUTE_MS = 60 * SECOND_MS;
@@ -61,6 +62,7 @@ export class Service {
   cache!: Cache;
   budget!: Budget;
   prim!: Prim;
+  readonly timetables: Timetables;
   readonly mode: 'demo' | 'live';
   private running = false;
   private mutation: Promise<unknown> = Promise.resolve();
@@ -74,6 +76,7 @@ export class Service {
     private key: string,
   ) {
     this.mode = key.trim() ? 'live' : 'demo';
+    this.timetables = new Timetables(store.directory);
   }
   async init() {
     log.info(`Initialisation du service en mode ${this.mode}`);
@@ -92,6 +95,7 @@ export class Service {
       await this.store.read('budget.json', { reservations: [] }),
     );
     this.prim = new Prim(this.key, this.budget, () => this.online());
+    await this.timetables.refresh();
     if (this.mode === 'live') await this.store.write('config.json', this.config);
     log.info(
       `Service initialisé · ${this.config.blocks.length} blocs · budgets ${this.budget
@@ -386,6 +390,7 @@ export class Service {
       refreshSeconds: refreshDelay(config, now),
       config,
       blocks,
+      timetables: this.timetables.version(now),
     };
   }
   diagnostics() {
@@ -401,6 +406,7 @@ export class Service {
         importedAt: this.catalog.data.importedAt,
         rowCount: this.catalog.data.rowCount,
       },
+      timetables: this.timetables.status(this.config),
       stops: entries(this.cache.stops),
       traffic: entries(this.cache.traffic),
     };

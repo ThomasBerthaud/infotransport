@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { AddressInfo } from 'node:net';
@@ -8,7 +8,7 @@ import { createApp } from '../src/server/app.js';
 import { UpstreamError } from '../src/server/errors.js';
 import { Service } from '../src/server/service.js';
 import { Store } from '../src/server/storage.js';
-import { initialConfig, type Block } from '../src/shared/model.js';
+import { initialConfig, type Block, type Dashboard } from '../src/shared/model.js';
 
 type Harness = { base: string; service: Service; dir: string };
 
@@ -180,3 +180,85 @@ test('unreadable configuration JSON is quarantined too', async () =>
     },
     (dir) => writeFile(join(dir, 'config.json'), '{ not json'),
   ));
+
+test('production serves the service worker and manifest for the rich view only', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'infotransport-client-'));
+  const data = await mkdtemp(join(tmpdir(), 'infotransport-data-'));
+  try {
+    await mkdir(join(dir, '.vite'));
+    await writeFile(join(dir, 'index.html'), '<link rel="manifest" href="/manifest.webmanifest">');
+    await writeFile(join(dir, 'sw.js'), 'self.addEventListener("fetch", () => {});');
+    await writeFile(join(dir, 'manifest.webmanifest'), '{"name":"InfoTransport"}');
+    await writeFile(
+      join(dir, '.vite/manifest.json'),
+      JSON.stringify({ 'src/client/minimal.css': { file: 'assets/minimal.css' } }),
+    );
+    const service = new Service(new Store(data), '');
+    await service.init();
+    const server = createApp(service, { production: true, clientDir: dir }).listen(0, '127.0.0.1');
+    await new Promise<void>((resolve) => server.once('listening', resolve));
+    const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+    try {
+      const sw = await fetch(`${base}/sw.js`);
+      assert.equal(sw.status, 200);
+      assert.equal(sw.headers.get('cache-control'), 'no-cache');
+      assert.match(sw.headers.get('content-type') ?? '', /javascript/);
+      const manifest = await fetch(`${base}/manifest.webmanifest`);
+      assert.match(manifest.headers.get('content-type') ?? '', /^application\/manifest\+json/);
+      assert.match(await (await fetch(`${base}/admin`)).text(), /rel="manifest"/);
+      const minimal = await (await fetch(`${base}/minimal`)).text();
+      assert.doesNotMatch(minimal, /manifest|serviceWorker|sw\.js/);
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
+    }
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+    await rm(data, { recursive: true, force: true });
+  }
+});
+
+test('timetables are served for the configured blocks once imported', async () =>
+  withApp('test-key', async ({ base, service, dir }) => {
+    await service.save({ ...allDay(), blocks: [block()] });
+    const missing = await fetch(`${base}/api/timetables`);
+    assert.equal(missing.status, 404);
+    assert.equal(missing.headers.get('cache-control'), 'no-store');
+    let status = (await (await fetch(`${base}/api/status`)).json()) as {
+      timetables: { state: string };
+    };
+    assert.equal(status.timetables.state, 'missing');
+    const before = (await (await fetch(`${base}/api/dashboard`)).json()) as Dashboard;
+    assert.equal(before.timetables, undefined);
+    const soon = new Date(Date.now() + 10 * 60000).toISOString();
+    const b = block();
+    await writeFile(
+      join(dir, 'timetables.json'),
+      JSON.stringify({
+        version: 1,
+        source: 'test',
+        importedAt: '2026-11-20T08:00:00.000Z',
+        validFrom: '2026-11-20T08:00:00.000Z',
+        validUntil: new Date(Date.now() + 86400000).toISOString(),
+        entries: [
+          {
+            key: {
+              monitoringRef: b.monitoringRef,
+              lineRef: b.lineRef,
+              directionRef: b.directionRef,
+              destinationRef: b.destinationRef,
+            },
+            label: 'A · L → D',
+            departures: [{ time: soon, destination: 'D' }],
+          },
+        ],
+      }),
+    );
+    const dashboard = (await (await fetch(`${base}/api/dashboard`)).json()) as Dashboard;
+    assert.equal(dashboard.timetables, '2026-11-20T08:00:00.000Z');
+    const timetables = (await (await fetch(`${base}/api/timetables`)).json()) as {
+      blocks: Record<string, { time: string }[]>;
+    };
+    assert.deepEqual(timetables.blocks.b0, [{ time: soon, destination: 'D' }]);
+    status = (await (await fetch(`${base}/api/status`)).json()) as typeof status;
+    assert.equal(status.timetables.state, 'ok');
+  }));

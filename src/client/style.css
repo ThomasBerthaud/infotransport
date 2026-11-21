@@ -137,6 +137,38 @@ nav a:hover {
 .status-dot.paused {
   background: #8a7665;
 }
+/* Offline: a hollow dot, so the state does not rely on color alone. */
+.status-dot.offline {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--signal);
+}
+.offline-banner,
+.update-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  padding: 11px 4.5%;
+  background: #f1e4d6;
+  color: #6b3a1c;
+  font-size: 11px;
+}
+.offline-banner strong {
+  font-weight: 750;
+}
+.update-banner {
+  background: #ebece3;
+  color: #34452c;
+  font-weight: 600;
+}
+.update-banner .secondary-button {
+  padding: 6px 12px;
+}
+.traffic-offline {
+  margin: 0 0 14px;
+  font-size: 11px;
+  color: var(--muted);
+}
 .app-main {
   max-width: 1560px;
   margin: auto;
@@ -319,6 +351,15 @@ table {
 .service-cancelled {
   color: #aa2929;
   font-size: 11px;
+}
+/* Saved or scheduled times: the label carries the meaning, color only supports it. */
+.service-saved,
+.service-scheduled {
+  color: #6b4a33;
+  font-size: 11px;
+}
+.service-scheduled {
+  font-style: italic;
 }
 .departure-too-close td {
   color: #626e65;
@@ -1510,4 +1551,13 @@ dd {
 }
 .section-description {
   max-width: 65ch;
+}
+.timetables-status h3 {
+  margin: 18px 0 6px;
+  font-size: 12px;
+}
+.timetables-status ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  font-size: 11px;
 }

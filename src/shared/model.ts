@@ -95,10 +95,17 @@ export type Departure = {
   directionRef?: string;
   lineRef: string;
   cancelled: boolean;
+  /** PRIM sent an expected time; `false` means PRIM only knows the planned time. */
   realtime: boolean;
   platform?: string;
   mission?: string;
+  /**
+   * Where the browser got this departure. Absent means the server's current data.
+   * `snapshot`: last real-time data saved on the device; `scheduled`: imported timetable.
+   */
+  source?: DepartureSource;
 };
+export type DepartureSource = 'realtime' | 'snapshot' | 'scheduled';
 export type Incident = {
   id: string;
   title: string;
@@ -124,6 +131,28 @@ export type Dashboard = {
   refreshSeconds: number;
   config: Config;
   blocks: BlockView[];
+  /** Import date of the scheduled timetables the server can provide, if any. */
+  timetables?: string;
+  /** Set by the browser when the server is unreachable and saved data is shown instead. */
+  offline?: {
+    /** Server time of the saved real-time data. */
+    savedAt: string;
+    /** The saved real-time departures and incidents are too old to be shown. */
+    expired: boolean;
+    /** At least one scheduled departure completes the saved data. */
+    scheduled: boolean;
+  };
+};
+/** One planned departure from the imported GTFS timetables. */
+export type ScheduledDeparture = { time: string; destination: string };
+/** `GET /api/timetables`: planned departures of each configured block over a short window. */
+export type TimetablesResponse = {
+  importedAt: string;
+  /** End of the imported validity period. */
+  validUntil: string;
+  /** Departures are listed up to this instant. */
+  until: string;
+  blocks: Record<string, ScheduledDeparture[]>;
 };
 export type CatalogLine = {
   ref: string;

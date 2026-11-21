@@ -11,10 +11,11 @@
     "lint": "oxlint src tests vite.config.ts",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.sw.json",
     "test": "NODE_ENV=test node --import tsx --test tests/*.test.ts",
     "catalog:colors": "node --import tsx scripts/import-line-colors.ts",
-    "catalog:import": "node --import tsx scripts/import-catalog.ts"
+    "catalog:import": "node --import tsx scripts/import-catalog.ts",
+    "timetables:import": "node --env-file-if-exists=.env --import tsx src/server/import-timetables.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/node": "^2.1.2",

@@ -145,6 +145,13 @@ export function TrafficPanel({ data }: { data: Dashboard }) {
         <h2 id="traffic-title">Infos trafic</h2>
         {incidents.length > 0 && <span>{incidents.length} en cours</span>}
       </div>
+      {data.offline && (
+        <p className="traffic-offline">
+          {incidents.length
+            ? 'Hors connexion · informations connues au moment de l’enregistrement.'
+            : 'Hors connexion · état du trafic inconnu.'}
+        </p>
+      )}
       {incidents.length ? (
         <IncidentCarousel
           key={JSON.stringify(incidents.map((incident) => incident.id))}
@@ -157,9 +164,11 @@ export function TrafficPanel({ data }: { data: Dashboard }) {
           <p>
             {data.paused
               ? 'La collecte reprendra à la prochaine plage active.'
-              : known
-                ? 'Sur les lignes que vous suivez.'
-                : 'Consultez les réglages pour vérifier la connexion PRIM.'}
+              : data.offline
+                ? 'Les informations reviendront avec la connexion.'
+                : known
+                  ? 'Sur les lignes que vous suivez.'
+                  : 'Consultez les réglages pour vérifier la connexion PRIM.'}
           </p>
         </div>
       )}

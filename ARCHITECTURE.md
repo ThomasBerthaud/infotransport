@@ -45,11 +45,22 @@ Le journal écrit une ligne horodatée par événement sur la sortie standard, f
 - Scripts disponibles : `dev`, `build`, `start`, `lint`, `fmt`, `fmt:check`, `typecheck`, `test`. Versions verrouillées et installation reproductible avec npm et `npm ci` à partir du lockfile.
 - Construction Docker en plusieurs étapes : build des assets et vérifications avant livraison du serveur et des assets compilés dans l'image finale.
 
+## PWA et mode hors ligne
+
+- Périmètre : la vue riche `/`, sur téléphone et ordinateur. `/minimal` n'a ni manifeste ni service worker ; `/admin` affiche « Réglages indisponibles hors connexion » sans serveur. Le service worker suppose un accès HTTPS, fourni hors de l'application.
+- `public/manifest.webmanifest` et les icônes PNG sont liés depuis `index.html` seulement.
+- `src/client/sw.ts` est une entrée Vite distincte, compilée sous le nom stable `/sw.js` (servi en `Cache-Control: no-cache`) et vérifiée avec la bibliothèque WebWorker (`tsconfig.sw.json`). Un plugin de `vite.config.ts` y inscrit la liste des fichiers du build et une version issue de leur contenu. Il n'importe rien. Stratégies : navigation `/` et `/admin` réseau d'abord (5 s, ou réponse ≥ 500) avec repli sur `index.html` préchargé ; assets cache d'abord ; `/api`, `/minimal`, `/mcp`, `/metrics` et `/health` jamais interceptés. Installation avec `skipWaiting`, purge des anciennes versions à l'activation ; la page propose un rechargement quand une nouvelle version prend le contrôle. Écrit à la main plutôt qu'avec `vite-plugin-pwa`, dont la compatibilité avec Vite 8 n'était pas vérifiée.
+- Données : le service worker ne met aucune donnée en cache. Après chaque `/api/dashboard` réussi, `src/client/offline-store.ts` enregistre le tableau dans IndexedDB, puis télécharge `/api/timetables` si l'import serveur ou les blocs ont changé, ou après 24 h. Une erreur réseau, une redirection ou une réponse non JSON sur `/api` (`OfflineError`) fait reconstruire le tableau depuis ces données ; une erreur HTTP JSON reste une erreur du serveur.
+- Règles dans `src/shared/offline.ts`, fonctions pures : départs mémorisés gardés jusqu'à 30 s après leur heure, instantané ignoré 2 h après son heure serveur, plages actives recalculées localement, complément par les départs théoriques postérieurs au dernier départ mémorisé, dédupliqués à la minute prévue. Chaque départ porte `source: 'snapshot' | 'scheduled'`, distinct du `realtime: false` de PRIM (« Horaire prévu (PRIM) »).
+- Retour du réseau : hors ligne, la requête est retentée toutes les 30 s (sans coût PRIM) ; l'événement `online` déclenche une tentative immédiate hors pause. `refetchOnReconnect` reste désactivé.
+- Horaires théoriques : `src/server/import-timetables.ts` (CLI compilée dans l'image) appelle `importTimetables` de `src/server/timetables.ts`, qui lit un GTFS IDFM décompressé en flux, applique `calendar`/`calendar_dates`, convertit les heures (y compris au-delà de 24:00) depuis « midi moins 12 h » à Paris, et ne garde que les blocs configurés sur 14 jours au plus. La classe `Timetables` recharge le fichier quand sa date change et alimente `/api/timetables` (fenêtre de 48 h), le champ `timetables` de `/api/dashboard` et l'état affiché par `/api/status`.
+
 ## Fichiers persistants
 
 - `/data/config.json` : configuration validée et versionnée.
 - `/data/cache.json` : derniers résultats utilisables, horodatages de collecte et horodatages source lorsqu'ils sont disponibles.
 - `/data/budget.json` : compteurs persistants par journée et par API, dernier appel et attentes éventuelles.
+- `/data/timetables.json` : horaires théoriques des blocs configurés, écrits par l'import manuel (facultatif).
 
 Configuration : `defaults` contient les réglages héritables (seuil de trajet, nombre de départs, plages actives et intervalle de collecte) ; chaque entrée de `blocks` contient un identifiant stable, le tuple, son placement et ses `overrides`. Une propriété absente dans `overrides` hérite dynamiquement de la valeur globale : ne pas recopier les valeurs par défaut à la création. Résoudre et valider les réglages effectifs avant planification. Le rafraîchissement complet de la page reste un réglage global de l'écran ; les intervalles de collecte peuvent varier par bloc dans la limite du budget commun. La configuration initiale ne contient aucun bloc ; en mode démonstration, deux blocs sont fournis pour illustrer l'interface.
 
@@ -93,9 +104,9 @@ Les décisions produit encore ouvertes sont tenues à jour dans [PRODUCT.md](PRO
 
 ## Tests et vérification
 
-`npm test` couvre l'héritage et les surcharges par bloc, le budget après redémarrage et erreurs, la déduplication des collectes, les plages traversant minuit et les changements d'heure, les données périmées, le filtrage des directions, l'analyse SIRI conforme aux contrats Swagger, les routes HTTP (statuts d'erreur, contrôle d'origine, vue épurée), la reprise après une configuration invalide, la purge du cache, MCP, les métriques et les fonctions de l'éditeur de blocs.
+`npm test` couvre l'héritage et les surcharges par bloc, le budget après redémarrage et erreurs, la déduplication des collectes, les plages traversant minuit et les changements d'heure, les données périmées, le filtrage des directions, l'analyse SIRI conforme aux contrats Swagger, les routes HTTP (statuts d'erreur, contrôle d'origine, vue épurée), la reprise après une configuration invalide, la purge du cache, MCP, les métriques et les fonctions de l'éditeur de blocs. Ils couvrent aussi les règles hors ligne (expiration, départs passés, pause, fusion avec le théorique), l'import GTFS (calendrier, heures après minuit, changements d'heure, sens) et les en-têtes du service worker et du manifeste.
 
-Restent manuels : l'essai réel avec une clé PRIM et l'essai sur l'écran cible (rendu, rafraîchissement, Wi-Fi, veille et reprise matinale).
+Restent manuels : l'essai réel avec une clé PRIM et l'essai sur l'écran cible (rendu, rafraîchissement, Wi-Fi, veille et reprise matinale), ainsi que l'installation de la PWA en HTTPS sur Android, iOS et ordinateur et un import sur le GTFS IDFM complet.
 
 ## Sources techniques
 

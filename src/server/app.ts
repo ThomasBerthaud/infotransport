@@ -1,6 +1,6 @@
 import express from 'express';
 import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { z } from 'zod';
@@ -16,6 +16,8 @@ import { log } from './log.js';
 export type AppOptions = {
   /** Serve the Vite build from dist/client instead of redirecting to the dev server. */
   production: boolean;
+  /** Folder of the Vite build, served in production. */
+  clientDir?: string;
 };
 
 const quiet = new Set(['/health', '/metrics']);
@@ -42,7 +44,10 @@ const sameOriginOnly: express.RequestHandler = (req, res, next) => {
   next();
 };
 
-export function createApp(service: Service, { production }: AppOptions) {
+export function createApp(
+  service: Service,
+  { production, clientDir = resolve('dist/client') }: AppOptions,
+) {
   const app = express();
   app.disable('x-powered-by');
   const metrics = createMetrics(() => service.budget.counts());
@@ -61,14 +66,27 @@ export function createApp(service: Service, { production }: AppOptions) {
   app.get('/health', (_req, res) => res.json({ ok: true }));
   app.get('/metrics', metrics.handler);
   app.use('/mcp', createMcpRouter(service));
-  app.get('/api/dashboard', (req, res) =>
-    res.json(service.dashboard(new Date(), { preview: req.query.preview === '1' })),
-  );
+  app.get('/api/dashboard', async (req, res) => {
+    await service.timetables.refresh();
+    res.json(service.dashboard(new Date(), { preview: req.query.preview === '1' }));
+  });
+  app.get('/api/timetables', async (_req, res) => {
+    await service.timetables.refresh();
+    const timetables = service.timetables.forBrowser(service.config);
+    if (!timetables) {
+      res.status(404).json({ error: 'Aucun horaire théorique valide n’est importé.' });
+      return;
+    }
+    res.json(timetables);
+  });
   app.get('/api/config', (_req, res) => res.json(service.config));
   app.put('/api/config', async (req, res) => {
     res.json(await service.save(req.body));
   });
-  app.get('/api/status', (_req, res) => res.json(service.diagnostics()));
+  app.get('/api/status', async (_req, res) => {
+    await service.timetables.refresh();
+    res.json(service.diagnostics());
+  });
   app.get('/api/stops', async (req, res) => {
     const q = z.string().trim().min(2).max(100).parse(req.query.q);
     res.json(await service.search(q));
@@ -88,7 +106,7 @@ export function createApp(service: Service, { production }: AppOptions) {
   let minimalCss: Promise<string> | undefined;
   const minimalCssHref = () =>
     (minimalCss ??= production
-      ? readFile(resolve('dist/client/.vite/manifest.json'), 'utf8').then((text) => {
+      ? readFile(resolve(clientDir, '.vite/manifest.json'), 'utf8').then((text) => {
           const entry = (JSON.parse(text) as Record<string, { file: string }>)[
             'src/client/minimal.css'
           ];
@@ -120,8 +138,20 @@ export function createApp(service: Service, { production }: AppOptions) {
       );
   });
   if (production) {
-    app.use(express.static(resolve('dist/client'), { index: false, maxAge: 0 }));
-    app.get(['/', '/admin'], (_req, res) => res.sendFile(resolve('dist/client/index.html')));
+    app.use(
+      express.static(clientDir, {
+        index: false,
+        maxAge: 0,
+        setHeaders: (res, path) => {
+          // Browsers must check for a new service worker on every visit.
+          if (basename(path) === 'sw.js') res.setHeader('Cache-Control', 'no-cache');
+          if (path.endsWith('.webmanifest'))
+            res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+        },
+      }),
+    );
+    // `root` keeps send's hidden-folder check on the file name only, not on clientDir.
+    app.get(['/', '/admin'], (_req, res) => res.sendFile('index.html', { root: clientDir }));
   } else {
     app.get('/minimal.css', (_req, res) => res.sendFile(resolve('src/client/minimal.css')));
     app.get(['/', '/admin'], (req, res) =>

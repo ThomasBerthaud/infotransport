@@ -12,5 +12,7 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["node", "vite/client"]
   },
-  "include": ["src", "tests", "vite.config.ts", "scripts"]
+  "include": ["src", "tests", "vite.config.ts", "scripts"],
+  // The service worker uses the WebWorker library, incompatible with DOM: tsconfig.sw.json.
+  "exclude": ["src/client/sw.ts"]
 }
