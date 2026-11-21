@@ -44,6 +44,13 @@ colors:
   layout-warning-paper: '#f8f0e3'
   layout-warning-border: '#dfc9a9'
   layout-warning-ink: '#674b2c'
+  banner-paper: '#ebece3'
+  update-ink: '#34452c'
+  offline-paper: '#f1e4d6'
+  offline-ink: '#6b3a1c'
+  stored-ink: '#6b4a33'
+  add-border: '#9caa99'
+  add-hover: '#eceee5'
   minimal-paper: '#fff'
   minimal-ink: '#000'
   minimal-rule: '#111'
@@ -184,6 +191,22 @@ components:
     textColor: '{colors.action-ink}'
     typography: '{typography.label}'
     padding: '10px 8px'
+  banner-offline:
+    backgroundColor: '{colors.offline-paper}'
+    textColor: '{colors.offline-ink}'
+    typography: '{typography.label}'
+    padding: '11px 4.5%'
+  banner-update:
+    backgroundColor: '{colors.banner-paper}'
+    textColor: '{colors.update-ink}'
+    typography: '{typography.label}'
+    padding: '11px 4.5%'
+  profile-selector:
+    backgroundColor: '{colors.field}'
+    textColor: '{colors.field-ink}'
+    rounded: '{rounded.small}'
+    padding: '8px 10px'
+    height: '40px'
   error-box:
     textColor: '{colors.error-ink}'
     padding: '24px'
@@ -238,6 +261,7 @@ Le papier chaud et l’encre sombre accueillent un accent rouille et des verts f
 - **Rouge de suppression** (`cancelled`) : mention explicite « Supprimé ».
 - **Rouge d’erreur** (`error-ink`, `error-border`) : texte et contour des encarts d’erreur riches ; **rouge d’action destructive** (`danger`) pour les commandes de suppression de l’administration.
 - **Ambre de débordement** (`layout-warning-paper`, `layout-warning-border`, `layout-warning-ink`) : fond, contour et texte de l’avertissement de disposition dans l’administration ; son titre reprend l’ambre du budget.
+- **Brun de mémoire** (`offline-paper`, `offline-ink`) : bandeau « Hors connexion » de la vue riche, sur papier rosé. L’encre **brun mémorisé** (`stored-ink`) marque les états « Mémorisé » et « Théorique » des départs, le second en italique ; le libellé porte le sens, la couleur l’accompagne.
 
 ### Neutral
 
@@ -248,6 +272,8 @@ Le papier chaud et l’encre sombre accueillent un accent rouille et des verts f
 - **Départ proche** (`too-close`) : atténuation des horaires et indications associées dans la vue riche.
 - **Encres vertes fonctionnelles** (`action-ink`, `add-ink`, `tag-ink`, `demo-ink`) : actions textuelles, bouton pointillé d’ajout de bloc, étiquette « Local » et bandeau de démonstration. Elles prolongent le vert de service à des contrastes adaptés à leur fond.
 - **Texte indicatif** (`placeholder`) : contenu d’exemple des champs, distinct du texte saisi.
+- **Bandeaux de service** (`banner-paper`) : fond vert-gris partagé par le bandeau de démonstration (`demo-ink`) et l’annonce de nouvelle version (`update-ink`).
+- **Ajout pointillé** (`add-border`, `add-hover`) : bordure pointillée et survol des boutons d’ajout de bloc et de profil.
 - **Pause** (`paused`) : témoin de suivi brun-gris hors des plages actives, accompagné de son libellé.
 - **Blanc, noir et gris épurés** (`minimal-*`) : système monochrome indépendant ; le gris signale les départs masqués et le trafic inconnu.
 
@@ -302,7 +328,7 @@ Le tableau de départs riche conserve des angles droits. Les panneaux d’éditi
 
 ### Buttons
 
-Actions sobres et compactes. Le bouton principal est vert sombre avec texte blanc ; son survol assombrit le fond. Le secondaire est transparent, bordé, et prend un fond vert très pâle au survol. Tous deux utilisent une taille de 12px et une graisse de 650. Les boutons désactivés ont une opacité de 0.45. Les boutons d’icône font 40px de côté ; les actions textuelles ont une hauteur minimale de 40px et se soulignent au survol ; l’ajout de bloc utilise une bordure pointillée.
+Actions sobres et compactes. Le bouton principal est vert sombre avec texte blanc ; son survol assombrit le fond. Le secondaire est transparent, bordé, et prend un fond vert très pâle au survol. Tous deux utilisent une taille de 12px et une graisse de 650. Les boutons désactivés ont une opacité de 0.45. Les boutons d’icône font 40px de côté ; les actions textuelles ont une hauteur minimale de 40px et se soulignent au survol ; l’ajout de bloc ou de profil utilise une bordure pointillée.
 
 ### Cards / Containers
 
@@ -310,7 +336,7 @@ Les blocs de départs ont un filet supérieur sombre de 2px, un en-tête espacé
 
 ### Inputs / Fields
 
-Fond de champ clair, bordure gris-vert et hauteur minimale de 40px. Les libellés sont au-dessus ; aide et erreur restent près du champ. Chaque aide explique l’effet du réglage et est associée au contrôle par `aria-describedby`. Les noms affichés sont distingués des filtres PRIM. Les identifiants techniques et les exceptions de bloc sont dans des sections repliables distinctes ; l’action « Utiliser le réglage commun » explicite le retour à l’héritage. Les indications de dimensions décrivent la zone utile du navigateur ; les aides distinguent le rafraîchissement de page de l’intervalle entre appels PRIM. Le focus partagé est une bordure externe rouille de 3px, décalée de 4px. Les cases à cocher utilisent un accent vert.
+Fond de champ clair, bordure gris-vert et hauteur minimale de 40px. Les libellés sont au-dessus ; aide et erreur restent près du champ. Chaque aide explique l’effet du réglage et est associée au contrôle par `aria-describedby`. Les noms affichés sont distingués des filtres PRIM. Les identifiants techniques et les exceptions de bloc sont dans des sections repliables distinctes ; l’action « Utiliser le réglage commun » explicite le retour à l’héritage. Les indications de dimensions décrivent la zone utile du navigateur ; les aides distinguent le rafraîchissement de page de l’intervalle entre appels PRIM. Le focus partagé est une bordure externe rouille de 3px, décalée de 4px. Les cases à cocher et boutons radio utilisent un accent vert ; un champ invalide prend la bordure d’erreur (`error-border`) et son message, lié par `aria-describedby`, apparaît sous l’aide après la sortie du champ.
 
 ### Autocomplete
 
@@ -361,6 +387,20 @@ L’option « Afficher les dimensions réelles » est intégrée au groupe « Di
 L’indicateur est désactivé par défaut. Lorsqu’il est activé, la vue épurée affiche « Zone utile : largeur × hauteur px » dans un encart fixe au coin inférieur droit, au-dessus de la grille. Cet encart monochrome a un fond blanc, une bordure noire de 1px, des angles droits et des retraits de 4px verticalement et 8px horizontalement ; son texte Arial de 16px utilise une hauteur de ligne de 1.4. Sa largeur est limitée à l’écran et il n’intercepte aucune interaction. Il reste superposé au contenu sans modifier la grille.
 
 La mesure correspond à la zone utile du navigateur en pixels CSS et suit les redimensionnements ; elle ne correspond pas aux dimensions minimales configurées pour la grille. Le contenu de consultation reste rendu côté serveur ; seul le diagnostic nécessite JavaScript et affiche « JavaScript requis » si la mesure ne peut pas s’exécuter. L’aperçu de l’administration affiche les dimensions simulées, sans exécuter de script dans son iframe.
+
+### Hors ligne et mise à jour
+
+Les bandeaux de service occupent toute la largeur sous l’en-tête, avec les retraits latéraux du conteneur (4.5%), 11px de retrait vertical et un texte de 11px qui revient à la ligne. Le bandeau « Hors connexion » utilise le brun de mémoire, un titre en graisse 750 et la date des horaires mémorisés ; il précise « Horaires théoriques · sans information temps réel » quand ils prennent le relais. L’annonce « Nouvelle version disponible » utilise le bandeau de service et un bouton secondaire compact (6px 12px) « Recharger ». Les deux sont des sorties (`output`), sans fermeture ni animation.
+
+Hors connexion, le témoin de suivi devient un cercle creux bordé de rouille de signalement (1.5px), pour que l’état ne dépende pas de la couleur seule. Les départs mémorisés affichent « Mémorisé », les théoriques « Théorique » en italique, jamais un retard.
+
+### Profils de stations
+
+Dans la vue riche, le sélecteur de profil se place sous l’introduction, à 14px du texte, seulement si plusieurs profils existent. C’est un `select` natif au style des champs (hauteur minimale 40px, 12px, petit rayon), nommé « Profil affiché » pour les lecteurs d’écran ; sa première option « Automatique · <profil retenu> » dit le résultat du choix automatique. L’état de la localisation (« Automatique indisponible sans HTTPS », « Localisation en cours », « Localisation refusée », « Position indisponible ») suit en 11px dans le texte secondaire, annoncé poliment, avec l’action textuelle « Réessayer » quand elle a un sens. Aucun bandeau ni couleur d’alerte : l’échec de localisation n’est pas une erreur de consultation.
+
+Dans l’administration, un sélecteur « Profil modifié » précède les onglets et désigne le profil dont on édite les blocs, la grille et l’aperçu. L’onglet « Profils » empile une carte d’édition par profil, nommée par son titre, avec nombre de blocs et zone en métadonnée. La carte du profil modifié prend la bordure de contrôle (`control-border`) et remplace son action « Modifier ses blocs » par le repère textuel « Profil modifié » (11px, graisse 650, `tag-ink`). Le profil par défaut se choisit par bouton radio ; la position regroupe coordonnées, rayon et libellé sous un filet et un titre de 14px. L’erreur de coordonnées apparaît sous l’aide du champ à la sortie de celui-ci, avec la bordure d’erreur. Le chevauchement de zones reprend l’avertissement ambré, sans bloquer l’enregistrement. Les actions d’une carte nomment le profil concerné pour les lecteurs d’écran. Dans l’éditeur de bloc, « Déplacer vers… » est un petit `select` natif de 11px aligné avec les actions.
+
+**The Quiet Location Rule.** La localisation choisit un profil sans jamais interrompre la consultation : pas de modale, pas de bandeau, pas de blocage ; le profil par défaut prend le relais.
 
 ### Minimal departure block
 

@@ -28,12 +28,13 @@ const departure = (minutes: number, cancelled = false): Departure => ({
   cancelled,
   realtime: true,
 });
-const block = demoConfig.blocks[0];
+const block = demoConfig.profiles[0].blocks[0];
 const view = (
   minutes: number[],
   overrides: Partial<Settings> = {},
   extra: Partial<BlockView> = {},
 ): BlockView => ({
+  profileId: demoConfig.profiles[0].id,
   block,
   effective: { ...settings(demoConfig, block), minimalCount: 3, walkMinutes: 10, ...overrides },
   departures: minutes.map((m) => departure(m)),

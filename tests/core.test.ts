@@ -49,12 +49,12 @@ test('inheritance remains dynamic and an override survives a default change', ()
     overrides: {},
   };
   const b1 = { ...b0, id: 'b1', overrides: { walkMinutes: 12 } };
-  c.blocks = [b0, b1];
+  c.profiles[0].blocks = [b0, b1];
   c.defaults.walkMinutes = 5;
-  assert.equal(settings(c, c.blocks[0]).walkMinutes, 5);
-  assert.equal(settings(c, c.blocks[1]).walkMinutes, 12);
-  delete c.blocks[1].overrides.walkMinutes;
-  assert.equal(settings(c, c.blocks[1]).walkMinutes, 5);
+  assert.equal(settings(c, c.profiles[0].blocks[0]).walkMinutes, 5);
+  assert.equal(settings(c, c.profiles[0].blocks[1]).walkMinutes, 12);
+  delete c.profiles[0].blocks[1].overrides.walkMinutes;
+  assert.equal(settings(c, c.profiles[0].blocks[1]).walkMinutes, 5);
 });
 test('night is paused in Paris and DST repeated hour is handled', () => {
   const s = initialConfig.defaults;
@@ -87,9 +87,9 @@ test('layout packs half-width blocks without overlap and warns about screen over
     overrides: {},
   };
   const b1 = { ...b0, id: 'b1' };
-  c.blocks = [b0, b1];
+  c.profiles[0].blocks = [b0, b1];
   assert.deepEqual(
-    layout(c.blocks).cells.map((v) => [v.row, v.col]),
+    layout(c.profiles[0].blocks).cells.map((v) => [v.row, v.col]),
     [
       [0, 0],
       [0, 1],
@@ -108,7 +108,10 @@ test('layout packs half-width blocks without overlap and warns about screen over
     overrides: {},
   };
   c.defaults.pollSeconds = 900;
-  c.blocks = Array.from({ length: 5 }, (_, i) => ({ ...base, id: String(i) })) as Block[];
+  c.profiles[0].blocks = Array.from({ length: 5 }, (_, i) => ({
+    ...base,
+    id: String(i),
+  })) as Block[];
   assert.doesNotThrow(() => validateConfig(c));
   assert.ok(minimalWarnings(c).length > 0);
 });
@@ -126,12 +129,12 @@ test('estimated budget deduplicates a station and rejects excessive collection',
     span: 2,
     overrides: {},
   };
-  c.blocks = [
+  c.profiles[0].blocks = [
     { ...base, id: 'b0' },
     { ...base, id: 'b1' },
   ];
   const separate = estimatedCalls(c);
-  c.blocks.forEach((b) => {
+  c.profiles[0].blocks.forEach((b) => {
     b.monitoringRef = 'STIF:StopArea:SP:123:';
   });
   assert.ok(estimatedCalls(c) < separate);
@@ -153,12 +156,12 @@ test('estimates above 900 combined calls are accepted when each API stays within
     overrides: {},
   };
   c.defaults.pollSeconds = 300;
-  c.blocks = Array.from({ length: 3 }, (_, i) => ({ ...base, id: String(i) }));
+  c.profiles[0].blocks = Array.from({ length: 3 }, (_, i) => ({ ...base, id: String(i) }));
   assert.deepEqual(estimatedCallsByApi(c), { 'stop-monitoring': 651, 'line-reports': 219 });
-  c.blocks.push({ ...base, id: '3' });
+  c.profiles[0].blocks.push({ ...base, id: '3' });
   assert.ok(estimatedCalls(c) > 900);
   assert.doesNotThrow(() => validateConfig(c));
-  c.blocks.push({ ...base, id: '4' });
+  c.profiles[0].blocks.push({ ...base, id: '4' });
   assert.throws(() => validateConfig(c), /Prochains passages.*900/);
 });
 test('traffic estimates enforce their own automatic quota', () => {
@@ -176,7 +179,7 @@ test('traffic estimates enforce their own automatic quota', () => {
     span: 2,
     overrides: {},
   };
-  c.blocks = Array.from({ length: 9 }, (_, i) => ({ ...base, id: String(i) }));
+  c.profiles[0].blocks = Array.from({ length: 9 }, (_, i) => ({ ...base, id: String(i) }));
   assert.throws(() => validateConfig(c), /Messages info trafic.*900/);
 });
 test('exhausting one API leaves the other quota available, including after restart', async () =>
@@ -372,7 +375,7 @@ test('no-key demo never calls upstream; configuration persists and pause removes
       span: 2,
       overrides: {},
     };
-    c.blocks = [base];
+    c.profiles[0].blocks = [base];
     await service.save(c);
     const view = service.dashboard(new Date('2026-10-26T10:00:00Z'));
     assert.equal(view.blocks.length, 1);
@@ -383,7 +386,7 @@ test('no-key demo never calls upstream; configuration persists and pause removes
       0,
     );
     const c2 = clone();
-    c2.blocks = [base];
+    c2.profiles[0].blocks = [base];
     c2.defaults.walkMinutes = 11;
     await service.save(c2);
     const restarted = new Service(new Store(dir), '');
@@ -411,7 +414,7 @@ test('live snapshot filters by line and direction, rejects past departures and s
     base.monitoringRef = 'STIF:StopArea:SP:123:';
     base.lineRef = 'STIF:Line::C01740:';
     base.directionRef = 'outbound';
-    c.blocks = [base];
+    c.profiles[0].blocks = [base];
     await service.save(c);
     const now = new Date('2026-10-26T08:00:00Z');
     const train = parseDepartures(stopPayload())[0];
@@ -460,7 +463,8 @@ test('PRIM errors still reserve budget and API key stays in headers', async () =
 test('minimal capacity warns about short rows and long text without blocking or shrinking', () => {
   const c = clone();
   c.defaults.pollSeconds = 600;
-  c.screen = { ...c.screen, width: 800, height: 688, rows: 4 };
+  c.screen = { ...c.screen, width: 800, height: 688 };
+  c.profiles[0].grid.rows = 4;
   const base: Block = {
     id: 'x',
     station: 'A',
@@ -473,7 +477,7 @@ test('minimal capacity warns about short rows and long text without blocking or 
     span: 2,
     overrides: {},
   };
-  c.blocks = Array.from({ length: 4 }, (_, i) => ({ ...base, id: String(i) }));
+  c.profiles[0].blocks = Array.from({ length: 4 }, (_, i) => ({ ...base, id: String(i) }));
   assert.doesNotThrow(() => validateConfig(c));
   assert.match(minimalWarnings(c).join(' '), /ne tient pas/);
   c.screen.height = 840;
@@ -482,11 +486,11 @@ test('minimal capacity warns about short rows and long text without blocking or 
   c.screen.height = 839;
   assert.doesNotThrow(() => validateConfig(c));
   assert.match(minimalWarnings(c).join(' '), /ne tient pas/);
-  c.blocks = c.blocks.map((b) => ({ ...b, span: 1 as const }));
+  c.profiles[0].blocks = c.profiles[0].blocks.map((b) => ({ ...b, span: 1 as const }));
   c.screen.height = 600;
-  c.screen.rows = 2;
+  c.profiles[0].grid.rows = 2;
   assert.doesNotThrow(() => validateConfig(c));
-  c.blocks[0].direction = 'W'.repeat(60);
+  c.profiles[0].blocks[0].direction = 'W'.repeat(60);
   assert.doesNotThrow(() => validateConfig(c));
   assert.match(minimalWarnings(c).join(' '), /ne tient pas/);
 });
@@ -520,7 +524,7 @@ test('collector deduplicates stop requests across blocks and respects next colle
       span: 2,
       overrides: {},
     };
-    c.blocks = [
+    c.profiles[0].blocks = [
       {
         ...base,
         id: 'b0',
@@ -678,7 +682,7 @@ test('demonstration direction IDs cannot silently become live collection filters
       span: 2,
       overrides: {},
     };
-    c.blocks = [
+    c.profiles[0].blocks = [
       {
         ...base,
         id: 'b0',
@@ -729,21 +733,22 @@ test('configurable grid packs mixed spans and wraps without backfilling gaps', (
   });
   const c = clone();
   c.defaults.pollSeconds = 600;
-  c.screen = { ...c.screen, width: 2400, height: 900, columns: 4, rows: 3 };
+  c.screen = { ...c.screen, width: 2400, height: 900 };
+  c.profiles[0].grid = { columns: 4, rows: 3 };
   c.defaults.pollSeconds = 900;
-  c.blocks = blocks;
+  c.profiles[0].blocks = blocks;
   assert.doesNotThrow(() => validateConfig(c));
-  c.screen.rows = 2;
+  c.profiles[0].grid.rows = 2;
   assert.doesNotThrow(() => validateConfig(c));
   assert.match(minimalWarnings(c).join(' '), /nécessite 3 lignes/);
-  c.screen.columns = 2;
+  c.profiles[0].grid.columns = 2;
   assert.doesNotThrow(() => validateConfig(c));
   assert.match(minimalWarnings(c).join(' '), /occupe 3 colonnes/);
 });
 
 test('grid respects empty rows, validates dimensions, and migrates legacy layouts', () => {
   const c = clone();
-  c.blocks = [
+  c.profiles[0].blocks = [
     {
       id: 'x',
       station: 'A',
@@ -757,23 +762,29 @@ test('grid respects empty rows, validates dimensions, and migrates legacy layout
       overrides: {},
     },
   ];
-  c.screen.rows = 3;
+  c.profiles[0].grid.rows = 3;
   assert.doesNotThrow(() => validateConfig(c));
   assert.match(minimalWarnings(c).join(' '), /ne tient pas/);
   for (const key of ['columns', 'rows'] as const) {
     for (const value of [0, 13, 1.5]) {
       const invalid = clone();
-      invalid.screen[key] = value;
+      invalid.profiles[0].grid[key] = value;
       assert.throws(() => validateConfig(invalid));
     }
   }
-  const { columns: _columns, rows: _rows, ...screen } = c.screen;
-  const migrated = validateConfig({ ...c, screen });
-  assert.equal(migrated.screen.columns, 2);
-  assert.equal(migrated.screen.rows, 1);
-  assert.deepEqual(migrated.blocks, c.blocks);
-  c.screen = { ...c.screen, columns: 1, rows: 1 };
-  c.blocks[0].span = 1;
+  // A v1 configuration without grid gets the default columns and the rows its blocks need.
+  const legacy = {
+    version: 1,
+    defaults: c.defaults,
+    screen: c.screen,
+    blocks: c.profiles[0].blocks,
+  };
+  const migrated = validateConfig(legacy);
+  assert.equal(migrated.profiles[0].grid.columns, 2);
+  assert.equal(migrated.profiles[0].grid.rows, 1);
+  assert.deepEqual(migrated.profiles[0].blocks, c.profiles[0].blocks);
+  c.profiles[0].grid = { columns: 1, rows: 1 };
+  c.profiles[0].blocks[0].span = 1;
   assert.doesNotThrow(() => validateConfig(c));
 });
 
@@ -782,8 +793,9 @@ test('overflowing layouts persist and oversized first blocks start at the top', 
     const service = new Service(new Store(dir), 'test-key');
     await service.init();
     const c = clone();
-    c.screen = { ...c.screen, columns: 1, rows: 1, height: 240 };
-    c.blocks = [0, 1].map((id) => ({
+    c.screen = { ...c.screen, height: 240 };
+    c.profiles[0].grid = { columns: 1, rows: 1 };
+    c.profiles[0].blocks = [0, 1].map((id) => ({
       id: String(id),
       station: 'A',
       line: 'L',
@@ -799,7 +811,7 @@ test('overflowing layouts persist and oversized first blocks start at the top', 
     await service.save(c);
     assert.deepEqual(await new Store(dir).read('config.json', null), c);
     assert.deepEqual(
-      layout(c.blocks, 1).cells.map(({ row, col }) => [row, col]),
+      layout(c.profiles[0].blocks, 1).cells.map(({ row, col }) => [row, col]),
       [
         [0, 0],
         [1, 0],

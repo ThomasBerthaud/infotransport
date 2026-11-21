@@ -101,7 +101,7 @@ export const newBlock = (columns: number): Block => ({
   overrides: {},
 });
 
-export function moveBlock(blocks: Block[], index: number, delta: number): Block[] {
+export function moveBlock<T>(blocks: T[], index: number, delta: number): T[] {
   const target = index + delta;
   if (target < 0 || target >= blocks.length) return blocks;
   const next = [...blocks];

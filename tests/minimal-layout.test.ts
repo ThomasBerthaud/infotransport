@@ -22,7 +22,7 @@ test('minimal capacity estimates follow labels and inherited departure counts', 
     span: 1,
     overrides: {},
   };
-  config.blocks = [block];
+  config.profiles[0].blocks = [block];
   const original = minimalBlockSize(config, block);
   config.defaults.minimalCount = 5;
   assert.ok(minimalBlockSize(config, block).width > original.width);
@@ -36,7 +36,7 @@ test('minimal capacity estimates follow labels and inherited departure counts', 
 
   block.span = 2;
   config.screen.width = original.width;
-  config.screen.height = original.height * config.screen.rows;
+  config.screen.height = original.height * config.profiles[0].grid.rows;
   assert.deepEqual(minimalWarnings(config), []);
   block.direction = 'W'.repeat(40);
   assert.ok(minimalWarnings(config).length > 0);
@@ -44,8 +44,9 @@ test('minimal capacity estimates follow labels and inherited departure counts', 
 
 test('minimal grid keeps the configured screen dimensions even when content overflows', () => {
   const config = structuredClone(initialConfig);
-  config.screen = { ...config.screen, width: 600, height: 480, columns: 2, rows: 4 };
-  config.blocks = [
+  config.screen = { ...config.screen, width: 600, height: 480 };
+  config.profiles[0].grid = { columns: 2, rows: 4 };
+  config.profiles[0].blocks = [
     {
       id: 'wide',
       station: 'W'.repeat(40),
@@ -60,20 +61,21 @@ test('minimal grid keeps the configured screen dimensions even when content over
     },
   ];
 
-  assert.ok(minimalBlockSize(config, config.blocks[0]).width > config.screen.width);
+  assert.ok(minimalBlockSize(config, config.profiles[0].blocks[0]).width > config.screen.width);
   assert.ok(minimalWarnings(config).length > 0);
   assert.deepEqual(minimalGridSize(config), { width: 600, height: 480 });
 
-  config.blocks[0].span = 2;
+  config.profiles[0].blocks[0].span = 2;
   assert.deepEqual(minimalGridSize(config), { width: 600, height: 480 });
-  config.blocks = [];
+  config.profiles[0].blocks = [];
   assert.deepEqual(minimalGridSize(config), { width: 600, height: 480 });
 });
 
 test('measured content replaces capacity estimates while keeping structural warnings', () => {
   const config = structuredClone(initialConfig);
-  config.screen = { ...config.screen, width: 600, height: 800, columns: 2, rows: 1 };
-  config.blocks = ['Maria Valtat', 'Paddock Paris'].map((station, index) => ({
+  config.screen = { ...config.screen, width: 600, height: 800 };
+  config.profiles[0].grid = { columns: 2, rows: 1 };
+  config.profiles[0].blocks = ['Maria Valtat', 'Paddock Paris'].map((station, index) => ({
     id: String(index),
     station,
     line: '247',
@@ -90,7 +92,7 @@ test('measured content replaces capacity estimates while keeping structural warn
   assert.deepEqual(minimalWarnings(config, ['1']), [
     'Le bloc « Paddock Paris · 247 » ne tient pas lisiblement dans l’écran épuré.',
   ]);
-  config.blocks[0].span = 3;
+  config.profiles[0].blocks[0].span = 3;
   assert.match(minimalWarnings(config, []).join(' '), /occupe 3 colonnes/);
   assert.match(minimalWarnings(config, []).join(' '), /nécessite 2 lignes/);
 });

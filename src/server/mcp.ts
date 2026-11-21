@@ -2,6 +2,7 @@ import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
 import { toNodeHandler } from '@modelcontextprotocol/node';
 import { Router } from 'express';
 import { z } from 'zod';
+import { defaultProfile } from '../shared/model.js';
 import type { Service } from './service.js';
 
 const annotations = {
@@ -24,6 +25,7 @@ export function createMcpServer(service: Service) {
     {
       instructions:
         'InfoTransport expose en lecture seule les transports suivis par ce site. ' +
+        'Les blocs sont regroupés en profils (list_profiles) ; get_dashboard et get_traffic lisent le profil par défaut sauf argument profile. ' +
         'Utiliser get_dashboard pour les prochains départs et get_traffic pour les perturbations. ' +
         'Toujours tenir compte de mode (demo = données fictives), now, paused, du status de chaque bloc ' +
         'et de trafficKnown (false = trafic inconnu, pas absence de perturbations). ' +
@@ -31,31 +33,63 @@ export function createMcpServer(service: Service) {
         'La recherche du catalogue ne fournit pas de départs pour les arrêts non suivis.',
     },
   );
+  const profileInput = z.object({
+    profile: z
+      .string()
+      .min(1)
+      .max(80)
+      .optional()
+      .describe('Identifiant issu de list_profiles. Profil par défaut si absent.'),
+  });
+  const profileDashboard = (profile?: string) =>
+    service.dashboard(new Date(), {
+      profile: profile ?? defaultProfile(service.config).id,
+    });
+  server.registerTool(
+    'list_profiles',
+    {
+      description:
+        'Lister les profils de stations (identifiant, nom, position éventuelle) et le profil par défaut.',
+      inputSchema: z.object({}),
+      annotations,
+    },
+    async () =>
+      result({
+        defaultProfileId: defaultProfile(service.config).id,
+        profiles: service.config.profiles.map(({ id, name, location, blocks }) => ({
+          id,
+          name,
+          location,
+          blocks: blocks.length,
+        })),
+      }),
+  );
   server.registerTool(
     'get_dashboard',
     {
       description:
-        'Lire les prochains départs, directions, voies, incidents et états des blocs suivis.',
-      inputSchema: z.object({}),
+        'Lire les prochains départs, directions, voies, incidents et états des blocs d’un profil.',
+      inputSchema: profileInput,
       annotations,
     },
-    async () => result(service.dashboard()),
+    async ({ profile }) => result(profileDashboard(profile)),
   );
   server.registerTool(
     'get_traffic',
     {
       description:
-        'Lire les perturbations des blocs suivis, avec le mode et la disponibilité du trafic.',
-      inputSchema: z.object({}),
+        'Lire les perturbations des blocs d’un profil, avec le mode et la disponibilité du trafic.',
+      inputSchema: profileInput,
       annotations,
     },
-    async () => {
-      const dashboard = service.dashboard();
+    async ({ profile }) => {
+      const dashboard = profileDashboard(profile);
       return result({
         mode: dashboard.mode,
         now: dashboard.now,
         paused: dashboard.paused,
-        blocks: dashboard.blocks.map(({ block, status, trafficKnown, incidents }) => ({
+        blocks: dashboard.blocks.map(({ profileId, block, status, trafficKnown, incidents }) => ({
+          profileId,
           block,
           status,
           trafficKnown,

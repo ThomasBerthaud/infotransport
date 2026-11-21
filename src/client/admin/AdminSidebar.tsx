@@ -132,11 +132,12 @@ export function AdminSidebar({
           <summary>Comprendre l’estimation</summary>
           <p>
             Calculée avec les réglages du formulaire et une heure de marge pour le changement
-            d’heure. Chaque API dispose de 1 000 appels par jour, dont 900 au maximum pour la
-            collecte automatique. La découverte des directions utilise le quota des passages. Les
-            recherches de gares et de lignes ne consomment aucun appel. Ces compteurs suivent
-            uniquement cette instance : les appels effectués ailleurs avec le même compte PRIM ne
-            sont pas connus.
+            d’heure. Les blocs de tous les profils sont collectés et comptés ; un arrêt ou une ligne
+            partagés par plusieurs profils ne sont comptés qu’une fois. Chaque API dispose de 1 000
+            appels par jour, dont 900 au maximum pour la collecte automatique. La découverte des
+            directions utilise le quota des passages. Les recherches de gares et de lignes ne
+            consomment aucun appel. Ces compteurs suivent uniquement cette instance : les appels
+            effectués ailleurs avec le même compte PRIM ne sont pas connus.
           </p>
         </details>
       </section>

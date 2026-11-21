@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import type { BlockView, Config, Dashboard } from '../../shared/model.js';
+import type { BlockView, Config, Dashboard, Profile } from '../../shared/model.js';
 import { layout, minimalGridSize, settings, shownInMinimal } from '../../shared/model.js';
 import { MinimalBlock } from '../../components/Block.js';
 import { minimalDebugMarkup } from '../../shared/minimal-debug.js';
@@ -10,11 +10,14 @@ import { overflowingMinimalBlocks } from '../minimal-overflow.js';
 /** Renders the draft exactly as /minimal would and reports blocks whose text overflows. */
 export function Preview({
   config,
+  profile,
   dashboard,
   onMeasure,
   hidden = false,
 }: {
   config: Config;
+  /** Profile of the draft whose minimal grid is shown. */
+  profile: Profile;
   dashboard: Dashboard;
   onMeasure: (ids: string[]) => void;
   hidden?: boolean;
@@ -32,16 +35,17 @@ export function Preview({
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
-  const { columns, rows } = config.screen;
+  const { columns, rows } = profile.grid;
   const minimum = minimalGridSize(config);
-  const cells = new Map(layout(config.blocks, columns).cells.map((cell) => [cell.id, cell]));
-  const visibleBlocks = config.blocks.filter(shownInMinimal);
+  const cells = new Map(layout(profile.blocks, columns).cells.map((cell) => [cell.id, cell]));
+  const visibleBlocks = profile.blocks.filter(shownInMinimal);
   const html = visibleBlocks
     .map((block) => {
       const old = dashboard.blocks.find((v) => v.block.id === block.id);
       const view: BlockView = old
-        ? { ...old, block, effective: settings(config, block) }
+        ? { ...old, profileId: profile.id, block, effective: settings(config, block) }
         : {
+            profileId: profile.id,
             block,
             effective: settings(config, block),
             departures: [],

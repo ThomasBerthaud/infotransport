@@ -1,5 +1,8 @@
 import {
   active,
+  allBlocks,
+  configSchema,
+  defaultProfile,
   departureWindow,
   refreshDelay,
   type BlockView,
@@ -24,7 +27,7 @@ export type StoredTimetables = TimetablesResponse & { fetchedAt: string; signatu
 export function timetablesSignature(dashboard: Dashboard): string {
   return JSON.stringify([
     dashboard.timetables ?? '',
-    dashboard.config.blocks.map((b) => [
+    allBlocks(dashboard.config).map((b) => [
       b.id,
       b.monitoringRef,
       b.lineRef,
@@ -103,8 +106,22 @@ export function offlineDashboard(
   now: Date,
 ): Dashboard | undefined {
   if (!snapshot) return undefined;
-  const { dashboard } = snapshot;
-  const config = dashboard.config;
+  // A snapshot saved by an older version holds a single-list configuration: migrate it.
+  const parsed = configSchema.safeParse(snapshot.dashboard.config);
+  if (!parsed.success) return undefined;
+  const config = parsed.data;
+  const fallbackProfile = defaultProfile(config).id;
+  const dashboard: Dashboard = {
+    ...snapshot.dashboard,
+    config,
+    blocks: snapshot.dashboard.blocks.map((view) => ({
+      ...view,
+      profileId:
+        view.profileId ??
+        config.profiles.find((p) => p.blocks.some((b) => b.id === view.block.id))?.id ??
+        fallbackProfile,
+    })),
+  };
   const expired = now.getTime() - Date.parse(snapshot.savedAt) > SNAPSHOT_MAX_AGE_MS;
   const timetablesUsable =
     !!timetables &&
@@ -114,6 +131,7 @@ export function offlineDashboard(
   let scheduledShown = false;
   const blocks = dashboard.blocks.map((view): BlockView => {
     const base = {
+      profileId: view.profileId,
       block: view.block,
       effective: view.effective,
       lineAppearance: view.lineAppearance,

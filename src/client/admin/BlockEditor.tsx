@@ -1,4 +1,4 @@
-import type { Block, BlockView, Config, Dashboard } from '../../shared/model.js';
+import type { Block, BlockView, Config, Dashboard, Profile } from '../../shared/model.js';
 import { settings, shownInMinimal } from '../../shared/model.js';
 import { Icon } from '../../components/Icon.js';
 import { Line } from '../../components/Block.js';
@@ -18,13 +18,23 @@ export function BlockEditor({
   onDelete,
   mode,
   savedView,
+  count,
+  columns,
+  otherProfiles,
+  onMoveToProfile,
 }: EditorProps & {
   savedView?: BlockView;
   mode: Dashboard['mode'];
   config: Config;
   index: number;
+  /** Number of blocks in the block's profile. */
+  count: number;
+  /** Columns of the profile's minimal grid. */
+  columns: number;
+  otherProfiles: Pick<Profile, 'id' | 'name'>[];
   onMove: (delta: number) => void;
   onDelete: () => void;
+  onMoveToProfile: (profileId: string) => void;
 }) {
   const lookup = useBlockLookup(block, mode, onChange);
   const selectedLine = lookup.lines.data?.find((line) => line.ref === block.lineRef);
@@ -55,7 +65,7 @@ export function BlockEditor({
             type="button"
             className="icon-button"
             onClick={() => onMove(1)}
-            disabled={index === config.blocks.length - 1}
+            disabled={index === count - 1}
             aria-label="Descendre le bloc"
           >
             <Icon name="down" />
@@ -64,14 +74,31 @@ export function BlockEditor({
             type="button"
             className="text-button danger"
             onClick={onDelete}
-            disabled={config.blocks.length === 1}
+            disabled={count === 1}
           >
             Retirer
           </button>
+          {otherProfiles.length > 0 && (
+            <select
+              className="move-to-profile"
+              value=""
+              aria-label="Déplacer vers le profil"
+              onChange={(e) => {
+                if (e.target.value) onMoveToProfile(e.target.value);
+              }}
+            >
+              <option value="">Déplacer vers…</option>
+              {otherProfiles.map((profile) => (
+                <option key={profile.id} value={profile.id}>
+                  {profile.name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
       <CatalogChoice block={block} mode={mode} lookup={lookup} />
-      <DisplayFields block={block} config={config} onChange={onChange} />
+      <DisplayFields block={block} columns={columns} onChange={onChange} />
       <ManualReferences block={block} onChange={onChange} lookup={lookup} />
       <BlockOverrides block={block} config={config} onChange={onChange} />
     </article>
@@ -182,8 +209,7 @@ const labelFields = [
   },
 ] as const;
 
-export function DisplayFields({ block, config, onChange }: EditorProps & { config: Config }) {
-  const { columns } = config.screen;
+export function DisplayFields({ block, columns, onChange }: EditorProps & { columns: number }) {
   return (
     <section className="block-display" aria-labelledby={`display-title-${block.id}`}>
       <h4 id={`display-title-${block.id}`}>Libellés et affichage</h4>

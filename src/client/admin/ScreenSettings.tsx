@@ -1,27 +1,37 @@
-import type { Config } from '../../shared/model.js';
+import type { Config, Profile } from '../../shared/model.js';
 
 type Screen = Config['screen'];
+type Grid = Profile['grid'];
 
 export function ScreenSettings({
   screen,
+  grid,
+  profileName,
   onChange,
+  onGridChange,
 }: {
   screen: Screen;
+  grid: Grid;
+  profileName: string;
   onChange: (screen: Screen) => void;
+  onGridChange: (grid: Grid) => void;
 }) {
   return (
     <div className="settings-groups">
       <section className="settings-group">
-        <h3>Disposition des blocs</h3>
+        <h3>Disposition des blocs · {profileName}</h3>
+        <p className="section-description">
+          Chaque profil a sa propre grille. Les dimensions et l’actualisation sont communes.
+        </p>
         <div className="fields-grid">
           {(['columns', 'rows'] as const).map((key) => (
             <label className="field" key={key}>
               {key === 'columns' ? 'Colonnes' : 'Lignes'}
               <select
-                value={screen[key]}
+                value={grid[key]}
                 aria-label={key === 'columns' ? 'Colonnes' : 'Lignes'}
                 aria-describedby={`screen-${key}-help`}
-                onChange={(e) => onChange({ ...screen, [key]: Number(e.target.value) })}
+                onChange={(e) => onGridChange({ ...grid, [key]: Number(e.target.value) })}
               >
                 {Array.from({ length: 12 }, (_, i) => i + 1).map((value) => (
                   <option key={value} value={value}>

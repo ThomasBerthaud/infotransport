@@ -197,6 +197,39 @@ h1 {
   color: var(--muted);
   font-size: 13px;
 }
+.profile-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.profile-selector select {
+  border: 1px solid #cbd2c7;
+  background: #fffefa;
+  color: #24352a;
+  padding: 8px 10px;
+  min-height: 40px;
+  border-radius: 4px;
+  font-size: 12px;
+  max-width: 100%;
+}
+.profile-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .live-state {
   display: flex;
   align-items: center;
@@ -634,6 +667,9 @@ table {
   border-radius: 4px;
   font-size: 12px;
 }
+.field input[aria-invalid='true'] {
+  border-color: #ae5148;
+}
 input::placeholder {
   color: #737d70;
 }
@@ -759,7 +795,8 @@ input::placeholder {
   font-size: 11px;
   cursor: pointer;
 }
-input[type='checkbox'] {
+input[type='checkbox'],
+input[type='radio'] {
   accent-color: #385e43;
 }
 .check-label {
@@ -1224,6 +1261,59 @@ dd {
 }
 .block-display > .field-help {
   margin: 0 0 0 24px;
+}
+.profile-switch {
+  margin-bottom: 22px;
+  max-width: 420px;
+}
+.profile-editor[aria-current='true'] {
+  border-color: #bbc8bb;
+}
+.profile-current {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 8px;
+  color: #42624b;
+  font-size: 11px;
+  font-weight: 650;
+}
+.profile-default {
+  align-self: end;
+  min-height: 40px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.profile-location {
+  margin-top: 26px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+.profile-location h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.profile-location > .field-help {
+  margin: 0 0 18px;
+}
+.profile-location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+.move-to-profile {
+  border: 1px solid #cbd2c7;
+  background: #fffefa;
+  color: #24352a;
+  min-height: 40px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 11px;
 }
 .override-row label {
   grid-column: 1 / -1;

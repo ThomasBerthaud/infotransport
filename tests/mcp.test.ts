@@ -40,6 +40,7 @@ test('MCP HTTP exposes site data read-only without provider calls or persistent 
       'get_status',
       'get_stop_lines',
       'get_traffic',
+      'list_profiles',
       'search_stops',
     ]);
     assert.ok(tools.tools.every((tool) => tool.annotations?.readOnlyHint));
@@ -48,8 +49,31 @@ test('MCP HTTP exposes site data read-only without provider calls or persistent 
     assert.equal(data(dashboard).mode, 'demo');
     assert.deepEqual(
       dashboard.structuredContent,
-      JSON.parse(JSON.stringify(service.dashboard(new Date(String(data(dashboard).now))))),
+      JSON.parse(
+        JSON.stringify(
+          service.dashboard(new Date(String(data(dashboard).now)), { profile: 'la-defense' }),
+        ),
+      ),
     );
+    const profiles = await client.callTool({ name: 'list_profiles', arguments: {} });
+    assert.equal(data(profiles).defaultProfileId, 'la-defense');
+    assert.deepEqual(
+      (data(profiles).profiles as { id: string }[]).map((p) => p.id),
+      ['la-defense', 'saint-lazare'],
+    );
+    const other = await client.callTool({
+      name: 'get_dashboard',
+      arguments: { profile: 'saint-lazare' },
+    });
+    assert.deepEqual(
+      (data(other).blocks as { profileId: string }[]).map((v) => v.profileId),
+      ['saint-lazare'],
+    );
+    const unknown = await client.callTool({
+      name: 'get_dashboard',
+      arguments: { profile: 'nope' },
+    });
+    assert.equal(unknown.isError, true);
     const traffic = await client.callTool({ name: 'get_traffic', arguments: {} });
     assert.equal(data(traffic).mode, 'demo');
     assert.ok(Array.isArray(data(traffic).blocks));

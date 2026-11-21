@@ -27,28 +27,148 @@ export const blockSchema = z.object({
   overrides: settingsSchema.partial(),
 });
 export type Block = z.infer<typeof blockSchema>;
-export const configSchema = z
+export const MAX_BLOCKS_PER_PROFILE = 12;
+export const MAX_PROFILES = 8;
+/** Profile positions are limited to a widened Île-de-France. */
+export const LOCATION_BOUNDS = { lat: [48, 49.4], lon: [1.3, 3.7] } as const;
+export const RADIUS_RANGE = [100, 20000] as const;
+export const DEFAULT_RADIUS = 1000;
+/** Beyond this reported accuracy (metres), the device position does not choose a profile. */
+export const MAX_POSITION_ACCURACY = 2000;
+export const locationSchema = z.object({
+  lat: z.number().min(LOCATION_BOUNDS.lat[0]).max(LOCATION_BOUNDS.lat[1]),
+  lon: z.number().min(LOCATION_BOUNDS.lon[0]).max(LOCATION_BOUNDS.lon[1]),
+  radius: z.number().int().min(RADIUS_RANGE[0]).max(RADIUS_RANGE[1]).default(DEFAULT_RADIUS),
+  label: z.string().trim().max(60).optional(),
+});
+export type ProfileLocation = z.infer<typeof locationSchema>;
+const profileSchema = z
   .object({
-    version: z.literal(1),
+    id: z.string().min(1).max(80),
+    name: z.string().trim().min(1).max(40),
+    grid: z.object({
+      columns: z.number().int().min(1).max(12).default(2),
+      rows: z.number().int().min(1).max(12).optional(),
+    }),
+    location: locationSchema.optional(),
+    blocks: z.array(blockSchema).min(0).max(MAX_BLOCKS_PER_PROFILE),
+  })
+  .transform((profile) => ({
+    ...profile,
+    grid: {
+      ...profile.grid,
+      rows: profile.grid.rows ?? Math.max(1, layout(profile.blocks, profile.grid.columns).rows),
+    },
+  }));
+export type Profile = z.infer<typeof profileSchema>;
+const V1_PROFILE_ID = 'principal';
+/**
+ * Version 1 had a single list of blocks and the grid in `screen`: it becomes one default
+ * profile « Principal », without position, with the same blocks and grid.
+ */
+function migrateConfig(input: unknown): unknown {
+  if (!input || typeof input !== 'object' || (input as { version?: unknown }).version !== 1)
+    return input;
+  const { screen, blocks, ...rest } = input as {
+    screen?: Record<string, unknown>;
+    blocks?: unknown;
+  };
+  const { columns, rows, ...device } = screen ?? {};
+  return {
+    ...rest,
+    version: 2,
+    screen: device,
+    defaultProfileId: V1_PROFILE_ID,
+    profiles: [{ id: V1_PROFILE_ID, name: 'Principal', grid: { columns, rows }, blocks }],
+  };
+}
+export const configSchema = z.preprocess(
+  migrateConfig,
+  z.object({
+    version: z.literal(2),
     defaults: settingsSchema,
     screen: z.object({
       width: z.number().int().min(320).max(3840),
       height: z.number().int().min(240).max(2160),
       refreshSeconds: z.number().int().min(15).max(3600),
-      columns: z.number().int().min(1).max(12).default(2),
-      rows: z.number().int().min(1).max(12).optional(),
       debugDimensions: z.boolean().optional(),
     }),
-    blocks: z.array(blockSchema).min(0).max(12),
-  })
-  .transform((config) => ({
-    ...config,
-    screen: {
-      ...config.screen,
-      rows: config.screen.rows ?? Math.max(1, layout(config.blocks, config.screen.columns).rows),
-    },
-  }));
+    defaultProfileId: z.string().min(1).max(80),
+    profiles: z.array(profileSchema).min(1).max(MAX_PROFILES),
+  }),
+);
 export type Config = z.infer<typeof configSchema>;
+/** Blocks of every profile, in profile order. Block ids are unique across profiles. */
+export const allBlocks = (config: Pick<Config, 'profiles'>): Block[] =>
+  config.profiles.flatMap((profile) => profile.blocks);
+export const profileById = (config: Pick<Config, 'profiles'>, id: string | undefined | null) =>
+  id ? config.profiles.find((profile) => profile.id === id) : undefined;
+/** The profile shown on the minimal view and whenever no other profile applies. */
+export const defaultProfile = (config: Pick<Config, 'profiles' | 'defaultProfileId'>): Profile =>
+  profileById(config, config.defaultProfileId) ?? config.profiles[0]!;
+export type DevicePosition = { lat: number; lon: number; accuracy?: number };
+export type ProfileChoice = { profile: Profile; reason: 'manual' | 'nearest' | 'default' };
+/** Great-circle distance in metres (haversine). */
+export function distanceMeters(
+  a: Pick<DevicePosition, 'lat' | 'lon'>,
+  b: Pick<DevicePosition, 'lat' | 'lon'>,
+): number {
+  const rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad;
+  const dLon = (b.lon - a.lon) * rad;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
+  return 2 * 6371008.8 * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+/**
+ * A valid manual choice wins; otherwise the nearest profile whose radius contains the
+ * position (the first in order on a tie); otherwise the default profile.
+ */
+export function chooseProfile(
+  config: Pick<Config, 'profiles' | 'defaultProfileId'>,
+  position?: DevicePosition,
+  manualId?: string | null,
+): ProfileChoice {
+  const manual = profileById(config, manualId);
+  if (manual) return { profile: manual, reason: 'manual' };
+  if (position && !((position.accuracy ?? 0) > MAX_POSITION_ACCURACY)) {
+    let best: { profile: Profile; distance: number } | undefined;
+    for (const profile of config.profiles) {
+      if (!profile.location) continue;
+      const distance = distanceMeters(position, profile.location);
+      if (distance <= profile.location.radius && (!best || distance < best.distance))
+        best = { profile, distance };
+    }
+    if (best) return { profile: best.profile, reason: 'nearest' };
+  }
+  return { profile: defaultProfile(config), reason: 'default' };
+}
+/** The dashboard restricted to the blocks of one profile. */
+export const dashboardForProfile = (dashboard: Dashboard, profileId: string): Dashboard => ({
+  ...dashboard,
+  blocks: dashboard.blocks.filter((view) => view.profileId === profileId),
+});
+/** Pairs of profiles whose areas overlap: in the shared area, the nearest one wins. */
+export function overlappingProfiles(config: Pick<Config, 'profiles'>): [Profile, Profile][] {
+  const located = config.profiles.filter((p) => p.location);
+  const pairs: [Profile, Profile][] = [];
+  for (let i = 0; i < located.length; i++)
+    for (let j = i + 1; j < located.length; j++) {
+      const a = located[i]!.location!;
+      const b = located[j]!.location!;
+      if (distanceMeters(a, b) < a.radius + b.radius) pairs.push([located[i]!, located[j]!]);
+    }
+  return pairs;
+}
+/** Reads « 48.89, 2.24 » or « 48,89 2,24 » pasted from a map; undefined otherwise. */
+export function parseCoordinates(text: string): { lat: number; lon: number } | undefined {
+  const match = text.trim().match(/^(-?\d+(?:[.,]\d+)?)\s*[,;\s]\s*(-?\d+(?:[.,]\d+)?)$/);
+  if (!match) return undefined;
+  const lat = Number(match[1]!.replace(',', '.'));
+  const lon = Number(match[2]!.replace(',', '.'));
+  return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : undefined;
+}
 const defaultSettings: Settings = {
   walkMinutes: 14,
   minimalCount: 3,
@@ -58,9 +178,15 @@ const defaultSettings: Settings = {
   end: '22:00',
   days: [1, 2, 3, 4, 5, 6, 7],
 };
-const demoBlock = (id: string, line: string, direction: string, lineRef: string): Block => ({
+const demoBlock = (
+  id: string,
+  station: string,
+  line: string,
+  direction: string,
+  lineRef: string,
+): Block => ({
   id,
-  station: 'La Défense',
+  station,
   line,
   direction,
   monitoringRef: '',
@@ -71,16 +197,41 @@ const demoBlock = (id: string, line: string, direction: string, lineRef: string)
   overrides: {},
 });
 export const initialConfig: Config = {
-  version: 1,
+  version: 2,
   defaults: defaultSettings,
-  screen: { width: 800, height: 600, refreshSeconds: 60, columns: 2, rows: 2 },
-  blocks: [],
+  screen: { width: 800, height: 600, refreshSeconds: 60 },
+  defaultProfileId: V1_PROFILE_ID,
+  profiles: [{ id: V1_PROFILE_ID, name: 'Principal', grid: { columns: 2, rows: 2 }, blocks: [] }],
 };
 export const demoConfig: Config = {
   ...initialConfig,
-  blocks: [
-    demoBlock('la-defense-l', 'L', 'Paris Saint-Lazare', 'STIF:Line::C01740:'),
-    demoBlock('la-defense-u', 'U', 'La Verrière', 'STIF:Line::C01741:'),
+  defaultProfileId: 'la-defense',
+  profiles: [
+    {
+      id: 'la-defense',
+      name: 'La Défense',
+      grid: { columns: 2, rows: 2 },
+      location: { lat: 48.8919, lon: 2.2378, radius: 1000, label: 'La Défense' },
+      blocks: [
+        demoBlock('la-defense-l', 'La Défense', 'L', 'Paris Saint-Lazare', 'STIF:Line::C01740:'),
+        demoBlock('la-defense-u', 'La Défense', 'U', 'La Verrière', 'STIF:Line::C01741:'),
+      ],
+    },
+    {
+      id: 'saint-lazare',
+      name: 'Saint-Lazare',
+      grid: { columns: 2, rows: 1 },
+      location: { lat: 48.8763, lon: 2.3253, radius: 1000, label: 'Paris Saint-Lazare' },
+      blocks: [
+        demoBlock(
+          'saint-lazare-l',
+          'Paris Saint-Lazare',
+          'L',
+          'Versailles Rive Droite',
+          'STIF:Line::C01740:',
+        ),
+      ],
+    },
   ],
 };
 export function settings(config: Config, block: Block): Settings {
@@ -116,6 +267,8 @@ export type Incident = {
   url?: string;
 };
 export type BlockView = {
+  /** Profile the block belongs to. */
+  profileId: string;
   block: Block;
   effective: Settings;
   lineAppearance?: { color: string; textColor?: string };
@@ -266,7 +419,7 @@ export type ApiBudget = {
 export function estimatedCallsByApi(config: Config): Record<PrimApi, number> {
   const stops = new Map<string, number>();
   const lines = new Set<string>();
-  for (const block of config.blocks) {
+  for (const block of allBlocks(config)) {
     const s = settings(config, block);
     // Conservative: full global active window, even for a shorter block window.
     const count = Math.ceil(((activeMinutes(config.defaults) + 60) * 60) / s.pollSeconds) + 1;
@@ -288,8 +441,15 @@ export class ConfigError extends Error {
 }
 export function validateConfig(input: unknown): Config {
   const c = configSchema.parse(input);
-  if (new Set(c.blocks.map((b) => b.id)).size !== c.blocks.length)
-    throw new ConfigError('Chaque bloc doit avoir un identifiant unique.');
+  const blocks = allBlocks(c);
+  if (new Set(blocks.map((b) => b.id)).size !== blocks.length)
+    throw new ConfigError('Chaque bloc doit avoir un identifiant unique, tous profils confondus.');
+  if (new Set(c.profiles.map((p) => p.id)).size !== c.profiles.length)
+    throw new ConfigError('Chaque profil doit avoir un identifiant unique.');
+  if (new Set(c.profiles.map((p) => p.name.toLocaleLowerCase('fr'))).size !== c.profiles.length)
+    throw new ConfigError('Deux profils ne peuvent pas porter le même nom.');
+  if (!profileById(c, c.defaultProfileId))
+    throw new ConfigError('Le profil par défaut doit faire partie des profils.');
   const estimates = estimatedCallsByApi(c);
   for (const quota of primQuotas) {
     if (estimates[quota.api] > quota.automaticLimit)
@@ -328,28 +488,34 @@ export function minimalBlockSize(c: Config, block: Block): { width: number; heig
   };
 }
 
-export function minimalGridSize(c: Config): { width: number; height: number } {
+export function minimalGridSize(c: Pick<Config, 'screen'>): { width: number; height: number } {
   // Content estimates only drive warnings; they must not enlarge the configured screen.
   return { width: c.screen.width, height: c.screen.height };
 }
 
-export function minimalWarnings(c: Config, overflowingBlocks?: readonly string[]): string[] {
+/** Warnings about one profile's minimal grid, the default profile unless another is given. */
+export function minimalWarnings(
+  c: Config,
+  overflowingBlocks?: readonly string[],
+  profile: Profile = defaultProfile(c),
+): string[] {
   const warnings: string[] = [];
-  for (const block of c.blocks) {
-    if (shownInMinimal(block) && block.span > c.screen.columns)
+  const { blocks, grid } = profile;
+  for (const block of blocks) {
+    if (shownInMinimal(block) && block.span > grid.columns)
       warnings.push(
-        `Le bloc « ${block.station} · ${block.line} » occupe ${block.span} colonnes, mais la grille n’en a que ${c.screen.columns}.`,
+        `Le bloc « ${block.station} · ${block.line} » occupe ${block.span} colonnes, mais la grille n’en a que ${grid.columns}.`,
       );
   }
-  const { cells, rows: usedRows } = layout(c.blocks, c.screen.columns);
-  if (usedRows > c.screen.rows)
+  const { cells, rows: usedRows } = layout(blocks, grid.columns);
+  if (usedRows > grid.rows)
     warnings.push(
-      `La disposition nécessite ${usedRows} lignes, mais la grille n’en a que ${c.screen.rows}.`,
+      `La disposition nécessite ${usedRows} lignes, mais la grille n’en a que ${grid.rows}.`,
     );
   for (const cell of cells) {
-    const b = c.blocks.find((item) => item.id === cell.id)!;
-    const width = (c.screen.width * cell.span) / c.screen.columns;
-    const height = c.screen.height / c.screen.rows;
+    const b = blocks.find((item) => item.id === cell.id)!;
+    const width = (c.screen.width * cell.span) / grid.columns;
+    const height = c.screen.height / grid.rows;
     const minimum = minimalBlockSize(c, b);
     if (
       overflowingBlocks

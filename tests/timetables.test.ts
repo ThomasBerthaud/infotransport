@@ -32,19 +32,24 @@ const block = (patch: Partial<Block>): Block => ({
 });
 const config: Config = {
   ...initialConfig,
-  blocks: [
-    block({}),
-    block({
-      id: 'bus',
-      station: 'Mairie',
-      line: '144',
-      direction: 'Mairie',
-      monitoringRef: 'STIF:StopPoint:Q:100:',
-      lineRef: 'STIF:Line::C02000:',
-      directionRef: 'Aller',
-      destinationRef: '',
-    }),
-    block({ id: 'todo', station: 'Nouveau', monitoringRef: '', lineRef: '' }),
+  profiles: [
+    {
+      ...initialConfig.profiles[0],
+      blocks: [
+        block({}),
+        block({
+          id: 'bus',
+          station: 'Mairie',
+          line: '144',
+          direction: 'Mairie',
+          monitoringRef: 'STIF:StopPoint:Q:100:',
+          lineRef: 'STIF:Line::C02000:',
+          directionRef: 'Aller',
+          destinationRef: '',
+        }),
+        block({ id: 'todo', station: 'Nouveau', monitoringRef: '', lineRef: '' }),
+      ],
+    },
   ],
 };
 // Real-time departures already received for the bus direction teach its terminus.

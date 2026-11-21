@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-18T21:29:51.655093+00:00",
+  "generatedAt": "2026-11-21T22:41:46.610705+00:00",
   "title": "Design System: InfoTransport",
   "extensions": {
     "colorMeta": {
@@ -693,6 +693,111 @@
           "oklch(83.57% 0.00000 89.88)",
           "oklch(95.00% 0.00000 89.88)"
         ]
+      },
+      "banner-paper": {
+        "role": "neutral",
+        "displayName": "Papier de bandeau",
+        "canonical": "#ebece3",
+        "tonalRamp": [
+          "oklch(15.00% 0.00721 111.76)",
+          "oklch(26.43% 0.00858 111.76)",
+          "oklch(37.86% 0.00995 111.76)",
+          "oklch(49.29% 0.01132 111.76)",
+          "oklch(60.71% 0.01132 111.76)",
+          "oklch(72.14% 0.00995 111.76)",
+          "oklch(83.57% 0.00858 111.76)",
+          "oklch(95.00% 0.00721 111.76)"
+        ]
+      },
+      "update-ink": {
+        "role": "neutral",
+        "displayName": "Encre de mise à jour",
+        "canonical": "#34452c",
+        "tonalRamp": [
+          "oklch(15.00% 0.02805 135.96)",
+          "oklch(26.43% 0.03340 135.96)",
+          "oklch(37.86% 0.03874 135.96)",
+          "oklch(49.29% 0.04408 135.96)",
+          "oklch(60.71% 0.04408 135.96)",
+          "oklch(72.14% 0.03874 135.96)",
+          "oklch(83.57% 0.03340 135.96)",
+          "oklch(95.00% 0.02805 135.96)"
+        ]
+      },
+      "offline-paper": {
+        "role": "secondary",
+        "displayName": "Papier de mémoire",
+        "canonical": "#f1e4d6",
+        "tonalRamp": [
+          "oklch(15.00% 0.01411 69.59)",
+          "oklch(26.43% 0.01680 69.59)",
+          "oklch(37.86% 0.01949 69.59)",
+          "oklch(49.29% 0.02217 69.59)",
+          "oklch(60.71% 0.02217 69.59)",
+          "oklch(72.14% 0.01949 69.59)",
+          "oklch(83.57% 0.01680 69.59)",
+          "oklch(95.00% 0.01411 69.59)"
+        ]
+      },
+      "offline-ink": {
+        "role": "secondary",
+        "displayName": "Brun de mémoire",
+        "canonical": "#6b3a1c",
+        "tonalRamp": [
+          "oklch(15.00% 0.04887 50.12)",
+          "oklch(26.43% 0.05817 50.12)",
+          "oklch(37.86% 0.06748 50.12)",
+          "oklch(49.29% 0.07679 50.12)",
+          "oklch(60.71% 0.07679 50.12)",
+          "oklch(72.14% 0.06748 50.12)",
+          "oklch(83.57% 0.05817 50.12)",
+          "oklch(95.00% 0.04887 50.12)"
+        ]
+      },
+      "stored-ink": {
+        "role": "secondary",
+        "displayName": "Brun mémorisé",
+        "canonical": "#6b4a33",
+        "tonalRamp": [
+          "oklch(15.00% 0.03429 55.52)",
+          "oklch(26.43% 0.04082 55.52)",
+          "oklch(37.86% 0.04736 55.52)",
+          "oklch(49.29% 0.05389 55.52)",
+          "oklch(60.71% 0.05389 55.52)",
+          "oklch(72.14% 0.04736 55.52)",
+          "oklch(83.57% 0.04082 55.52)",
+          "oklch(95.00% 0.03429 55.52)"
+        ]
+      },
+      "add-border": {
+        "role": "neutral",
+        "displayName": "Pointillé d’ajout",
+        "canonical": "#9caa99",
+        "tonalRamp": [
+          "oklch(15.00% 0.01730 140.17)",
+          "oklch(26.43% 0.02060 140.17)",
+          "oklch(37.86% 0.02390 140.17)",
+          "oklch(49.29% 0.02719 140.17)",
+          "oklch(60.71% 0.02719 140.17)",
+          "oklch(72.14% 0.02390 140.17)",
+          "oklch(83.57% 0.02060 140.17)",
+          "oklch(95.00% 0.01730 140.17)"
+        ]
+      },
+      "add-hover": {
+        "role": "neutral",
+        "displayName": "Survol d’ajout",
+        "canonical": "#eceee5",
+        "tonalRamp": [
+          "oklch(15.00% 0.00728 116.81)",
+          "oklch(26.43% 0.00867 116.81)",
+          "oklch(37.86% 0.01005 116.81)",
+          "oklch(49.29% 0.01144 116.81)",
+          "oklch(60.71% 0.01144 116.81)",
+          "oklch(72.14% 0.01005 116.81)",
+          "oklch(83.57% 0.00867 116.81)",
+          "oklch(95.00% 0.00728 116.81)"
+        ]
       }
     },
     "typographyMeta": {
@@ -897,6 +1002,30 @@
       "description": "Diapositive de l’encart « Infos trafic » : signalement, badge, échéance visible sans défilement, puis titre et détail défilable.",
       "html": "<article class=\"ds-incident\"><div class=\"ds-incident-top\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-label=\"Perturbation en cours\"><path d=\"M12 3 22 21H2Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linejoin=\"round\"/><path d=\"M12 9v5\" stroke=\"currentColor\" stroke-width=\"2\"/><circle cx=\"12\" cy=\"17.5\" r=\"1\" fill=\"currentColor\"/></svg><span class=\"ds-incident-line\">U</span><time class=\"ds-incident-until\">Jusqu’à demain 02:13</time></div><section class=\"ds-incident-content\" tabindex=\"0\"><h3>La Défense – La Verrière en semaine de soirée</h3><p>Le trafic est interrompu entre La Défense et La Verrière.\n\nDernier train de La Défense pour La Verrière : le VERI de 21h15.</p></section></article>",
       "css": ".ds-incident{font-family:'Manrope Variable',sans-serif;max-width:260px;padding:20px;background:#fbfaf7;border-top:2px solid #26392e;color:#202a2b}.ds-incident-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px;color:#a14d24}.ds-incident-line{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;border-radius:4px;background:#b6134c;color:#fff;font-size:13px;font-weight:750}.ds-incident-until{margin-left:auto;color:#202a2b;font-size:11px;font-weight:650;line-height:1.4;text-align:right;font-variant-numeric:tabular-nums}.ds-incident-content{height:150px;overflow-y:auto;padding-right:8px}.ds-incident-content:focus-visible{outline:3px solid #b94c23;outline-offset:-3px}.ds-incident-content h3{margin:0 0 10px;font-size:14px;font-weight:700;line-height:1.5}.ds-incident-content p{margin:0;color:#626d6a;font-size:12px;line-height:1.8;white-space:pre-line;max-width:70ch}"
+    },
+    {
+      "name": "Bandeau hors connexion",
+      "kind": "custom",
+      "refersTo": "banner-offline",
+      "description": "Vue riche hors connexion : horaires mémorisés ou théoriques.",
+      "html": "<output class=\"ds-offline\"><strong>Hors connexion</strong><span>Horaires mémorisés le 21 nov. à 23:10</span><span>Horaires théoriques · sans information temps réel</span></output>",
+      "css": ".ds-offline{font-family:'Manrope Variable',sans-serif;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:11px 4.5%;background:#f1e4d6;color:#6b3a1c;font-size:11px}.ds-offline strong{font-weight:750}"
+    },
+    {
+      "name": "Bandeau de nouvelle version",
+      "kind": "custom",
+      "refersTo": "banner-update",
+      "description": "Annonce d’une nouvelle version de l’application installée.",
+      "html": "<output class=\"ds-update\">Nouvelle version disponible.<button class=\"ds-update-button\">Recharger</button></output>",
+      "css": ".ds-update{font-family:'Manrope Variable',sans-serif;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:11px 4.5%;background:#ebece3;color:#34452c;font-size:11px;font-weight:600}.ds-update-button{font:inherit;font-size:12px;font-weight:650;padding:6px 12px;border:1px solid #bbc8bb;border-radius:5px;background:transparent;color:#26392e;cursor:pointer}.ds-update-button:hover{background:#e6e9e0}.ds-update-button:focus-visible{outline:3px solid #b94c23;outline-offset:4px}"
+    },
+    {
+      "name": "Sélecteur de profil",
+      "kind": "input",
+      "refersTo": "profile-selector",
+      "description": "Choix du profil affiché sur la vue riche, avec l’état de la localisation.",
+      "html": "<div class=\"ds-profile\"><select aria-label=\"Profil affiché\"><option>Automatique · La Défense</option><option>La Défense</option><option>Saint-Lazare</option></select><span class=\"ds-profile-note\">Localisation refusée <button class=\"ds-profile-retry\">Réessayer</button></span></div>",
+      "css": ".ds-profile{font-family:'Manrope Variable',sans-serif;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:12px;color:#626d6a}.ds-profile select{font:inherit;border:1px solid #cbd2c7;background:#fffefa;color:#24352a;padding:8px 10px;min-height:40px;border-radius:4px;font-size:12px}.ds-profile select:focus-visible,.ds-profile-retry:focus-visible{outline:3px solid #b94c23;outline-offset:4px}.ds-profile-note{display:inline-flex;align-items:center;gap:4px;font-size:11px}.ds-profile-retry{font:inherit;font-size:11px;font-weight:650;min-height:40px;padding:0 8px;border:0;background:transparent;color:#385e43;cursor:pointer}.ds-profile-retry:hover{text-decoration:underline}"
     }
   ],
   "narrative": {
@@ -923,6 +1052,11 @@
         "name": "The Flat Paper Rule",
         "body": "Les surfaces de page sont séparées par des filets et des variations de fond ; l’ombre est réservée au menu flottant de suggestions.",
         "section": "elevation"
+      },
+      {
+        "name": "The Quiet Location Rule",
+        "body": "La localisation choisit un profil sans jamais interrompre la consultation : pas de modale, pas de bandeau, pas de blocage ; le profil par défaut prend le relais.",
+        "section": "components"
       }
     ],
     "dos": [

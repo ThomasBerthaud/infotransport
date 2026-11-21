@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-quer
 import '@fontsource-variable/manrope';
 import './style.css';
 import { Icon } from '../components/Icon.js';
-import { DashboardView } from './view.js';
+import { ProfileDashboard } from './view.js';
 const Admin = lazy(() => import('./admin.js').then((module) => ({ default: module.Admin })));
 import { api, OfflineError } from './api.js';
 import type { Dashboard } from '../shared/model.js';
@@ -189,7 +189,7 @@ function App() {
                   <Admin dashboard={query.data} />
                 </Suspense>
               ) : (
-                <DashboardView data={query.data} />
+                <ProfileDashboard data={query.data} />
               )}
             </>
           )

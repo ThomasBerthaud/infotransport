@@ -12,6 +12,8 @@ TanStack Query gère les requêtes HTTP de la vue riche et les requêtes/mutatio
 
 Consultation sur navigateur classique, mise en page adaptée à l'espace disponible, défilement autorisé. Même configuration des tuples et même cache que la vue épurée. Afficher davantage de départs, avec un nombre réglable distinct des trois départs de la vue épurée. Conserver la priorité à gare, ligne, direction et horaires.
 
+La vue riche affiche un seul profil. Quand plusieurs profils existent, un sélecteur discret sous le titre propose « Automatique · <profil retenu> » puis chaque profil ; l’état de la localisation (« Automatique indisponible sans HTTPS », « Localisation refusée », « Position indisponible ») reste dans ce sélecteur, sans bandeau d’erreur dans le contenu principal. Tant que la position n’est pas connue, le dernier profil affiché sur l’appareil reste à l’écran.
+
 Un encart « Infos trafic » apparaît à côté des départs sur grand écran et avant les tableaux sur écran étroit, pour rester immédiatement repérable. L’encart conserve une hauteur compacte : une information à la fois dans un carrousel horizontal à défilement magnétisé, avec flèches et compteur si plusieurs messages sont présents. Aucun défilement automatique. Les textes longs se lisent par défilement vertical à l’intérieur du message. Afficher les informations complètes disponibles sur les incidents en cours qui concernent les lignes/arrêts suivis : titre et texte intégral, périmètre et période d'application, recommandations et lien source lorsque PRIM les fournit. Dédupliquer les incidents partagés entre plusieurs blocs et indiquer les blocs concernés. Ne pas inventer les champs manquants. Les diagnostics techniques et l'édition des réglages restent dans l'administration.
 
 ## Vue épurée `/minimal`
@@ -36,6 +38,8 @@ Exigence absolue : tous les blocs de l'écran et leurs trois départs doivent ê
 ## Administration `/admin`
 
 Formulaire simple : blocs ordonnables et placement modifiable ; recherche de gare, ligne et direction. Chaque bloc possède des réglages indépendants (seuil de trajet, nombre de départs, plages actives et collecte), hérités par défaut des réglages globaux. Afficher la valeur effective et si elle est héritée ou personnalisée ; permettre de rétablir l'héritage. Modifier un défaut met à jour tous ses héritiers, sans écraser les personnalisations. Pause par défaut 22 h–5 h tous les jours. Rafraîchissement complet de la page global, distinct de la collecte par bloc. Afficher l'estimation d'appels et l'intervalle minimal compatible avec le budget.
+
+Un sélecteur « Profil modifié » en haut des réglages désigne le profil dont on édite les blocs, la grille et l’aperçu. L’onglet « Profils » gère la liste (ajout, nom, ordre, suppression confirmée s’il contient des blocs), le profil par défaut (bouton radio « affiché sur la vue épurée ») et la position de chaque profil : coordonnées collées ou position actuelle (en HTTPS), rayon et libellé facultatif. Un chevauchement de zones est signalé sans bloquer. Un bloc peut être déplacé vers un autre profil.
 
 Prévisualisation distincte des deux vues, avec le même rendu que sur l’écran cible pour le profil épuré et validation de sa capacité d'affichage. Statut : connexion PRIM, dernière collecte, appels consommés et prochaine collecte/reprise. Sauvegarder une configuration valide atomiquement, sans message de confirmation ni statut permanent de sauvegarde, avec erreurs près des champs.
 

@@ -2,9 +2,11 @@ import { z } from 'zod';
 import { loadCatalog, type Catalog } from './catalog.js';
 import {
   active,
+  allBlocks,
   ConfigError,
   departureWindow,
   previewWindowSettings,
+  profileById,
   demoConfig,
   initialConfig,
   refreshDelay,
@@ -21,7 +23,7 @@ import {
 import { Budget, Store } from './storage.js';
 import { discover, lineReportsPath, parseDepartures, parseLineReports, Prim } from './prim.js';
 import { demoDepartures, demoDiscovery, demoIncidents } from './demo.js';
-import { toHttpError, UnavailableError } from './errors.js';
+import { NotFoundError, toHttpError, UnavailableError } from './errors.js';
 import { log } from './log.js';
 import { Timetables } from './timetables.js';
 
@@ -98,7 +100,7 @@ export class Service {
     await this.timetables.refresh();
     if (this.mode === 'live') await this.store.write('config.json', this.config);
     log.info(
-      `Service initialisé · ${this.config.blocks.length} blocs · budgets ${this.budget
+      `Service initialisé · ${allBlocks(this.config).length} blocs · ${this.config.profiles.length} profils · budgets ${this.budget
         .counts()
         .apis.map((quota) => `${quota.api} ${quota.used}/${quota.limit}`)
         .join(' · ')}`,
@@ -131,7 +133,9 @@ export class Service {
         this.configError = undefined;
         if (this.mode === 'live' && this.prune(Date.now()))
           await this.store.write('cache.json', this.cache);
-        log.info(`Configuration enregistrée · ${config.blocks.length} blocs`);
+        log.info(
+          `Configuration enregistrée · ${allBlocks(config).length} blocs · ${config.profiles.length} profils`,
+        );
         return config;
       });
     this.mutation = work;
@@ -198,8 +202,8 @@ export class Service {
   }
   /** Drops cache entries no block uses any more; recent lookups stay for discovery. */
   private prune(now: number) {
-    const stops = new Set(this.config.blocks.map((b) => b.monitoringRef));
-    const lines = new Set(this.config.blocks.map((b) => b.lineRef));
+    const stops = new Set(allBlocks(this.config).map((b) => b.monitoringRef));
+    const lines = new Set(allBlocks(this.config).map((b) => b.lineRef));
     let changed = false;
     for (const [ref, entry] of Object.entries(this.cache.stops))
       if (!stops.has(ref) && now - entry.at >= DISCOVERY_TTL_MS) {
@@ -220,7 +224,7 @@ export class Service {
     try {
       const now = Date.now();
       const config = this.config;
-      const blocks = config.blocks.filter(
+      const blocks = allBlocks(config).filter(
         (b) => this.configured(b) && active(settings(config, b), new Date()),
       );
       const stops = new Map<string, number>();
@@ -307,18 +311,28 @@ export class Service {
   /**
    * `preview` widens each block's departure window so the admin preview can apply a draft
    * walking threshold or minimal count that is higher than the saved one.
+   * Blocks of every profile are returned, each with its `profileId`, so the browser can
+   * choose the profile itself, even offline; `profile` restricts them to one profile.
    */
-  dashboard(now = new Date(), { preview = false }: { preview?: boolean } = {}): Dashboard {
+  dashboard(
+    now = new Date(),
+    { preview = false, profile }: { preview?: boolean; profile?: string } = {},
+  ): Dashboard {
     const config = this.config;
     const paused = !active(config.defaults, now);
-    const blocks = config.blocks.map((block, index): BlockView => {
+    if (profile !== undefined && !profileById(config, profile))
+      throw new NotFoundError(`Profil inconnu : ${profile}.`);
+    const entries = config.profiles
+      .filter((p) => profile === undefined || p.id === profile)
+      .flatMap((p) => p.blocks.map((block, index) => ({ profileId: p.id, block, index })));
+    const blocks = entries.map(({ profileId, block, index }): BlockView => {
       const effective = settings(config, block);
       const line = this.catalog.line(block.lineRef);
       const lineAppearance = line?.color
         ? { color: line.color, textColor: line.textColor }
         : undefined;
       const isPaused = paused || !active(effective, now);
-      const view = { block, effective, lineAppearance };
+      const view = { profileId, block, effective, lineAppearance };
       if (isPaused)
         return { ...view, departures: [], incidents: [], status: 'paused', trafficKnown: false };
       const at = now.toISOString();

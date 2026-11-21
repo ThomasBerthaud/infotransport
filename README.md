@@ -73,7 +73,7 @@ Une clé non vide mais invalide ne bascule jamais silencieusement en démonstrat
 
 ## Configurer les données réelles
 
-La configuration initiale ne contient aucun bloc. En mode démonstration (sans `PRIM_API_KEY`), deux blocs de démonstration sont fournis : **La Défense · L · Paris Saint-Lazare** et **La Défense · U · La Verrière**. Leurs identifiants PRIM ne sont pas renseignés, car ils servent uniquement à illustrer l'interface.
+La configuration initiale contient un profil « Principal » sans bloc. En mode démonstration (sans `PRIM_API_KEY`), deux profils sont fournis : **La Défense**, par défaut, avec **La Défense · L · Paris Saint-Lazare** et **La Défense · U · La Verrière**, et **Saint-Lazare**, avec **Paris Saint-Lazare · L · Versailles Rive Droite**. Leurs identifiants PRIM ne sont pas renseignés, car ils servent uniquement à illustrer l'interface.
 
 1. Dans `/admin`, rechercher la gare et sélectionner le résultat.
 2. Choisir la ligne et la direction parmi les passages disponibles, puis renseigner le nom court de ligne affiché si nécessaire.
@@ -126,7 +126,19 @@ Valeurs initiales modifiables : trajet de 14 minutes, 3 départs épurés, 8 dé
 
 Pour mesurer cette zone, activer « Afficher les dimensions réelles » sous « Dimensions de l’écran », dans « Affichage & aperçu », puis enregistrer. Au prochain rafraîchissement de `/minimal`, un encart affiche la largeur × hauteur utile en pixels CSS et se met à jour lors d’un redimensionnement. Reporter ces valeurs dans les dimensions de l’écran, puis désactiver l’indicateur. Cette option (`screen.debugDimensions`) est désactivée par défaut et nécessite JavaScript uniquement pour la mesure.
 
-Dans « Affichage & aperçu », choisir de 1 à 12 lignes et colonnes pour la grille épurée. Chaque bloc choisit combien de colonnes il occupe dans « Blocs suivis ». Les blocs se placent dans l’ordre, de gauche à droite, puis sur la ligne suivante ; les lignes vides conservent leur place. Réduire le nombre de colonnes conserve la largeur choisie pour les blocs, même si elle dépasse la grille. Les anciennes configurations conservent leurs deux colonnes et leur nombre de lignes existant.
+Dans « Affichage & aperçu », choisir de 1 à 12 lignes et colonnes pour la grille épurée du profil modifié. Chaque bloc choisit combien de colonnes il occupe dans « Blocs suivis ». Les blocs se placent dans l’ordre, de gauche à droite, puis sur la ligne suivante ; les lignes vides conservent leur place. Réduire le nombre de colonnes conserve la largeur choisie pour les blocs, même si elle dépasse la grille. Les anciennes configurations conservent leurs deux colonnes et leur nombre de lignes existant.
+
+### Profils de stations
+
+Les blocs sont regroupés en **profils**, par exemple « Maison » et « Travail » : de 1 à 8 profils, chacun avec au plus 12 blocs et sa propre grille épurée. Les dimensions de l’écran, le rafraîchissement et l’indicateur de dimensions restent communs. Le sélecteur « Profil modifié », en haut des réglages, choisit le profil dont on modifie les blocs, la grille et l’aperçu ; l’onglet « Profils » permet d’ajouter, renommer, réordonner ou supprimer un profil, et de désigner le **profil par défaut**. Un bloc peut être déplacé vers un autre profil.
+
+- **Vue épurée** : `/minimal` affiche toujours le profil par défaut, avec sa grille. Changer le profil par défaut change l’écran au rafraîchissement suivant.
+- **Vue détaillée** : un profil peut être associé à une position (latitude et longitude saisies ou collées, ou « Utiliser ma position actuelle ») et à un rayon de 300 m à 5 km. Sur l’appareil qui consulte `/`, le profil le plus proche dont le rayon contient la position s’affiche automatiquement ; hors de tout rayon, c’est le profil par défaut. Un sélecteur sous le titre permet de choisir un profil à la main : ce choix est conservé sur l’appareil jusqu’au retour à « Automatique ».
+- **Sans localisation** : le choix automatique demande un accès en **HTTPS** (ou `localhost`), comme l’application installable. Sans HTTPS, si la localisation est refusée ou si la précision dépasse 2 km, le profil par défaut s’affiche ; le sélecteur indique la raison, sans nouvelle demande répétée. Si aucun profil n’a de position, aucune autorisation n’est demandée.
+- **Confidentialité** : la position de l’appareil reste dans le navigateur. Elle n’est ni envoyée au serveur ni enregistrée ; seul l’identifiant du profil choisi est gardé localement. Seules les positions des profils, saisies volontairement, sont dans `config.json`.
+- **Collecte** : les blocs de tous les profils sont collectés pendant leurs plages et comptés dans le budget PRIM ; un arrêt ou une ligne partagés ne sont collectés qu’une fois. Les plages par bloc limitent un profil, par exemple « Travail » en jours ouvrés.
+
+Une configuration enregistrée avant les profils (`version: 1`) devient au démarrage un profil unique « Principal », par défaut et sans position, avec les mêmes blocs et la même grille.
 
 L'administration avertit si une disposition dépasse une capacité de lecture prudente pour ce profil, sans bloquer la sauvegarde. Cela ne remplace pas l'essai sur l'écran cible : vérifier les noms longs, la place occupée par les barres du navigateur, les polices et la compatibilité CSS. Le contenu peut déborder des blocs et de l’écran ; aucun défilement horizontal ou vertical ne permet de consulter la partie hors écran. Ses blocs sont positionnés sans dépendre de CSS Grid.
 
@@ -242,13 +254,14 @@ Le format exact dépend du client. L’IA doit pouvoir joindre le serveur : une 
 
 | Outil            | Informations accessibles                                        | Arguments                            |
 | ---------------- | --------------------------------------------------------------- | ------------------------------------ |
-| `get_dashboard`  | Départs, directions, voies, incidents et états des blocs suivis | Aucun                                |
-| `get_traffic`    | Perturbations et disponibilité du trafic par bloc suivi         | Aucun                                |
+| `list_profiles`  | Profils de stations, positions éventuelles et profil par défaut | Aucun                                |
+| `get_dashboard`  | Départs, directions, voies, incidents et états des blocs suivis | `profile` facultatif (défaut sinon)  |
+| `get_traffic`    | Perturbations et disponibilité du trafic par bloc suivi         | `profile` facultatif (défaut sinon)  |
 | `search_stops`   | Jusqu’à 20 arrêts du catalogue local                            | `query` : 2 à 100 caractères         |
 | `get_stop_lines` | Lignes desservant un arrêt du catalogue                         | `monitoringRef` issu de la recherche |
 | `get_status`     | Mode, budgets PRIM, dates de collecte et erreurs                | Aucun                                |
 
-Les ressources JSON `infotransport://dashboard` et `infotransport://status` permettent aussi de lire le tableau de départs et l’état du service. Exemple de demande : « Quels sont les prochains trains de mes lignes suivies et les perturbations annoncées ? »
+Les ressources JSON `infotransport://dashboard` (blocs de tous les profils, chacun avec son `profileId`) et `infotransport://status` permettent aussi de lire le tableau de départs et l’état du service. Exemple de demande : « Quels sont les prochains trains de mes lignes suivies et les perturbations annoncées ? »
 
 Tous les accès MCP sont **en lecture seule**, sans modification de configuration et sans appel PRIM supplémentaire. Ils utilisent le même service et le même cache que le site. La découverte de directions, qui peut consommer un appel PRIM, n’est pas exposée. Les départs des arrêts non configurés ne sont pas disponibles par la recherche du catalogue.
 

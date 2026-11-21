@@ -32,7 +32,7 @@ const emptyTraffic = { disruptions: [], line_reports: [] };
 const allDay = (blocks: Block[]) => {
   const c = structuredClone(initialConfig);
   c.defaults.start = c.defaults.end = '00:00';
-  c.blocks = blocks;
+  c.profiles[0].blocks = blocks;
   return c;
 };
 

@@ -42,10 +42,11 @@ function snapshot(departures: Departure[], savedMinutesAgo = 10, config = initia
     now: at(-savedMinutesAgo),
     paused: false,
     refreshSeconds: 60,
-    config: { ...config, blocks: [block] },
+    config: { ...config, profiles: [{ ...config.profiles[0], blocks: [block] }] },
     timetables: '2026-11-19T08:00:00.000Z',
     blocks: [
       {
+        profileId: config.profiles[0].id,
         block,
         effective: { ...config.defaults, ...block.overrides },
         departures,
@@ -74,6 +75,35 @@ function timetables(saved: Snapshot, minutes: number[], patch: Partial<StoredTim
 
 test('nothing saved means no offline dashboard', () => {
   assert.equal(offlineDashboard(undefined, undefined, NOW), undefined);
+});
+
+test('a snapshot saved before profiles is migrated and keeps its timetables', () => {
+  const saved = snapshot([departure(5)]);
+  const { defaultProfileId: _d, profiles, ...rest } = saved.dashboard.config;
+  const legacy = {
+    savedAt: saved.savedAt,
+    dashboard: {
+      ...saved.dashboard,
+      config: {
+        ...rest,
+        version: 1,
+        screen: { ...rest.screen, columns: 2, rows: 1 },
+        blocks: profiles[0].blocks,
+      },
+      blocks: saved.dashboard.blocks.map(({ profileId: _p, ...view }) => view),
+    },
+  } as unknown as Snapshot;
+  const stored = timetables(saved, [30]);
+  const view = offlineDashboard(legacy, stored, NOW)!;
+  assert.equal(view.config.version, 2);
+  assert.deepEqual(
+    view.blocks.map((b) => b.profileId),
+    ['principal'],
+  );
+  assert.deepEqual(
+    view.blocks[0].departures.map((d) => d.source),
+    ['snapshot', 'scheduled'],
+  );
 });
 
 test('saved departures are marked, and drop once left beyond the 30 s grace', () => {

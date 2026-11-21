@@ -1,5 +1,7 @@
-import type { Dashboard, Departure } from '../shared/model.js';
-import { hour, isReachable, minutesUntil } from '../shared/model.js';
+import type { ReactNode } from 'react';
+import type { Config, Dashboard, Departure } from '../shared/model.js';
+import { dashboardForProfile, hour, isReachable, minutesUntil } from '../shared/model.js';
+import { useProfileChoice, type LocationState, type ProfileSelection } from './profile-choice.js';
 import { BlockHeading } from '../components/Block.js';
 import { TrafficPanel } from './TrafficPanel.js';
 const statusLabel = {
@@ -18,7 +20,60 @@ function DepartureState({ departure: d, delay }: { departure: Departure; delay: 
   if (delay > 0) return <span className="service-delay">+{delay} min</span>;
   return <span className="service-ok">{d.realtime ? 'Prévu' : 'Horaire prévu (PRIM)'}</span>;
 }
-export function DashboardView({ data }: { data: Dashboard }) {
+const locationNotes: Partial<Record<LocationState, string>> = {
+  insecure: 'Automatique indisponible sans HTTPS',
+  locating: 'Localisation en cours',
+  denied: 'Localisation refusée',
+  unavailable: 'Position indisponible',
+};
+function ProfileSelector({ config, selection }: { config: Config; selection: ProfileSelection }) {
+  const { choice, manualId, state, select } = selection;
+  const note = manualId ? undefined : locationNotes[state];
+  return (
+    <div className="profile-selector">
+      <label>
+        <span className="visually-hidden">Profil affiché</span>
+        <select
+          value={manualId ?? ''}
+          aria-describedby={note ? 'profile-note' : undefined}
+          onChange={(e) => select(e.target.value || null)}
+        >
+          <option value="">
+            Automatique · {manualId ? 'selon la position' : choice.profile.name}
+          </option>
+          {config.profiles.map((profile) => (
+            <option key={profile.id} value={profile.id}>
+              {profile.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <span className="profile-note" id="profile-note" aria-live="polite">
+        {note}
+        {note && (state === 'denied' || state === 'unavailable') && (
+          <button type="button" className="text-button" onClick={() => select(null)}>
+            Réessayer
+          </button>
+        )}
+      </span>
+    </div>
+  );
+}
+/** The detailed view of the profile chosen on this device. */
+export function ProfileDashboard({ data }: { data: Dashboard }) {
+  const selection = useProfileChoice(data.config);
+  return (
+    <DashboardView
+      data={dashboardForProfile(data, selection.choice.profile.id)}
+      selector={
+        data.config.profiles.length > 1 && (
+          <ProfileSelector config={data.config} selection={selection} />
+        )
+      }
+    />
+  );
+}
+export function DashboardView({ data, selector }: { data: Dashboard; selector?: ReactNode }) {
   return (
     <>
       <div className="page-intro">
@@ -27,6 +82,7 @@ export function DashboardView({ data }: { data: Dashboard }) {
             Vos prochains départs<span className="heading-dot">.</span>
           </h1>
           <p>Un coup d’œil avant de partir.</p>
+          {selector}
         </div>
         <div className="live-state">
           <span

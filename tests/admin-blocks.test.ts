@@ -114,7 +114,7 @@ test('budget level thresholds', () => {
 test('block editor sections render overrides and label fields', () => {
   const config = structuredClone(initialConfig);
   const b = block({ overrides: { pollSeconds: 300 } });
-  config.blocks = [b];
+  config.profiles[0].blocks = [b];
   const overrides = renderToStaticMarkup(
     createElement(BlockOverrides, { block: b, config, onChange: () => {} }),
   );
@@ -130,7 +130,7 @@ test('block editor sections render overrides and label fields', () => {
   );
   assert.match(scheduled, /Début des mises à jour/);
   const display = renderToStaticMarkup(
-    createElement(DisplayFields, { block: b, config, onChange: () => {} }),
+    createElement(DisplayFields, { block: b, columns: 2, onChange: () => {} }),
   );
   assert.match(display, /value="La Défense"/);
   assert.match(display, /2 colonnes · toute la largeur/);

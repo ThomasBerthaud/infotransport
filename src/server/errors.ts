@@ -26,6 +26,13 @@ export class UnavailableError extends HttpError {
   }
 }
 
+/** The requested item (a profile, for instance) does not exist. */
+export class NotFoundError extends HttpError {
+  constructor(message: string) {
+    super(404, message);
+  }
+}
+
 /** Maps any thrown value to the status and message returned by the API. */
 export function toHttpError(error: unknown): { status: number; message: string } {
   if (error instanceof z.ZodError)

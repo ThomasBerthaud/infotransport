@@ -48,6 +48,7 @@ Afficher les temps d'attente et signaler les perturbations des transports sélec
 - Version épurée : grille configurable en lignes et colonnes, avec largeur de chaque bloc en colonnes. Si les blocs ne tiennent pas lisiblement, avertir dans l’administration sans bloquer la sauvegarde. Laisser le contenu déborder des cellules et de l’écran, sans défilement horizontal ou vertical ; la partie hors écran reste inaccessible. Ne pas réduire automatiquement les polices ni ajouter de pagination ou de carrousel.
 - Vue épurée minimale : gare, ligne, direction, horaires, et icône de perturbation si nécessaire. Pas de titre de gare mutualisé entre blocs, de date de dernière mise à jour ni de texte superflu.
 - Vue riche : interface de consultation pour navigateur classique, avec davantage d'horaires et les informations complètes disponibles sur les incidents en cours. Elle partage les données, les réglages des tuples et le budget PRIM avec la version épurée. Le défilement est permis sur cette vue pour consulter les détails.
+- Profils de stations : les blocs sont regroupés en profils (1 à 8, par exemple « Maison » et « Travail »), chacun avec sa grille épurée. Un profil est désigné par défaut et s’affiche toujours sur la vue épurée. Un profil peut être associé à une position et un rayon : sur la vue détaillée, l’appareil affiche le profil le plus proche dans son rayon, sinon le profil par défaut ; un choix manuel prime jusqu’au retour à « Automatique ». Le choix automatique demande HTTPS ; sans HTTPS, sur refus ou sans position, le profil par défaut s’affiche sans blocage. La position de l’appareil reste dans le navigateur, sans appel PRIM ni fournisseur géographique supplémentaire. Les blocs de tous les profils sont collectés et comptés dans le budget.
 - Vue riche installable (PWA) sur téléphone et ordinateur, utilisable sans serveur : derniers départs temps réel reçus, marqués « Mémorisé » et ignorés 2 h après leur réception, puis horaires théoriques importés à la main depuis le GTFS IDFM, marqués « Théorique ». Une donnée mémorisée ou théorique n'est jamais présentée comme du temps réel. La vue épurée et l'administration restent en ligne uniquement.
 - Décisions ouvertes : capacité maximale de l'écran, valeurs initiales des seuils de trajet et compatibilité réelle du navigateur cible.
 
@@ -74,6 +75,7 @@ Lecture rapide sur tout écran cible, avec prise en charge des petits écrans à
 - Capacité maximale de blocs sans défilement, à mesurer sur l’écran cible.
 - Compatibilité matérielle : rendu, rafraîchissement, maintien du Wi-Fi et reprise à 5 h.
 - Identifiants PRIM réels et couverture des deux tuples initiaux, à vérifier avant de considérer l'intégration validée.
+- Profils : rayons proposés (300 m à 5 km, 1 km par défaut) et seuil de précision de la position (2 km) à confirmer à l’usage ; pas de plages d’activité propres aux profils pour l’instant.
 - Mode hors ligne : durée de validité des horaires mémorisés (2 h par défaut) et fenêtre d'horaires théoriques conservée par le navigateur (48 h par défaut) ; couverture réelle du GTFS IDFM pour les blocs suivis, à vérifier sur un import complet.
 
 ## Evidence on Hand

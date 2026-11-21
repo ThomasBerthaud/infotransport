@@ -3,12 +3,13 @@ import { access, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline';
 import { z } from 'zod';
-import type {
-  Block,
-  Config,
-  Departure,
-  ScheduledDeparture,
-  TimetablesResponse,
+import {
+  allBlocks,
+  type Block,
+  type Config,
+  type Departure,
+  type ScheduledDeparture,
+  type TimetablesResponse,
 } from '../shared/model.js';
 
 // Scheduled timetables imported by hand from the IDFM GTFS feed ("Offre horaires TC GTFS
@@ -273,7 +274,7 @@ export async function importTimetables({
   source?: string;
 }): Promise<ImportResult> {
   const targets = [
-    ...new Map(config.blocks.map((b) => [keyOf(b), target(b, known)])).values(),
+    ...new Map(allBlocks(config).map((b) => [keyOf(b), target(b, known)])).values(),
   ].filter((t) => t.stopId && t.routeId && (t.terminusIds.size || t.names.size));
   // Start one day early: trips of yesterday's service day may run after midnight.
   const today = parisDate(now.getTime());
@@ -342,18 +343,20 @@ export async function importTimetables({
       }
     }
   }
-  const entries = [...new Map(config.blocks.map((b) => [keyOf(b), b])).values()].map((block) => ({
-    key: {
-      monitoringRef: block.monitoringRef,
-      lineRef: block.lineRef,
-      directionRef: block.directionRef,
-      destinationRef: block.destinationRef,
-    },
-    label: labelOf(block),
-    departures: [...(byKey.get(keyOf(block))?.values() ?? [])].sort((a, b) =>
-      a.time.localeCompare(b.time),
-    ),
-  }));
+  const entries = [...new Map(allBlocks(config).map((b) => [keyOf(b), b])).values()].map(
+    (block) => ({
+      key: {
+        monitoringRef: block.monitoringRef,
+        lineRef: block.lineRef,
+        directionRef: block.directionRef,
+        destinationRef: block.destinationRef,
+      },
+      label: labelOf(block),
+      departures: [...(byKey.get(keyOf(block))?.values() ?? [])].sort((a, b) =>
+        a.time.localeCompare(b.time),
+      ),
+    }),
+  );
   return {
     version: 1,
     source,
@@ -428,7 +431,9 @@ export class Timetables {
       importedAt: this.data.importedAt,
       validUntil: this.data.validUntil,
       source: this.data.source,
-      uncovered: config.blocks.filter((b) => !covered.has(keyOf(b))).map(labelOf),
+      uncovered: allBlocks(config)
+        .filter((b) => !covered.has(keyOf(b)))
+        .map(labelOf),
     };
   }
   /** Departures of each configured block from now on, over the browser window. */
@@ -438,7 +443,7 @@ export class Timetables {
     const end = Math.min(now.getTime() + BROWSER_WINDOW_MS, Date.parse(data.validUntil));
     const entries = new Map(data.entries.map((e) => [keyOf(e.key), e.departures]));
     const blocks: TimetablesResponse['blocks'] = {};
-    for (const block of config.blocks)
+    for (const block of allBlocks(config))
       blocks[block.id] = (entries.get(keyOf(block)) ?? []).filter((d) => {
         const time = Date.parse(d.time);
         return time >= now.getTime() - HOUR_MS && time < end;

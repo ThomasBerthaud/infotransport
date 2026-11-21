@@ -83,7 +83,7 @@ test('validation errors are 400, upstream failures 502 and local pauses 503', as
     assert.equal((await fetch(`${base}/api/stops?q=a`)).status, 400);
     assert.equal((await fetch(`${base}/api/discover?ref=nope`)).status, 400);
     const duplicate = allDay();
-    duplicate.blocks = [block(), block()];
+    duplicate.profiles[0].blocks = [block(), block()];
     const put = await fetch(`${base}/api/config`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -155,7 +155,7 @@ test('an invalid stored configuration is set aside instead of preventing startup
     'test-key',
     async ({ base, service, dir }) => {
       assert.match(service.configError ?? '', /config\.json\.invalid-/);
-      assert.equal(service.config.blocks.length, 0);
+      assert.equal(service.config.profiles[0].blocks.length, 0);
       const files = await readdir(dir);
       const saved = files.find((name) => name.startsWith('config.json.invalid-'));
       assert.ok(saved);
@@ -219,7 +219,9 @@ test('production serves the service worker and manifest for the rich view only',
 
 test('timetables are served for the configured blocks once imported', async () =>
   withApp('test-key', async ({ base, service, dir }) => {
-    await service.save({ ...allDay(), blocks: [block()] });
+    const config = allDay();
+    config.profiles[0].blocks = [block()];
+    await service.save(config);
     const missing = await fetch(`${base}/api/timetables`);
     assert.equal(missing.status, 404);
     assert.equal(missing.headers.get('cache-control'), 'no-store');
@@ -261,4 +263,78 @@ test('timetables are served for the configured blocks once imported', async () =
     assert.deepEqual(timetables.blocks.b0, [{ time: soon, destination: 'D' }]);
     status = (await (await fetch(`${base}/api/status`)).json()) as typeof status;
     assert.equal(status.timetables.state, 'ok');
+  }));
+
+test('a stored v1 configuration starts as a single default profile without quarantine', async () =>
+  withApp(
+    'test-key',
+    async ({ base, service, dir }) => {
+      assert.equal(service.configError, undefined);
+      assert.deepEqual(
+        service.config.profiles.map((p) => [p.id, p.name, p.grid, p.blocks.length]),
+        [['principal', 'Principal', { columns: 1, rows: 3 }, 1]],
+      );
+      assert.equal(service.config.defaultProfileId, 'principal');
+      assert.ok(!(await readdir(dir)).some((name) => name.includes('invalid')));
+      // The file is rewritten in version 2 at startup.
+      const stored = JSON.parse(await readFile(join(dir, 'config.json'), 'utf8'));
+      assert.equal(stored.version, 2);
+      const dashboard = (await (await fetch(`${base}/api/dashboard`)).json()) as Dashboard;
+      assert.deepEqual(
+        dashboard.blocks.map((v) => [v.profileId, v.block.id]),
+        [['principal', 'b0']],
+      );
+      // A v1 configuration sent by an older admin page is still accepted.
+      const put = await fetch(`${base}/api/config`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          version: 1,
+          defaults: initialConfig.defaults,
+          screen: { width: 800, height: 600, refreshSeconds: 60, columns: 2 },
+          blocks: [block()],
+        }),
+      });
+      assert.equal(put.status, 200);
+      assert.equal(((await put.json()) as { version: number }).version, 2);
+    },
+    (dir) =>
+      writeFile(
+        join(dir, 'config.json'),
+        JSON.stringify({
+          version: 1,
+          defaults: initialConfig.defaults,
+          screen: { width: 800, height: 600, refreshSeconds: 60, columns: 1, rows: 3 },
+          blocks: [block()],
+        }),
+      ),
+  ));
+
+test('the minimal view shows the default profile; ?profile= filters the dashboard', async () =>
+  withApp('', async ({ base, service }) => {
+    const all = (await (await fetch(`${base}/api/dashboard`)).json()) as Dashboard;
+    assert.deepEqual(
+      all.blocks.map((v) => v.profileId),
+      ['la-defense', 'la-defense', 'saint-lazare'],
+    );
+    const one = (await (
+      await fetch(`${base}/api/dashboard?preview=1&profile=saint-lazare`)
+    ).json()) as Dashboard;
+    assert.deepEqual(
+      one.blocks.map((v) => v.block.id),
+      ['saint-lazare-l'],
+    );
+    assert.equal((await fetch(`${base}/api/dashboard?profile=nope`)).status, 404);
+    let html = await (await fetch(`${base}/minimal`)).text();
+    assert.equal(html.match(/class="minimal-cell"/g)?.length, 2);
+    assert.match(html, /La Verrière/);
+    const config = structuredClone(service.config);
+    config.defaultProfileId = 'saint-lazare';
+    await service.save(config);
+    html = await (await fetch(`${base}/minimal`)).text();
+    assert.equal(html.match(/class="minimal-cell"/g)?.length, 1);
+    assert.match(html, /Versailles Rive Droite/);
+    assert.doesNotMatch(html, /La Verrière/);
+    // The saint-lazare grid has a single row: its cell takes the full height.
+    assert.match(html, /height:100%/);
   }));

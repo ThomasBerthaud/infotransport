@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { z } from 'zod';
 import { MinimalBlock } from '../components/Block.js';
 import { minimalDebugMarkup } from '../shared/minimal-debug.js';
-import { layout, minimalGridSize, shownInMinimal } from '../shared/model.js';
+import { defaultProfile, layout, minimalGridSize, shownInMinimal } from '../shared/model.js';
 import type { Service } from './service.js';
 import { createMcpRouter } from './mcp.js';
 import { createMetrics } from './metrics.js';
@@ -68,7 +68,8 @@ export function createApp(
   app.use('/mcp', createMcpRouter(service));
   app.get('/api/dashboard', async (req, res) => {
     await service.timetables.refresh();
-    res.json(service.dashboard(new Date(), { preview: req.query.preview === '1' }));
+    const profile = z.string().min(1).max(80).optional().parse(req.query.profile);
+    res.json(service.dashboard(new Date(), { preview: req.query.preview === '1', profile }));
   });
   app.get('/api/timetables', async (_req, res) => {
     await service.timetables.refresh();
@@ -118,10 +119,12 @@ export function createApp(
       throw error;
     });
   app.get('/minimal', async (_req, res) => {
-    const dashboard = service.dashboard();
-    const { columns, rows } = dashboard.config.screen;
+    // The minimal screen always shows the default profile, with its own grid.
+    const profile = defaultProfile(service.config);
+    const dashboard = service.dashboard(new Date(), { profile: profile.id });
+    const { columns, rows } = profile.grid;
     const minimum = minimalGridSize(dashboard.config);
-    const cells = new Map(layout(dashboard.config.blocks, columns).cells.map((c) => [c.id, c]));
+    const cells = new Map(layout(profile.blocks, columns).cells.map((c) => [c.id, c]));
     const blocks = dashboard.blocks
       .filter((view) => shownInMinimal(view.block))
       .flatMap((view) => {
