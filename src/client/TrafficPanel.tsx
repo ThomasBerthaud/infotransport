@@ -71,7 +71,11 @@ function IncidentCarousel({ incidents, data }: { incidents: Incident[]; data: Da
               {[
                 ...new Map(
                   data.blocks
-                    .filter((view) => view.incidents.some((i) => i.id === incident.id))
+                    .filter(
+                      (view) =>
+                        incident.lineRefs.includes(view.block.lineRef) &&
+                        view.incidents.some((i) => i.id === incident.id),
+                    )
                     .map((view) => [view.block.lineRef || view.block.line, view]),
                 ).values(),
               ].map((view) => (

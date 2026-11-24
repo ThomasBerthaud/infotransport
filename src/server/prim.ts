@@ -100,6 +100,42 @@ const stifLine = (id: string) => {
   const code = /^line:IDFM:(C\d+)$/.exec(id)?.[1];
   return code ? `STIF:Line::${code}:` : undefined;
 };
+/**
+ * Lines a Navitia disruption actually affects, read from its impacted objects:
+ * whole lines, line sections, routes and impacted sections. Never the queried line
+ * by default: `line_reports` also returns disruptions of objects shared with other
+ * lines (stations, sections), which must not be shown on the queried line.
+ */
+function impactedLines(d: Obj): string[] {
+  const ids: unknown[] = [];
+  for (const raw of list(d.impacted_objects)) {
+    const impacted = obj(raw);
+    const o = obj(impacted.pt_object);
+    const type = text(o.embedded_type);
+    if (type === 'line') ids.push(o.id);
+    ids.push(obj(obj(o.line_section).line).id, obj(obj(o.route).line).id);
+    ids.push(...list(obj(o.stop_area).lines).map((l) => obj(l).id));
+    ids.push(obj(obj(obj(o.stop_point).route).line).id);
+    for (const section of [impacted.impacted_section, impacted.impacted_rail_section])
+      ids.push(...list(obj(section).routes).map((r) => obj(obj(r).line).id));
+  }
+  return [...new Set(ids.map((id) => stifLine(text(id))).filter((ref): ref is string => !!ref))];
+}
+/** Disruption ids the queried line's report links to (the line itself or its objects). */
+function linkedDisruptions(payload: Obj, lineRef: string): Set<string> {
+  const ids = new Set<string>();
+  for (const raw of list(payload.line_reports)) {
+    const report = obj(raw);
+    const line = obj(report.line);
+    if (stifLine(text(line.id)) !== lineRef) continue;
+    for (const holder of [line, ...list(report.pt_objects).map(obj)])
+      for (const link of list(holder.links).map(obj))
+        if (text(link.type) === 'disruption' || text(link.rel) === 'disruptions')
+          ids.add(text(link.id));
+  }
+  ids.delete('');
+  return ids;
+}
 const parisOffset = (t: number) => {
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat('en-US', {
@@ -149,6 +185,7 @@ export function parseLineReports(payload: unknown, lineRef: string, now = Date.n
   // IDFM splits one notice into several disruptions with identical texts and
   // different periods: merge them so the panel shows each notice once.
   const notices = new Map<string, { incident: Incident; periods: Period[] }>();
+  const linked = linkedDisruptions(p, lineRef);
   for (const raw of p.disruptions) {
     const d = obj(raw);
     if (text(d.status) === 'past') continue;
@@ -170,11 +207,17 @@ export function parseLineReports(payload: unknown, lineRef: string, now = Date.n
     const periods = list(d.application_periods)
       .map(obj)
       .map((period) => ({ starts: navitiaDate(period.begin), ends: navitiaDate(period.end) }));
-    const lines = list(d.impacted_objects)
-      .map((i) => obj(obj(i).pt_object))
-      .filter((o) => text(o.embedded_type) === 'line')
-      .map((o) => stifLine(text(o.id)))
-      .filter((ref): ref is string => !!ref);
+    let lines = impactedLines(d);
+    if (!lines.length) {
+      // No identifiable line (station, network…): only keep it on the queried
+      // line when that line's report explicitly links to it.
+      const ids = [d.id, d.disruption_id, d.impact_id].map(text).filter(Boolean);
+      if (!ids.some((id) => linked.has(id))) {
+        log.debug(`[PRIM] perturbation ${ids[0] || '?'} ignorée : aucune ligne identifiable`);
+        continue;
+      }
+      lines = [lineRef];
+    }
     const title = heading || text(d.cause) || 'Perturbation en cours';
     const key = `${title}\n${body}`;
     const known = notices.get(key);
@@ -188,7 +231,7 @@ export function parseLineReports(payload: unknown, lineRef: string, now = Date.n
         id: text(d.id) || text(d.impact_id) || text(d.disruption_id) || body,
         title,
         text: body,
-        lineRefs: lines.length ? [...new Set(lines)] : [lineRef],
+        lineRefs: lines,
       },
       periods,
     });

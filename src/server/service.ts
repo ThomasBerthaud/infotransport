@@ -351,7 +351,7 @@ export class Service {
             at,
             window,
           ),
-          incidents: demoIncidents(block, index),
+          incidents: demoIncidents(block),
           status: 'ok',
           trafficKnown: true,
         };
@@ -380,6 +380,8 @@ export class Service {
       const incidents = trafficKnown
         ? traffic.data.filter(
             (i) =>
+              // Only disruptions of this block's line, whatever line was queried.
+              i.lineRefs.includes(block.lineRef) &&
               (!i.starts || Date.parse(i.starts) <= now.getTime()) &&
               (!i.ends || Date.parse(i.ends) > now.getTime()),
           )

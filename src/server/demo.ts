@@ -9,18 +9,20 @@ const demoDirectionNames: Record<string, [string, string]> = {
   'STIF:Line::C01741:': ['La Défense', 'La Verrière'],
 };
 
-const demoIncidentTexts: Pick<Incident, 'id' | 'title' | 'text'>[] = [
-  {
+// Keyed by line: each fictional notice describes one line and must stay on it,
+// whatever the order of the blocks.
+const demoIncidentTexts: Record<string, Pick<Incident, 'id' | 'title' | 'text'>> = {
+  'STIF:Line::C01740:': {
     id: 'demo-incident',
     title: 'Ralentissements vers Paris Saint-Lazare',
     text: 'Exemple fictif : un incident de signalisation entraîne des retards de quelques minutes entre La Défense et Paris Saint-Lazare. Les trains continuent de circuler. Ce message illustre l’affichage des informations complètes en mode démonstration.',
   },
-  {
+  'STIF:Line::C01741:': {
     id: 'demo-incident-u',
     title: 'Desserte adaptée vers La Verrière',
     text: 'Exemple fictif : des travaux entraînent une adaptation de la desserte sur la ligne U. Vérifiez les horaires annoncés avant de rejoindre la gare. Les trains en direction de La Verrière restent accessibles. Ce message sert à tester la navigation entre plusieurs informations et ne décrit pas un incident réel.',
   },
-];
+};
 
 /** Regular fictional departures; the first block shows one delayed train. */
 export function demoDepartures(block: Block, index: number, now: Date, count: number): Departure[] {
@@ -44,9 +46,9 @@ export function demoDepartures(block: Block, index: number, now: Date, count: nu
   });
 }
 
-/** One fictional incident for each of the first two blocks. */
-export function demoIncidents(block: Block, index: number): Incident[] {
-  const incident = demoIncidentTexts[index];
+/** The fictional incident of the block's line, if that line has one. */
+export function demoIncidents(block: Block): Incident[] {
+  const incident = demoIncidentTexts[block.lineRef];
   return incident ? [{ ...incident, lineRefs: [block.lineRef] }] : [];
 }
 

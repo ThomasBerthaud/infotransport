@@ -1,0 +1,228 @@
+{
+  "disruptions": [
+    {
+      "id": "34c76f2e-65a5-4214-ab3e-6184353bb6de",
+      "disruption_id": "165f8620-31d7-4239-bcbd-09d559ce3065",
+      "impact_id": "34c76f2e-65a5-4214-ab3e-6184353bb6de",
+      "status": "active",
+      "cause": "perturbation",
+      "category": "Incidents",
+      "tags": ["Ascenseur"],
+      "application_periods": [
+        {
+          "begin": "20260529T201244",
+          "end": "20270529T201244"
+        }
+      ],
+      "messages": [
+        {
+          "text": "Panne d'un ascenseur",
+          "channel": {
+            "types": ["title"]
+          }
+        },
+        {
+          "text": "GARE DE VIROFLAY RIVE DROITE Panne de l'ascenseur situé VRD MZH <> Surface, jusqu'au 2026-05-30",
+          "channel": {
+            "types": ["web"]
+          }
+        }
+      ],
+      "impacted_objects": [
+        {
+          "pt_object": {
+            "id": "stop_area:IDFM:422420",
+            "embedded_type": "stop_area",
+            "name": "Viroflay - Rive Droite (Viroflay)",
+            "stop_area": {
+              "id": "stop_area:IDFM:422420",
+              "name": "Viroflay - Rive Droite"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "7537023c-8c51-417e-ada5-693581a26f8d",
+      "disruption_id": "600aa316-79f1-49d4-a498-cc062f5e56fd",
+      "impact_id": "7537023c-8c51-417e-ada5-693581a26f8d",
+      "status": "active",
+      "cause": "travaux",
+      "category": "Incidents",
+      "application_periods": [
+        {
+          "begin": "20261123T225000",
+          "end": "20261124T030000"
+        },
+        {
+          "begin": "20261120T225000",
+          "end": "20261121T030000"
+        },
+        {
+          "begin": "20261125T225000",
+          "end": "20261126T030000"
+        }
+      ],
+      "messages": [
+        {
+          "text": "<p>P&#233;riode : en semaine, &#224; partir de 21h50.<br><br>Dates : du lundi 16 au vendredi 27 novembre.<br><br>Axe Paris Saint-Lazare &lt;&gt; Maisons-Laffitte :<br>- Trafic interrompu entre Sartrouville &lt;&gt; Maisons-Laffitte.<br>- La gare de Nanterre Universit&#233; n&#8217;est pas desservie.<br><br>Axe Paris Saint-Lazare &lt;&gt; Nanterre Universit&#233; :<br>- Moins de trains (les trains origine / terminus Nanterre Universit&#233; sont supprim&#233;s).<br><br>Les clients souhaitant rejoindre ou quitter la gare de Maisons-Laffitte peuvent &#233;galement emprunter le RER A branche Poissy.<br><br>Un service de bus de remplacement est mis en place, avec desserte des gares interm&#233;diaires, entre :<br>- La Garenne Colombes &lt;&gt; Sartrouville.<br>- Sartrouville &lt;&gt; Cergy le Haut. <br><br>Les derniers trains &#224; circuler normalement :<br>- Paris Saint-Lazare vers  Maisons-Laffitte : 21h50<br>- Maisons-Laffitte vers Paris Saint-Lazare  : 22h04<br><br>- Paris Saint-Lazare vers Nanterre Universit&#233; : 22h05 <br>- Nanterre Universit&#233; vers Paris Saint-Lazare : 22h30<br><br><u>Informations compl&#233;mentaires </u>:<br>- Le train de 22h35 au d&#233;part de Paris Saint-Lazare et &#224; destination de Nanterre Universit&#233; est rendu terminus La Garenne Colombes.<br>- Le train de 22h38 au d&#233;part de Maisons-Laffitte et &#224; destination de Paris Saint-Lazare <br>- Le train de 00h29 au d&#233;part de Paris Saint-Lazare et &#224; destination de Maisons-Laffitte est supprim&#233;.<br><br>Les horaires du calculateur d'itin&#233;raire tiennent compte des travaux.<br><br>Motif : travaux.</p>",
+          "channel": {
+            "types": ["web"]
+          }
+        },
+        {
+          "text": "Ligne L : Paris <> Nanterre Univ./Maisons-Laffitte du 16 au 27/11",
+          "channel": {
+            "types": ["title"]
+          }
+        }
+      ],
+      "impacted_objects": [
+        {
+          "pt_object": {
+            "id": "line:IDFM:C01740",
+            "embedded_type": "line",
+            "name": "Transilien Train Transilien L",
+            "line": {
+              "id": "line:IDFM:C01740",
+              "code": "L",
+              "name": "L"
+            }
+          },
+          "impacted_section": {
+            "from": {
+              "id": "stop_area:IDFM:70956",
+              "embedded_type": "stop_area",
+              "name": "Nanterre Université (Nanterre)",
+              "stop_area": {
+                "id": "stop_area:IDFM:70956",
+                "name": "Nanterre Université"
+              }
+            },
+            "to": {
+              "id": "stop_area:IDFM:70956",
+              "embedded_type": "stop_area",
+              "name": "Nanterre Université (Nanterre)",
+              "stop_area": {
+                "id": "stop_area:IDFM:70956",
+                "name": "Nanterre Université"
+              }
+            },
+            "routes": [
+              {
+                "id": "route:IDFM:SNCF:ae86ba04-71e9-4f07-b17e-ff86be86ccdc",
+                "name": "Gare Saint-Lazare - Nanterre Université"
+              },
+              {
+                "id": "route:IDFM:SVCO:ae86ba04-71e9-4f07-b17e-ff86be86ccdc",
+                "name": "Gare Saint-Lazare - Nanterre Université"
+              },
+              {
+                "id": "route:IDFM:SNCF:d0fd8819-771d-4e7b-899e-66357a5adaae",
+                "name": "Nanterre Université - Gare Saint-Lazare"
+              },
+              {
+                "id": "route:IDFM:SVCO:d0fd8819-771d-4e7b-899e-66357a5adaae",
+                "name": "Nanterre Université - Gare Saint-Lazare"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "e2a63b7b-293b-445f-a9d8-8be812726d4b",
+      "disruption_id": "931dfd72-3f53-4c1a-8d75-2e55b09d3a07",
+      "impact_id": "e2a63b7b-293b-445f-a9d8-8be812726d4b",
+      "status": "future",
+      "cause": "travaux",
+      "category": "Incidents",
+      "application_periods": [
+        {
+          "begin": "20261129T040000",
+          "end": "20261129T121500"
+        }
+      ],
+      "messages": [
+        {
+          "text": "Ligne L : Saint-Cloud <> Saint-Nom la Bretèche du 28 au 29/11",
+          "channel": {
+            "types": ["title"]
+          }
+        },
+        {
+          "text": "<p>P&#233;riode : samedi toute la journ&#233;e et dimanche jusqu&#8217;&#224; 12h00.<br><br>Dates : du samedi 28 au dimanche 29 novembre.<br><br>Le trafic est interrompu entre Saint-Cloud &lt;&gt; Saint-Nom la Bret&#232;che.<br><br>Un service de bus de remplacement est mis en place, avec desserte des gares interm&#233;diaires, entre Saint-Cloud &lt;&gt; Saint-Nom la Bret&#232;che.<br><br>Renforcement de lignes r&#233;guli&#232;res :<br>- Bus 6246, Gare Garches Marnes la Coquette, Gare de Vaucresson, Gare de La Celle Saint-Cloud.<br><br>Les premiers trains &#224; circuler normalement le dimanche :<br>- Paris Saint-Lazare vers Saint-Nom la Bret&#232;che : 12h17<br>- Saint-Nom la Bret&#232;che vers Paris Saint-Lazare : 12h49<br><br><u>Informations compl&#233;mentaires </u>:<br><u>Le dimanche 29 novembre</u><br>- Le train de 12h25 au d&#233;part de Saint-Nom la Bret&#232;che et &#224; destination de Paris Saint-Lazare est rendu origine en gare de Marly le Roi.&nbsp;<br>- Le train de 05h23 au d&#233;part de Paris Saint-Lazare et &#224; destination de Saint-Nom la Bret&#232;che est supprim&#233;.<br><br>Les horaires du calculateur d&#8217;itin&#233;raire tiennent compte des travaux.<br><br>Motif : travaux.</p>",
+          "channel": {
+            "types": ["web"]
+          }
+        }
+      ],
+      "impacted_objects": [
+        {
+          "pt_object": {
+            "id": "line:IDFM:C01740",
+            "embedded_type": "line",
+            "name": "Transilien Train Transilien L",
+            "line": {
+              "id": "line:IDFM:C01740",
+              "code": "L",
+              "name": "L"
+            }
+          },
+          "impacted_rail_section": {
+            "from": {
+              "id": "stop_area:IDFM:73749",
+              "embedded_type": "stop_area",
+              "name": "Saint-Cloud (Saint-Cloud)",
+              "stop_area": {
+                "id": "stop_area:IDFM:73749",
+                "name": "Saint-Cloud"
+              }
+            },
+            "to": {
+              "id": "stop_area:IDFM:64382",
+              "embedded_type": "stop_area",
+              "name": "Saint-Nom-la-Bretèche - Forêt de Marly (L'Étang-la-Ville)",
+              "stop_area": {
+                "id": "stop_area:IDFM:64382",
+                "name": "Saint-Nom-la-Bretèche - Forêt de Marly"
+              }
+            },
+            "routes": [
+              {
+                "id": "route:IDFM:SNCF:cafd9521-a348-4835-8f9f-b7d996023c2b",
+                "name": "Gare Saint-Lazare - Saint-Nom-la-Bretèche - Forêt de Marly"
+              },
+              {
+                "id": "route:IDFM:SVCO:cafd9521-a348-4835-8f9f-b7d996023c2b",
+                "name": "Gare Saint-Lazare - Saint-Nom-la-Bretèche - Forêt de Marly"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "line_reports": [
+    {
+      "line": {
+        "id": "line:IDFM:C01740",
+        "code": "L",
+        "name": "L",
+        "links": [
+          {
+            "id": "e2a63b7b-293b-445f-a9d8-8be812726d4b",
+            "type": "disruption",
+            "rel": "disruptions"
+          },
+          {
+            "id": "7537023c-8c51-417e-ada5-693581a26f8d",
+            "type": "disruption",
+            "rel": "disruptions"
+          }
+        ]
+      },
+      "pt_objects": []
+    }
+  ]
+}

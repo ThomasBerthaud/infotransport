@@ -353,6 +353,116 @@ test('line_reports parser keeps current disruptions, web text, title and Paris v
     'v2/navitia/line_reports/lines/line:IDFM:C01740/line_reports',
   );
 });
+test('line_reports parser attaches each disruption to the lines it actually impacts', () => {
+  const notice = (body: string) => [{ text: body, channel: { types: ['web'] } }];
+  const input = {
+    disruptions: [
+      // Section of another line through a shared station.
+      {
+        id: 'section',
+        status: 'active',
+        messages: notice('Travaux sur la ligne voisine'),
+        impacted_objects: [
+          {
+            pt_object: {
+              embedded_type: 'line_section',
+              id: 'ls1',
+              line_section: { line: { id: 'line:IDFM:C01742' } },
+            },
+          },
+        ],
+      },
+      // Station disruption with no identifiable line, not linked to the queried line.
+      {
+        id: 'elsewhere',
+        status: 'active',
+        messages: notice('Gare fermée ailleurs'),
+        impacted_objects: [{ pt_object: { embedded_type: 'stop_area', id: 'stop_area:IDFM:9' } }],
+      },
+      // Station disruption linked by the queried line's report: kept on that line.
+      {
+        id: 'closure',
+        status: 'active',
+        messages: notice('Gare fermée'),
+        impacted_objects: [{ pt_object: { embedded_type: 'stop_area', id: 'stop_area:IDFM:1' } }],
+      },
+      // Route of another line, via its impacted section.
+      {
+        id: 'route',
+        status: 'active',
+        messages: notice('Arrêt non desservi'),
+        impacted_objects: [
+          {
+            pt_object: { embedded_type: 'stop_point', id: 'stop_point:IDFM:3' },
+            impacted_section: { routes: [{ id: 'r', line: { id: 'line:IDFM:C01743' } }] },
+          },
+        ],
+      },
+      // One notice split over two lines: merged, union of the lines.
+      {
+        id: 'm1',
+        status: 'active',
+        messages: notice('Grève'),
+        impacted_objects: [{ pt_object: { embedded_type: 'line', id: 'line:IDFM:C01740' } }],
+      },
+      {
+        id: 'm2',
+        status: 'active',
+        messages: notice('Grève'),
+        impacted_objects: [
+          {
+            pt_object: {
+              embedded_type: 'route',
+              id: 'route:1',
+              route: { line: { id: 'line:IDFM:C01741' } },
+            },
+          },
+        ],
+      },
+    ],
+    line_reports: [
+      {
+        line: { id: 'line:IDFM:C01740', links: [{ type: 'disruption', id: 'm1' }] },
+        pt_objects: [
+          {
+            id: 'stop_area:IDFM:1',
+            embedded_type: 'stop_area',
+            links: [{ type: 'disruption', id: 'closure', rel: 'disruptions' }],
+          },
+        ],
+      },
+      {
+        line: { id: 'line:IDFM:C01742', links: [{ type: 'disruption', id: 'elsewhere' }] },
+        pt_objects: [],
+      },
+    ],
+  };
+  const byId = Object.fromEntries(
+    parseLineReports(input, 'STIF:Line::C01740:').map((i) => [i.id, i.lineRefs]),
+  );
+  assert.deepEqual(byId, {
+    section: ['STIF:Line::C01742:'],
+    closure: ['STIF:Line::C01740:'],
+    route: ['STIF:Line::C01743:'],
+    m1: ['STIF:Line::C01740:', 'STIF:Line::C01741:'],
+  });
+});
+test('real line_reports response (line L, reduced): lifts dropped, notices kept on line L only', async () => {
+  const payload = JSON.parse(
+    await readFile(new URL('./fixtures/line-reports-C01740.json', import.meta.url), 'utf8'),
+  );
+  const now = Date.parse('2026-11-24T22:00:00Z');
+  for (const queried of ['STIF:Line::C01740:', 'STIF:Line::C01741:']) {
+    const incidents = parseLineReports(payload, queried, now);
+    assert.deepEqual(
+      incidents.map((i) => [i.id.slice(0, 8), i.lineRefs]),
+      [
+        ['7537023c', ['STIF:Line::C01740:']],
+        ['e2a63b7b', ['STIF:Line::C01740:']],
+      ],
+    );
+  }
+});
 test('no-key demo never calls upstream; configuration persists and pause removes times', async () =>
   withDirectory(async (dir) => {
     const service = new Service(new Store(dir), '');
@@ -392,6 +502,39 @@ test('no-key demo never calls upstream; configuration persists and pause removes
     const restarted = new Service(new Store(dir), '');
     await restarted.init();
     assert.equal(restarted.config.defaults.walkMinutes, 14);
+  }));
+test('demo incidents follow the line of each block, not its position', async () =>
+  withDirectory(async (dir) => {
+    const service = new Service(new Store(dir), '');
+    await service.init();
+    const block = (id: string, line: string, lineRef: string): Block => ({
+      id,
+      station: 'La Défense',
+      line,
+      direction: 'D',
+      monitoringRef: '',
+      lineRef,
+      directionRef: '',
+      destinationRef: '',
+      span: 1,
+      overrides: {},
+    });
+    const c = clone();
+    c.profiles[0].blocks = [
+      block('a', 'A', 'STIF:Line::C01742:'),
+      block('u', 'U', 'STIF:Line::C01741:'),
+      block('l', 'L', 'STIF:Line::C01740:'),
+    ];
+    await service.save(c);
+    const views = service.dashboard(new Date('2026-10-26T10:00:00Z')).blocks;
+    assert.deepEqual(
+      views.map((v) => [v.block.id, v.incidents.map((i) => i.id), v.incidents[0]?.lineRefs]),
+      [
+        ['a', [], undefined],
+        ['u', ['demo-incident-u'], ['STIF:Line::C01741:']],
+        ['l', ['demo-incident'], ['STIF:Line::C01740:']],
+      ],
+    );
   }));
 test('live snapshot filters by line and direction, rejects past departures and stale data', async () =>
   withDirectory(async (dir) => {

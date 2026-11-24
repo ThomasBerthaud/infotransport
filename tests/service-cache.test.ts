@@ -88,3 +88,31 @@ test('a pause starting mid-tick stops calls but still persists collected data', 
     };
     assert.ok(persisted.stops['STIF:StopArea:SP:1:']);
   }));
+
+test('each block only shows the disruptions of its own line', async () =>
+  withDirectory(async (dir) => {
+    const service = new Service(new Store(dir), 'test-key');
+    await service.init();
+    const disruption = (id: string, line: string) => ({
+      id,
+      status: 'active',
+      messages: [{ text: `Info ${id}`, channel: { types: ['web'] } }],
+      impacted_objects: [{ pt_object: { embedded_type: 'line', id: `line:IDFM:C0${line}` } }],
+    });
+    // A shared station makes both lines' reports return both disruptions.
+    const traffic = {
+      disruptions: [disruption('d1', '1'), disruption('d2', '2')],
+      line_reports: [],
+    };
+    service.prim.request = async (path) => (path === 'stop-monitoring' ? emptyStop : traffic);
+    await service.save(allDay([block('a', '1', '1'), block('b', '1', '2')]));
+    await service.tick();
+    const views = service.dashboard().blocks;
+    assert.deepEqual(
+      views.map((v) => [v.block.id, v.incidents.map((i) => i.id)]),
+      [
+        ['a', ['d1']],
+        ['b', ['d2']],
+      ],
+    );
+  }));
