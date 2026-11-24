@@ -35,8 +35,8 @@ export const numericFields: NumericField[] = [
   },
   {
     key: 'pollSeconds',
-    label: 'Intervalle entre les appels PRIM',
-    help: 'Un intervalle plus court augmente le nombre d’appels.',
+    label: 'Intervalle minimal entre les appels PRIM',
+    help: 'PRIM n’est appelé que lorsqu’une page est affichée. Un intervalle plus court augmente le nombre d’appels.',
     min: 60,
     max: 3600,
     unit: 's',

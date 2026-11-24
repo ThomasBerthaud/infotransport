@@ -29,7 +29,8 @@ export function createMcpServer(service: Service) {
         'Utiliser get_dashboard pour les prochains départs et get_traffic pour les perturbations. ' +
         'Toujours tenir compte de mode (demo = données fictives), now, paused, du status de chaque bloc ' +
         'et de trafficKnown (false = trafic inconnu, pas absence de perturbations). ' +
-        'Les données proviennent du cache du site : aucune consultation ne force de collecte PRIM. ' +
+        'Les données proviennent du cache du site : aucune consultation MCP ne force de collecte PRIM ; ' +
+        'le site ne les collecte que lorsqu’une de ses pages est affichée, elles peuvent donc être anciennes (status stale ou empty). ' +
         'La recherche du catalogue ne fournit pas de départs pour les arrêts non suivis.',
     },
   );

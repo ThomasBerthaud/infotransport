@@ -19,6 +19,7 @@ import { Budget, Store } from '../src/server/storage.js';
 import { Service } from '../src/server/service.js';
 import {
   lineReportsPath,
+  MAX_CONCURRENT_REQUESTS,
   navitiaDate,
   parseDepartures,
   parseLineReports,
@@ -471,7 +472,7 @@ test('no-key demo never calls upstream; configuration persists and pause removes
     service.prim.request = async () => {
       throw new Error('Unexpected upstream access');
     };
-    await service.tick();
+    await service.refresh();
     const c = clone();
     const base: Block = {
       id: 'demo-1',
@@ -602,6 +603,46 @@ test('PRIM errors still reserve budget and API key stays in headers', async () =
       globalThis.fetch = original;
     }
   }));
+test('PRIM calls run in parallel, bounded and paced per API under the 5 req/s quota', async () =>
+  withDirectory(async (dir) => {
+    const budget = new Budget(new Store(dir), { reservations: [] });
+    const original = globalThis.fetch;
+    const starts: { api: string; at: number }[] = [];
+    let inFlight = 0;
+    let peak = 0;
+    globalThis.fetch = async (input) => {
+      starts.push({
+        api: String(input).includes('line_reports') ? 'line-reports' : 'stop-monitoring',
+        at: Date.now(),
+      });
+      peak = Math.max(peak, ++inFlight);
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      inFlight--;
+      return new Response('{}');
+    };
+    try {
+      const prim = new Prim('test-key', budget);
+      const began = Date.now();
+      await Promise.all([
+        ...Array.from({ length: 3 }, () => prim.request('stop-monitoring', {})),
+        ...Array.from({ length: 3 }, () =>
+          prim.request('line-reports', {}, true, 'v2/navitia/line_reports/x/line_reports'),
+        ),
+      ]);
+      const elapsed = Date.now() - began;
+      assert.equal(starts.length, 6);
+      assert.equal(peak, MAX_CONCURRENT_REQUESTS);
+      // Sequential calls would take 6 × 800 ms.
+      assert.ok(elapsed < 2500, `${elapsed} ms`);
+      for (const api of ['stop-monitoring', 'line-reports']) {
+        const at = starts.filter((s) => s.api === api).map((s) => s.at);
+        for (let i = 1; i < at.length; i++)
+          assert.ok(at[i] - at[i - 1] >= 240, `${api} spaced ${at[i] - at[i - 1]} ms`);
+      }
+    } finally {
+      globalThis.fetch = original;
+    }
+  }));
 
 test('minimal capacity warns about short rows and long text without blocking or shrinking', () => {
   const c = clone();
@@ -689,15 +730,15 @@ test('collector deduplicates stop requests across blocks and respects next colle
       calls.push(path);
       return path === 'stop-monitoring' ? stopPayload() : { disruptions: [], line_reports: [] };
     };
-    await service.tick();
+    await service.refresh();
     assert.equal(calls.filter((c) => c === 'stop-monitoring').length, 1);
     assert.equal(calls.filter((c) => c === 'line-reports').length, 2);
-    await service.tick();
+    await service.refresh();
     service.dashboard();
     service.dashboard();
     assert.equal(calls.length, 3);
     service.config.defaults.days = [];
-    await service.tick();
+    await service.refresh();
     assert.equal(calls.length, 3);
   }));
 
@@ -845,7 +886,7 @@ test('demonstration direction IDs cannot silently become live collection filters
     service.prim.request = async () => {
       throw new Error('Unexpected upstream call');
     };
-    await service.tick();
+    await service.refresh();
     assert.ok(service.dashboard().blocks.every((block) => block.status === 'unconfigured'));
     assert.equal(service.budget.counts().used, 0);
   }));

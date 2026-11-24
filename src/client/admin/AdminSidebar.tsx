@@ -116,7 +116,7 @@ export function AdminSidebar({
               </p>
               <dl>
                 <div>
-                  <dt>Estimation automatique / jour</dt>
+                  <dt>Maximum estimé / jour</dt>
                   <dd>{estimates[quota.api]}</dd>
                 </div>
                 <div>
@@ -132,12 +132,14 @@ export function AdminSidebar({
           <summary>Comprendre l’estimation</summary>
           <p>
             Calculée avec les réglages du formulaire et une heure de marge pour le changement
-            d’heure. Les blocs de tous les profils sont collectés et comptés ; un arrêt ou une ligne
-            partagés par plusieurs profils ne sont comptés qu’une fois. Chaque API dispose de 1 000
-            appels par jour, dont 900 au maximum pour la collecte automatique. La découverte des
-            directions utilise le quota des passages. Les recherches de gares et de lignes ne
-            consomment aucun appel. Ces compteurs suivent uniquement cette instance : les appels
-            effectués ailleurs avec le même compte PRIM ne sont pas connus.
+            d’heure. C’est un plafond : PRIM n’est appelé que lorsqu’une page affiche les données,
+            au plus une fois par intervalle de collecte. Les blocs de tous les profils sont
+            collectés et comptés ; un arrêt ou une ligne partagés par plusieurs profils ne sont
+            comptés qu’une fois. Chaque API dispose de 1 000 appels par jour, dont 900 au maximum
+            pour la collecte automatique. La découverte des directions utilise le quota des
+            passages. Les recherches de gares et de lignes ne consomment aucun appel. Ces compteurs
+            suivent uniquement cette instance : les appels effectués ailleurs avec le même compte
+            PRIM ne sont pas connus.
           </p>
         </details>
       </section>

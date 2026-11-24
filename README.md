@@ -12,7 +12,7 @@ Par exemple, vous pouvez suivre la ligne L de La Défense vers Paris Saint-Lazar
 - **Consulter les perturbations** : la vue détaillée présente les messages disponibles pour les lignes suivies ; la vue épurée les signale par une icône.
 - **Garder un écran de départs à la maison** : une vue monochrome sans interaction est prévue notamment pour les petits écrans à encre électronique. La compatibilité et la lisibilité restent à vérifier sur votre appareil.
 - **Tout régler depuis le navigateur** : rechercher les arrêts, choisir les lignes et directions, organiser les blocs et définir les horaires de fonctionnement.
-- **Maîtriser les appels aux données** : le serveur partage son cache entre les vues, suspend la collecte hors des plages actives et suit les budgets PRIM.
+- **Maîtriser les appels aux données** : le serveur n’interroge PRIM que lorsqu’une page affiche les données, partage son cache entre les vues, suspend la collecte hors des plages actives et suit les budgets PRIM.
 - **Essayer sans clé API** : le mode démonstration fournit des horaires et incidents fictifs pour découvrir l’interface.
 
 L’application est conçue pour un usage sur un réseau local de confiance, sans authentification intégrée. Elle fonctionne avec Node.js ou Docker, et conserve ses réglages dans des fichiers, sans base de données à installer.
@@ -77,7 +77,7 @@ La configuration initiale contient un profil « Principal » sans bloc. En mode 
 
 1. Dans `/admin`, rechercher la gare et sélectionner le résultat.
 2. Choisir la ligne et la direction parmi les passages disponibles, puis renseigner le nom court de ligne affiché si nécessaire.
-3. Enregistrer les réglages. La collecte démarre à la prochaine échéance pendant une plage active.
+3. Enregistrer les réglages. La collecte démarre à la prochaine consultation d’une page pendant une plage active.
 
 La recherche de gares et de lignes utilise le référentiel local fourni (`resources/catalog.json`) : aucune requête PRIM, même hors plage ou sans clé. Les sens et terminus sont proposés à partir des passages SIRI Stop Monitoring, puis le trafic provient de SIRI General Message. La clé doit avoir accès à ces deux services. Les identifiants avancés peuvent aussi être renseignés manuellement : `MonitoringRef`, `LineRef`, et soit `DirectionRef`, soit `DestinationRef`. Pour le ferroviaire SNCF, utiliser une zone d'arrêt `STIF:StopArea:SP:…:` selon la documentation PRIM.
 
@@ -120,9 +120,9 @@ Les suggestions s’ouvrent pendant la saisie, par nom ou code, dans les contrô
 
 Chaque bloc est un tuple autonome. Les blocs sont pleine largeur par défaut ; on peut les réordonner et choisir une demi-largeur pour placer deux blocs sur une même rangée.
 
-Les valeurs par défaut sont héritées dynamiquement. Chaque bloc peut personnaliser le temps de trajet, le nombre de départs par vue, la fréquence de collecte et ses plages. Le bouton « Reprendre la valeur par défaut » supprime une exception. Les plages globales restent une limite commune à toute collecte.
+Les valeurs par défaut sont héritées dynamiquement. Chaque bloc peut personnaliser le temps de trajet, le nombre de départs par vue, l’intervalle minimal entre deux collectes et ses plages. Le bouton « Reprendre la valeur par défaut » supprime une exception. Les plages globales restent une limite commune à toute collecte.
 
-Valeurs initiales modifiables : trajet de 14 minutes, 3 départs épurés, 8 départs riches, collecte toutes les 600 secondes, rafraîchissement d'écran toutes les 60 secondes, profil utile de 800 × 600 pixels. Ces dimensions sont un profil de départ à ajuster au navigateur réel.
+Valeurs initiales modifiables : trajet de 14 minutes, 3 départs épurés, 8 départs riches, au plus une collecte toutes les 600 secondes, rafraîchissement d'écran toutes les 60 secondes, profil utile de 800 × 600 pixels. Ces dimensions sont un profil de départ à ajuster au navigateur réel.
 
 Pour mesurer cette zone, activer « Afficher les dimensions réelles » sous « Dimensions de l’écran », dans « Affichage & aperçu », puis enregistrer. Au prochain rafraîchissement de `/minimal`, un encart affiche la largeur × hauteur utile en pixels CSS et se met à jour lors d’un redimensionnement. Reporter ces valeurs dans les dimensions de l’écran, puis désactiver l’indicateur. Cette option (`screen.debugDimensions`) est désactivée par défaut et nécessite JavaScript uniquement pour la mesure.
 
@@ -151,7 +151,7 @@ De 22 h à 5 h par défaut, les horaires sont masqués et les appels suspendus. 
 - Les compteurs locaux conservent les réservations existantes et ne connaissent pas les appels faits par d’autres applications avec le même compte PRIM. La fenêtre glissante reste prudente, sans supposer le fuseau de remise à zéro du fournisseur.
 - Réservation persistée avant chaque appel, même s'il échoue. Requêtes sérialisées, timeout, prise en compte des limitations HTTP 429 et attente entre nouvelles tentatives.
 - Tous les appels PRIM annoncent `Accept-Encoding: gzip, deflate` ; le client HTTP Node.js décompresse automatiquement les réponses avant leur lecture JSON.
-- Mutualisation par arrêt et par ligne ; consulter une page ou rafraîchir TanStack Query ne déclenche pas de collecte PRIM.
+- Collecte à la demande : PRIM n’est appelé que lorsqu’une page (`/`, `/minimal`, aperçu de l’administration) demande les données, et seulement pour un arrêt dont l’intervalle de collecte est écoulé ou une ligne dont le trafic date de plus de 15 minutes. Sans page affichée, aucun appel ; un onglet masqué ne rafraîchit pas. Mutualisation par arrêt et par ligne ; plusieurs pages ouvertes partagent la même collecte. Les arrêts et lignes sont interrogés en parallèle (4 appels au plus, 4 requêtes/s au plus par API, sous la limite PRIM de 5 requêtes/s).
 - Référentiel local d’arrêts/lignes embarqué dans l’image et disponible hors plage sans consommer de crédit. La découverte des sens reste mise en cache 3 minutes et soumise au budget et aux horaires actifs.
 - Les heures périmées sont retirées de l'affichage. Les diagnostics sont dans `/admin`.
 
@@ -159,7 +159,7 @@ Les fichiers `config.json`, `cache.json` et `budget.json` se trouvent dans `DATA
 
 Les erreurs de l’API utilisent des statuts distincts : `400` entrée invalide, `403` origine refusée, `502`/`504` PRIM en échec ou sans réponse, `503` appel empêché localement (budget, pause, attente après limitation), `500` erreur inattendue. Les tableaux Grafana séparent ainsi les erreurs du service de celles de PRIM.
 
-L'estimation dans l'admin est prudente et inclut une heure de marge pour le changement d'heure. Elle dépend des ressources configurées et ne remplace pas les compteurs effectifs. Les quotas et droits réels restent ceux du compte PRIM.
+L'estimation dans l'admin est un plafond, atteint seulement si un écran reste affiché pendant toutes les plages actives. Elle est prudente et inclut une heure de marge pour le changement d'heure. Elle dépend des ressources configurées et ne remplace pas les compteurs effectifs. Les quotas et droits réels restent ceux du compte PRIM.
 
 ## Application installable et mode hors ligne
 

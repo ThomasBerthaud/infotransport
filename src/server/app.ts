@@ -69,6 +69,8 @@ export function createApp(
   app.get('/api/dashboard', async (req, res) => {
     await service.timetables.refresh();
     const profile = z.string().min(1).max(80).optional().parse(req.query.profile);
+    // Only a displayed page asks PRIM for data, and only for resources whose cache is due.
+    await service.demand();
     res.json(service.dashboard(new Date(), { preview: req.query.preview === '1', profile }));
   });
   app.get('/api/timetables', async (_req, res) => {
@@ -121,6 +123,7 @@ export function createApp(
   app.get('/minimal', async (_req, res) => {
     // The minimal screen always shows the default profile, with its own grid.
     const profile = defaultProfile(service.config);
+    await service.demand();
     const dashboard = service.dashboard(new Date(), { profile: profile.id });
     const { columns, rows } = profile.grid;
     const minimum = minimalGridSize(dashboard.config);

@@ -3,8 +3,14 @@ import type { Budget } from './storage.js';
 import { UnavailableError, UpstreamError } from './errors.js';
 import { log } from './log.js';
 const PRIM_BASE_URL = 'https://prim.iledefrance-mobilites.fr/marketplace/';
-/** Minimum spacing between two PRIM calls, whatever the API. */
+/**
+ * Minimum spacing between the starts of two calls to the same API. PRIM's default quota
+ * for stop-monitoring is 5 requests per second (catalogue page of the API); 250 ms keeps
+ * each API at 4 per second at most, line-reports included (no per-second figure published).
+ */
 const REQUEST_SPACING_MS = 250;
+/** PRIM calls in flight at once; the others wait for a free slot. */
+export const MAX_CONCURRENT_REQUESTS = 4;
 const REQUEST_TIMEOUT_MS = 12_000;
 /** Minimum wait after an HTTP 429, even when Retry-After is shorter or absent. */
 const MIN_RATE_LIMIT_WAIT_S = 60;
@@ -260,58 +266,86 @@ export function discover(departures: Departure[]): Discovery {
   };
 }
 export class Prim {
-  private queue: Promise<unknown> = Promise.resolve();
+  private active = 0;
+  private waiting: (() => void)[] = [];
+  /** Per API: the last paced start, chained so that parallel calls queue their turn. */
+  private paced = new Map<string, Promise<number>>();
   private nextAllowed = new Map<string, number>();
-  private lastRequest = 0;
   constructor(
     private key: string,
     private budget: Budget,
     private canCall: () => boolean = () => true,
   ) {}
+  /** Waits for one of the MAX_CONCURRENT_REQUESTS slots. */
+  private async acquire() {
+    while (this.active >= MAX_CONCURRENT_REQUESTS)
+      await new Promise<void>((resolve) => this.waiting.push(resolve));
+    this.active++;
+  }
+  private release() {
+    this.active--;
+    this.waiting.shift()?.();
+  }
+  /** Spaces the starts of successive calls to one API, even when they run in parallel. */
+  private pace(api: string) {
+    const turn = (this.paced.get(api) ?? Promise.resolve(0)).then(async (last) => {
+      const spacing = REQUEST_SPACING_MS - (Date.now() - last);
+      if (spacing > 0) await new Promise((resolve) => setTimeout(resolve, spacing));
+      return Date.now();
+    });
+    this.paced.set(api, turn);
+    return turn;
+  }
   /** `api` names the quota bucket; `path` defaults to it when the endpoint is static. */
-  request(
+  async request(
     api: string,
     params: Record<string, string>,
     automatic = true,
     path: string = api,
   ): Promise<unknown> {
-    const work = this.queue
-      .catch(() => {})
-      .then(async () => {
-        if (Date.now() < (this.nextAllowed.get(api) ?? 0))
-          throw new UnavailableError('PRIM demande une attente avant le prochain appel.');
-        const spacing = REQUEST_SPACING_MS - (Date.now() - this.lastRequest);
-        if (spacing > 0) await new Promise((resolve) => setTimeout(resolve, spacing));
-        if (!this.key.trim() || !this.canCall())
-          throw new UnavailableError('Appels PRIM suspendus : clé absente ou plage inactive.');
-        this.lastRequest = Date.now();
-        await this.budget.reserve(api, automatic);
-        const url = new URL(path, PRIM_BASE_URL);
-        for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
-        log.debug(`[PRIM] ${path} — ${JSON.stringify(params)}`);
-        const response = await fetch(url, {
-          headers: {
-            apiKey: this.key,
-            Accept: 'application/json',
-            'Accept-Encoding': 'gzip, deflate',
-          },
-          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-        });
-        log.debug(`[PRIM] ${path} — HTTP ${response.status}`);
-        if (!response.ok) {
-          if (response.status === 429) {
-            const retry = Number(response.headers.get('retry-after'));
-            const wait = Math.max(MIN_RATE_LIMIT_WAIT_S, Number.isFinite(retry) ? retry : 0);
-            this.nextAllowed.set(api, Date.now() + wait * 1000);
-            log.warn(`[PRIM] ${path} limité (HTTP 429) — prochain appel dans ${wait} s`);
-          }
-          throw new UpstreamError(
-            `PRIM : HTTP ${response.status}. Vérifiez la clé, les droits et les identifiants dans l’administration.`,
-          );
-        }
-        return response.json() as Promise<unknown>;
-      });
-    this.queue = work;
-    return work;
+    await this.acquire();
+    try {
+      return await this.send(api, params, automatic, path);
+    } finally {
+      this.release();
+    }
+  }
+  private async send(
+    api: string,
+    params: Record<string, string>,
+    automatic: boolean,
+    path: string,
+  ) {
+    await this.pace(api);
+    // Checked after waiting: a parallel call may have hit HTTP 429 or the pause may have begun.
+    if (Date.now() < (this.nextAllowed.get(api) ?? 0))
+      throw new UnavailableError('PRIM demande une attente avant le prochain appel.');
+    if (!this.key.trim() || !this.canCall())
+      throw new UnavailableError('Appels PRIM suspendus : clé absente ou plage inactive.');
+    await this.budget.reserve(api, automatic);
+    const url = new URL(path, PRIM_BASE_URL);
+    for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
+    log.debug(`[PRIM] ${path} — ${JSON.stringify(params)}`);
+    const response = await fetch(url, {
+      headers: {
+        apiKey: this.key,
+        Accept: 'application/json',
+        'Accept-Encoding': 'gzip, deflate',
+      },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+    log.debug(`[PRIM] ${path} — HTTP ${response.status}`);
+    if (!response.ok) {
+      if (response.status === 429) {
+        const retry = Number(response.headers.get('retry-after'));
+        const wait = Math.max(MIN_RATE_LIMIT_WAIT_S, Number.isFinite(retry) ? retry : 0);
+        this.nextAllowed.set(api, Date.now() + wait * 1000);
+        log.warn(`[PRIM] ${path} limité (HTTP 429) — prochain appel dans ${wait} s`);
+      }
+      throw new UpstreamError(
+        `PRIM : HTTP ${response.status}. Vérifiez la clé, les droits et les identifiants dans l’administration.`,
+      );
+    }
+    return (await response.json()) as unknown;
   }
 }

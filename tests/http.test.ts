@@ -78,6 +78,32 @@ test('health, dashboard and minimal view respond with the expected headers', asy
     assert.equal(html.match(/class="minimal-cell"/g)?.length, 2);
   }));
 
+test('only displayed pages trigger a PRIM collection, and only when the cache is due', async () =>
+  withApp('test-key', async ({ base, service }) => {
+    const config = allDay();
+    config.profiles[0].blocks = [block()];
+    await service.save(config);
+    const calls: string[] = [];
+    service.prim.request = async (path) => {
+      calls.push(path);
+      return path === 'stop-monitoring'
+        ? { Siri: { ServiceDelivery: { StopMonitoringDelivery: [{ Status: true }] } } }
+        : { disruptions: [], line_reports: [] };
+    };
+    for (const path of ['/health', '/metrics', '/api/status', '/api/config'])
+      assert.equal((await fetch(`${base}${path}`)).status, 200, path);
+    assert.deepEqual(calls, []);
+    assert.equal((await fetch(`${base}/api/dashboard`)).status, 200);
+    assert.deepEqual(calls, ['stop-monitoring', 'line-reports']);
+    // The cache is still valid: neither the preview nor the minimal view call again.
+    assert.equal((await fetch(`${base}/api/dashboard?preview=1`)).status, 200);
+    assert.equal((await fetch(`${base}/minimal`)).status, 200);
+    assert.equal(calls.length, 2);
+    for (const entry of Object.values(service.cache.stops)) entry.next = 0;
+    assert.equal((await fetch(`${base}/minimal`)).status, 200);
+    assert.deepEqual(calls, ['stop-monitoring', 'line-reports', 'stop-monitoring']);
+  }));
+
 test('validation errors are 400, upstream failures 502 and local pauses 503', async () =>
   withApp('test-key', async ({ base, service }) => {
     assert.equal((await fetch(`${base}/api/stops?q=a`)).status, 400);

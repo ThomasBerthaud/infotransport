@@ -47,7 +47,7 @@ test('cache entries of removed blocks are pruned and legacy search cache is drop
     assert.equal('searches' in service.cache, false);
     service.prim.request = async (path) => (path === 'stop-monitoring' ? emptyStop : emptyTraffic);
     await service.save(allDay([block('a', '1', '1'), block('b', '2', '2')]));
-    await service.tick();
+    await service.refresh();
     assert.deepEqual(Object.keys(service.cache.stops).sort(), [
       'STIF:StopArea:SP:1:',
       'STIF:StopArea:SP:2:',
@@ -68,7 +68,7 @@ test('cache entries of removed blocks are pruned and legacy search cache is drop
     assert.equal('STIF:StopArea:SP:2:' in persisted.stops, false);
   }));
 
-test('a pause starting mid-tick stops calls but still persists collected data', async () =>
+test('a pause starting mid-collection stops calls but still persists collected data', async () =>
   withDirectory(async (dir) => {
     const service = new Service(new Store(dir), 'test-key');
     await service.init();
@@ -80,7 +80,7 @@ test('a pause starting mid-tick stops calls but still persists collected data', 
       service.config.defaults.days = [];
       return emptyStop;
     };
-    await service.tick();
+    await service.refresh();
     assert.deepEqual(calls, ['stop-monitoring']);
     assert.equal(service.error, undefined);
     const persisted = JSON.parse(await readFile(join(dir, 'cache.json'), 'utf8')) as {
@@ -106,7 +106,7 @@ test('each block only shows the disruptions of its own line', async () =>
     };
     service.prim.request = async (path) => (path === 'stop-monitoring' ? emptyStop : traffic);
     await service.save(allDay([block('a', '1', '1'), block('b', '1', '2')]));
-    await service.tick();
+    await service.refresh();
     const views = service.dashboard().blocks;
     assert.deepEqual(
       views.map((v) => [v.block.id, v.incidents.map((i) => i.id)]),
@@ -115,4 +115,114 @@ test('each block only shows the disruptions of its own line', async () =>
         ['b', ['d2']],
       ],
     );
+  }));
+
+const count = (calls: string[], path: string) => calls.filter((c) => c === path).length;
+const liveService = async (dir: string, blocks: Block[]) => {
+  const service = new Service(new Store(dir), 'test-key');
+  await service.init();
+  await service.save(allDay(blocks));
+  const calls: string[] = [];
+  service.prim.request = async (path) => {
+    calls.push(path);
+    return path === 'stop-monitoring' ? emptyStop : emptyTraffic;
+  };
+  return { service, calls };
+};
+
+test('without any page request, PRIM is never called', async () =>
+  withDirectory(async (dir) => {
+    const { calls } = await liveService(dir, [block('a', '1', '1')]);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    assert.deepEqual(calls, []);
+  }));
+
+test('a page request collects due resources; the next one reads the cache', async () =>
+  withDirectory(async (dir) => {
+    const { service, calls } = await liveService(dir, [
+      block('a', '1', '1'),
+      block('b', '1', '2'),
+      block('c', '2', '2'),
+    ]);
+    await service.demand();
+    assert.equal(count(calls, 'stop-monitoring'), 2);
+    assert.equal(count(calls, 'line-reports'), 2);
+    await service.demand();
+    service.dashboard();
+    assert.equal(calls.length, 4);
+    // Once the poll interval has elapsed, the next request collects the stops again.
+    for (const entry of Object.values(service.cache.stops)) entry.next = 0;
+    await service.demand();
+    assert.equal(count(calls, 'stop-monitoring'), 4);
+    assert.equal(calls.length, 6);
+  }));
+
+test('concurrent page requests share a single collection', async () =>
+  withDirectory(async (dir) => {
+    const { service, calls } = await liveService(dir, [block('a', '1', '1')]);
+    const request = service.prim.request;
+    service.prim.request = async (...args) => {
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      return request(...args);
+    };
+    await Promise.all([service.demand(), service.demand(), service.demand()]);
+    assert.deepEqual(calls, ['stop-monitoring', 'line-reports']);
+  }));
+
+test('a page request waits a bounded time, then the collection completes in background', async () =>
+  withDirectory(async (dir) => {
+    const { service, calls } = await liveService(dir, [block('a', '1', '1')]);
+    let release!: () => void;
+    const blocked = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    service.prim.request = async (path) => {
+      calls.push(path);
+      await blocked;
+      return path === 'stop-monitoring' ? emptyStop : emptyTraffic;
+    };
+    const started = Date.now();
+    await service.demand({ waitMs: 50 });
+    assert.ok(Date.now() - started < 1000);
+    assert.equal(service.cache.stops['STIF:StopArea:SP:1:'], undefined);
+    // Stops and traffic are collected in parallel. A request made meanwhile joins the
+    // running collection instead of calling again.
+    assert.deepEqual(calls, ['stop-monitoring', 'line-reports']);
+    await service.demand({ waitMs: 10 });
+    assert.deepEqual(calls, ['stop-monitoring', 'line-reports']);
+    release();
+    await service.refresh();
+    assert.ok(service.cache.stops['STIF:StopArea:SP:1:']);
+    assert.deepEqual(calls, ['stop-monitoring', 'line-reports']);
+    assert.equal(service.error, undefined);
+  }));
+
+test('page requests call nothing during a pause or in demo mode', async () =>
+  withDirectory(async (dir) => {
+    const { service, calls } = await liveService(dir, [block('a', '1', '1')]);
+    service.config.defaults.days = [];
+    await service.demand();
+    assert.deepEqual(calls, []);
+    const demo = new Service(new Store(dir), '');
+    await demo.init();
+    demo.prim.request = async () => {
+      throw new Error('Unexpected upstream access');
+    };
+    await demo.demand();
+    assert.equal(demo.error, undefined);
+  }));
+
+test('an unexpected collection error is reported without rejecting the request', async () =>
+  withDirectory(async (dir) => {
+    const { service } = await liveService(dir, [block('a', '1', '1')]);
+    const write = Store.prototype.write;
+    Store.prototype.write = async () => {
+      throw new Error('disque plein');
+    };
+    try {
+      await service.demand();
+    } finally {
+      Store.prototype.write = write;
+    }
+    assert.equal(service.error, 'disque plein');
   }));

@@ -13,7 +13,6 @@ const app = createApp(service, { production: process.env.NODE_ENV === 'productio
 const port = Number(process.env.PORT) || 3000;
 const server = app.listen(port, '0.0.0.0', () => {
   log.info(`InfoTransport : http://localhost:${port} · mode ${service.mode}`);
-  service.start();
 });
 server.on('error', (error) => {
   log.error(`Démarrage impossible : ${error.message}`);
@@ -21,6 +20,5 @@ server.on('error', (error) => {
 });
 for (const signal of ['SIGTERM', 'SIGINT'])
   process.on(signal, () => {
-    service.stop();
     server.close(() => process.exit(0));
   });

@@ -82,6 +82,8 @@ function App() {
       q.state.data && !q.state.data.offline
         ? q.state.data.refreshSeconds * 1000
         : OFFLINE_REFRESH_MS,
+    // The server only calls PRIM when a page asks for data: a hidden tab must not.
+    refetchIntervalInBackground: false,
   });
   const { refetch } = query;
   const paused = query.data?.paused;

@@ -29,8 +29,12 @@ import { Timetables } from './timetables.js';
 
 const SECOND_MS = 1000;
 const MINUTE_MS = 60 * SECOND_MS;
-/** How often the scheduler checks whether a resource is due. */
-const TICK_INTERVAL_MS = 5 * SECOND_MS;
+/**
+ * How long a page request waits for an on-demand collection before answering with the
+ * cache. Below PRIM's 12 s timeout so the target screen never hangs; an unfinished
+ * collection carries on and updates the cache for the next request.
+ */
+export const DEMAND_WAIT_MS = 5 * SECOND_MS;
 /** Traffic messages are collected at a fixed pace, independent of block settings. */
 const TRAFFIC_INTERVAL_MS = 15 * MINUTE_MS;
 /** Traffic older than this is reported as unknown rather than "no incident". */
@@ -66,13 +70,13 @@ export class Service {
   prim!: Prim;
   readonly timetables: Timetables;
   readonly mode: 'demo' | 'live';
-  private running = false;
+  /** Collection in progress, shared by concurrent requests (single-flight). */
+  private inflight?: Promise<void>;
   private mutation: Promise<unknown> = Promise.resolve();
-  /** Last unexpected scheduler error. */
+  /** Last unexpected collection error. */
   error?: string;
   /** Set when the stored configuration could not be used at startup. */
   configError?: string;
-  timer?: NodeJS.Timeout;
   constructor(
     private store: Store,
     private key: string,
@@ -141,18 +145,25 @@ export class Service {
     this.mutation = work;
     return work;
   }
-  start() {
-    const run = () =>
-      void this.tick().catch((error) => {
-        log.error(`[TICK] Erreur inattendue : ${describe(error)}`);
-        this.error = describe(error);
-      });
-    this.timer = setInterval(run, TICK_INTERVAL_MS);
-    this.timer.unref();
-    run();
-  }
-  stop() {
-    if (this.timer) clearInterval(this.timer);
+  /**
+   * Called when a displayed page asks for data: collects the resources whose cache entry
+   * is due, waiting at most `waitMs` for the result. Never rejects; unexpected errors are
+   * logged and reported in the diagnostics.
+   */
+  async demand({ waitMs = DEMAND_WAIT_MS }: { waitMs?: number } = {}) {
+    if (this.mode === 'demo' || !this.online()) return;
+    const work = this.refresh().catch((error: unknown) => {
+      log.error(`[COLLECTE] Erreur inattendue : ${describe(error)}`);
+      this.error = describe(error);
+    });
+    let timer: NodeJS.Timeout | undefined;
+    await Promise.race([
+      work,
+      new Promise<void>((resolve) => {
+        timer = setTimeout(resolve, waitMs);
+      }),
+    ]);
+    clearTimeout(timer);
   }
   private online(now = new Date()) {
     return active(this.config.defaults, now);
@@ -182,15 +193,19 @@ export class Service {
   ): Promise<boolean> {
     const old = entries[ref];
     if (old && now < old.next) {
-      log.debug(`[TICK] ${label} ${ref} — cache valide`);
+      log.debug(`[COLLECTE] ${label} ${ref} — cache valide`);
       return false;
     }
+    // The night pause may begin during a collection: stop calling, but keep what was collected.
+    if (!this.online()) return false;
     try {
       const data = await fetch();
       entries[ref] = { at: Date.now(), data, next: Date.now() + intervalMs };
-      log.debug(`[TICK] ${label} ${ref} — collecte réussie`);
+      log.debug(`[COLLECTE] ${label} ${ref} — collecte réussie`);
     } catch (error) {
-      log.warn(`[TICK] ${label} ${ref} — ${describe(error)}`);
+      // Refused because the pause began meanwhile: abandon without recording an error.
+      if (!this.online()) return false;
+      log.warn(`[COLLECTE] ${label} ${ref} — ${describe(error)}`);
       entries[ref] = {
         at: old?.at ?? 0,
         data: old?.data ?? ([] as T),
@@ -217,9 +232,18 @@ export class Service {
       }
     return changed;
   }
-  async tick() {
-    if (this.running || this.mode === 'demo' || !this.online()) return;
-    this.running = true;
+  /**
+   * Collects every due resource of the active blocks. Concurrent calls share the same
+   * collection; nothing runs in demo mode or outside the active hours.
+   */
+  refresh(): Promise<void> {
+    if (this.mode === 'demo' || !this.online()) return Promise.resolve();
+    this.inflight ??= this.collectAll().finally(() => {
+      this.inflight = undefined;
+    });
+    return this.inflight;
+  }
+  private async collectAll() {
     let dirty = false;
     try {
       const now = Date.now();
@@ -234,25 +258,23 @@ export class Service {
         stops.set(b.monitoringRef, Math.min(stops.get(b.monitoringRef) ?? Infinity, poll));
         lines.add(b.lineRef);
       }
-      for (const [ref, poll] of stops) {
-        // The night pause may begin during a tick: stop calling, but keep what was collected.
-        if (!this.online()) break;
-        dirty =
-          (await this.collect(
-            this.cache.stops,
-            'Arrêt',
-            ref,
-            now,
-            poll,
-            Math.min(MAX_RETRY_MS, poll * 2),
-            async () =>
-              parseDepartures(await this.prim.request('stop-monitoring', { MonitoringRef: ref })),
-          )) || dirty;
-      }
-      for (const ref of lines) {
-        if (!this.online()) break;
-        dirty =
-          (await this.collect(
+      const stopTasks = [...stops].map(
+        ([ref, poll]) =>
+          () =>
+            this.collect(
+              this.cache.stops,
+              'Arrêt',
+              ref,
+              now,
+              poll,
+              Math.min(MAX_RETRY_MS, poll * 2),
+              async () =>
+                parseDepartures(await this.prim.request('stop-monitoring', { MonitoringRef: ref })),
+            ),
+      );
+      const lineTasks = [...lines].map(
+        (ref) => () =>
+          this.collect(
             this.cache.traffic,
             'Trafic',
             ref,
@@ -269,15 +291,23 @@ export class Service {
                 ),
                 ref,
               ),
-          )) || dirty;
-      }
+          ),
+      );
+      // All resources are collected in parallel; the PRIM client bounds the calls in flight
+      // and paces each API. Interleaving lets both APIs progress side by side.
+      const tasks = Array.from({ length: Math.max(stopTasks.length, lineTasks.length) }, (_, i) => [
+        stopTasks[i],
+        lineTasks[i],
+      ])
+        .flat()
+        .filter((task) => task !== undefined);
+      const results = await Promise.allSettled(tasks.map((task) => task()));
+      dirty = results.some((r) => r.status === 'fulfilled' && r.value);
+      const failure = results.find((r) => r.status === 'rejected');
+      if (failure) throw failure.reason;
       dirty = this.prune(Date.now()) || dirty;
     } finally {
-      try {
-        if (dirty) await this.store.write('cache.json', this.cache);
-      } finally {
-        this.running = false;
-      }
+      if (dirty) await this.store.write('cache.json', this.cache);
     }
   }
   async search(q: string) {
