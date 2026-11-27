@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isLineRef, isStopRef, lineReportsPath } from '../shared/ids.js';
 import { loadCatalog, type Catalog } from './catalog.js';
 import {
   active,
@@ -21,7 +22,7 @@ import {
   type Incident,
 } from '../shared/model.js';
 import { Budget, Store } from './storage.js';
-import { discover, lineReportsPath, parseDepartures, parseLineReports, Prim } from './prim.js';
+import { discover, parseDepartures, parseLineReports, Prim } from './prim.js';
 import { demoDepartures, demoDiscovery, demoIncidents } from './demo.js';
 import { NotFoundError, toHttpError, UnavailableError } from './errors.js';
 import { log } from './log.js';
@@ -170,8 +171,8 @@ export class Service {
   }
   private configured(b: Block) {
     return (
-      /^STIF:Stop(?:Area:SP|Point:Q):\d+:$/.test(b.monitoringRef) &&
-      /^STIF:Line::C\d+:$/.test(b.lineRef) &&
+      isStopRef(b.monitoringRef) &&
+      isLineRef(b.lineRef) &&
       !!(b.directionRef || b.destinationRef) &&
       !b.directionRef.startsWith('DEMO:') &&
       !b.destinationRef.startsWith('DEMO:') &&

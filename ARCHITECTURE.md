@@ -44,7 +44,7 @@ Le journal écrit une ligne horodatée par événement sur la sortie standard, f
 - CSS de l'affichage épuré volontairement compatible avec le navigateur cible. Vite ne garantit pas la compatibilité des fonctionnalités CSS : vérifier la mise en page sur appareil et prévoir une disposition de repli pleine largeur.
 - Oxlint (`oxlint`) pour le lint, Oxfmt (`oxfmt`) pour le formatage. TypeScript pour la vérification des types, distincte du build Vite et du lint.
 - Scripts disponibles : `dev`, `build`, `start`, `lint`, `fmt`, `fmt:check`, `typecheck`, `test`. Versions verrouillées et installation reproductible avec npm et `npm ci` à partir du lockfile.
-- Construction Docker en plusieurs étapes : build des assets et vérifications avant livraison du serveur et des assets compilés dans l'image finale.
+- Construction Docker en plusieurs étapes : build des assets (avec la vérification des types) avant livraison du serveur et des assets compilés dans l'image finale. Lint, format et tests relèvent de la CI, pas de l'image.
 
 ## PWA et mode hors ligne
 

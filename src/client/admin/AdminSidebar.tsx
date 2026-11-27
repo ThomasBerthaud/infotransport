@@ -1,6 +1,7 @@
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { ApiBudget, Config, Dashboard } from '../../shared/model.js';
 import { estimatedCallsByApi, primQuotas } from '../../shared/model.js';
+import { formatParis } from '../../shared/paris-time.js';
 import { budgetLevel } from './blocks.js';
 
 export type Diagnostic = {
@@ -28,11 +29,8 @@ const consumptionLabel = {
   normal: 'utilisés',
 } as const;
 
-const parisDate = (value: string | number, withTime = true) =>
-  new Date(value).toLocaleString('fr-FR', {
-    timeZone: 'Europe/Paris',
-    ...(withTime ? {} : { dateStyle: 'long' }),
-  });
+const shownDate = (value: string | number, withTime = true) =>
+  formatParis(value, withTime ? {} : { dateStyle: 'long' });
 
 function TimetablesStatus({ timetables }: { timetables: NonNullable<Diagnostic['timetables']> }) {
   const problem =
@@ -41,7 +39,7 @@ function TimetablesStatus({ timetables }: { timetables: NonNullable<Diagnostic['
       : timetables.state === 'invalid'
         ? timetables.error
         : timetables.state === 'expired'
-          ? `Horaires théoriques expirés depuis le ${parisDate(timetables.validUntil!)}. Relancez l’import.`
+          ? `Horaires théoriques expirés depuis le ${shownDate(timetables.validUntil!)}. Relancez l’import.`
           : undefined;
   return (
     <div className="timetables-status">
@@ -50,8 +48,8 @@ function TimetablesStatus({ timetables }: { timetables: NonNullable<Diagnostic['
         <p className="field-error">{problem}</p>
       ) : (
         <p className="field-help">
-          Importés le {parisDate(timetables.importedAt!)}, valables jusqu’au{' '}
-          {parisDate(timetables.validUntil!)}.
+          Importés le {shownDate(timetables.importedAt!)}, valables jusqu’au{' '}
+          {shownDate(timetables.validUntil!)}.
         </p>
       )}
       {timetables.state !== 'missing' && timetables.uncovered.length > 0 && (
@@ -162,7 +160,7 @@ export function AdminSidebar({
             <div className="resource-status" key={`${entry.ref}-${i}`}>
               <strong>{entry.ref}</strong>
               <span>
-                {entry.at ? `Dernière réception : ${parisDate(entry.at)}` : 'Aucune donnée reçue'}
+                {entry.at ? `Dernière réception : ${shownDate(entry.at)}` : 'Aucune donnée reçue'}
               </span>
               {entry.error && <p className="field-error">{entry.error}</p>}
             </div>
@@ -174,7 +172,7 @@ export function AdminSidebar({
         {status.data?.timetables && <TimetablesStatus timetables={status.data.timetables} />}
         {status.data?.catalog?.importedAt && (
           <p className="field-help">
-            Référentiel des arrêts importé le {parisDate(status.data.catalog.importedAt, false)}.
+            Référentiel des arrêts importé le {shownDate(status.data.catalog.importedAt, false)}.
           </p>
         )}
       </section>

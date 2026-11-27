@@ -11,6 +11,8 @@ import {
   type ScheduledDeparture,
   type TimetablesResponse,
 } from '../shared/model.js';
+import { gtfsRouteId, gtfsStopId } from '../shared/ids.js';
+import { fromParisWallClock, parisDate } from '../shared/paris-time.js';
 
 // Scheduled timetables imported by hand from the IDFM GTFS feed ("Offre horaires TC GTFS
 // IDFM", Licence Mobilités). Only the configured blocks are kept, in /data/timetables.json.
@@ -50,20 +52,6 @@ export const keyOf = (b: Pick<Block, keyof TimetableKey>): string =>
 const labelOf = (b: Block) => `${b.station} · ${b.line} → ${b.direction}`;
 
 // ---------------------------------------------------------------------------
-// Identifiers. The IDFM GTFS documentation gives `IDFM:[ArRId]` for bus, tram and metro
-// stops (SIRI `STIF:StopPoint:Q:[ArRId]:`), `IDFM:monomodalStopPlace:[ZdAId]` for RER and
-// Transilien stops (SIRI `STIF:StopArea:SP:[ZdAId]:`) and `IDFM:CXXXXX` for lines.
-
-export function gtfsStopId(siriRef: string): string | undefined {
-  const quay = /^STIF:StopPoint:Q:(\d+):$/.exec(siriRef)?.[1];
-  if (quay) return `IDFM:${quay}`;
-  const area = /^STIF:StopArea:SP:(\d+):$/.exec(siriRef)?.[1];
-  return area ? `IDFM:monomodalStopPlace:${area}` : undefined;
-}
-export function gtfsRouteId(lineRef: string): string | undefined {
-  const code = /^STIF:Line::(C\d+):$/.exec(lineRef)?.[1];
-  return code ? `IDFM:${code}` : undefined;
-}
 /** Destination names are compared without case, accents or punctuation. */
 export const normalizeName = (name: string) =>
   name
@@ -77,25 +65,6 @@ export const normalizeName = (name: string) =>
 // Dates and times. GTFS times count from "noon minus 12 h" of the service day in the
 // agency time zone, so they stay right on daylight saving days and may exceed 24:00.
 
-const parisOffset = (t: number) => {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Europe/Paris',
-      hourCycle: 'h23',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    })
-      .formatToParts(new Date(t))
-      .map((p) => [p.type, Number(p.value)]),
-  );
-  return (
-    Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second) - t
-  );
-};
 /** `YYYYMMDD` → UTC midnight of that calendar date, used as a day counter. */
 const dayNumber = (date: string) =>
   Date.UTC(Number(date.slice(0, 4)), Number(date.slice(4, 6)) - 1, Number(date.slice(6, 8)));
@@ -104,12 +73,8 @@ const dateOf = (day: number) => new Date(day).toISOString().slice(0, 10).replace
 export function serviceTime(date: string, time: string): number {
   const [h, m, s] = time.split(':').map(Number);
   const utcNoon = dayNumber(date) + 12 * HOUR_MS;
-  const noon = utcNoon - parisOffset(utcNoon);
+  const noon = fromParisWallClock(utcNoon);
   return noon - 12 * HOUR_MS + ((h * 60 + m) * 60 + (s || 0)) * 1000;
-}
-/** Paris calendar date of an instant, as `YYYYMMDD`. */
-export function parisDate(t: number): string {
-  return dateOf(t + parisOffset(t));
 }
 /** Instant of Paris midnight starting `date`. */
 const parisMidnight = (date: string) => serviceTime(date, '12:00:00') - 12 * HOUR_MS;

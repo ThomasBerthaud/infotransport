@@ -5,8 +5,6 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { initialConfig, type Block, type Config } from '../src/shared/model.js';
 import {
-  gtfsRouteId,
-  gtfsStopId,
   importTimetables,
   serviceTime,
   splitCsv,
@@ -155,14 +153,6 @@ async function withGtfs(fn: (dir: string) => Promise<void>) {
     await rm(dir, { recursive: true, force: true });
   }
 }
-
-test('SIRI identifiers map to GTFS identifiers', () => {
-  assert.equal(gtfsStopId('STIF:StopPoint:Q:41210:'), 'IDFM:41210');
-  assert.equal(gtfsStopId('STIF:StopArea:SP:71517:'), 'IDFM:monomodalStopPlace:71517');
-  assert.equal(gtfsStopId('DEMO:x'), undefined);
-  assert.equal(gtfsRouteId('STIF:Line::C01740:'), 'IDFM:C01740');
-  assert.equal(gtfsRouteId(''), undefined);
-});
 
 test('CSV fields may be quoted', () => {
   assert.deepEqual(splitCsv('a,"b, c","d ""e""",'), ['a', 'b, c', 'd "e"', '']);

@@ -6,6 +6,7 @@
 import { stat } from 'node:fs/promises';
 import { basename, resolve } from 'node:path';
 import { validateConfig } from '../shared/model.js';
+import { formatParis } from '../shared/paris-time.js';
 import { Store } from './storage.js';
 import { importTimetables, TIMETABLES_FILE, type KnownDepartures } from './timetables.js';
 
@@ -41,6 +42,6 @@ const { uncovered, ...file } = result;
 await store.write(TIMETABLES_FILE, file);
 const total = file.entries.reduce((sum, e) => sum + e.departures.length, 0);
 console.log(
-  `${total} départs théoriques importés pour ${file.entries.length - uncovered.length}/${file.entries.length} blocs, jusqu’au ${new Date(file.validUntil).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })} (${Math.round((Date.now() - started) / 1000)} s).`,
+  `${total} départs théoriques importés pour ${file.entries.length - uncovered.length}/${file.entries.length} blocs, jusqu’au ${formatParis(file.validUntil)} (${Math.round((Date.now() - started) / 1000)} s).`,
 );
 for (const label of uncovered) console.warn(`Aucun départ trouvé : ${label}`);

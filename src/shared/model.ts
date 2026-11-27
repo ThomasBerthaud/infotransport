@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { formatParis, localParts } from './paris-time.js';
 
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 const MAX_WALK_MINUTES = 120;
@@ -329,22 +330,6 @@ export type Discovery = {
   directions: { lineRef: string; name: string; directionRef: string; destinationRef: string }[];
 };
 
-const parisFormatter = new Intl.DateTimeFormat('en-GB', {
-  timeZone: 'Europe/Paris',
-  weekday: 'short',
-  hour: '2-digit',
-  minute: '2-digit',
-  hourCycle: 'h23',
-});
-const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-export function localParts(date: Date) {
-  const parts = parisFormatter.formatToParts(date);
-  const value = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
-  return {
-    day: weekdays.indexOf(value('weekday')) + 1,
-    minute: Number(value('hour')) * 60 + Number(value('minute')),
-  };
-}
 const minuteOf = (value: string) => Number(value.slice(0, 2)) * 60 + Number(value.slice(3));
 export function active(s: Pick<Settings, 'start' | 'end' | 'days'>, now: Date): boolean {
   const { day, minute } = localParts(now);
@@ -530,12 +515,7 @@ export function minimalWarnings(
 }
 export const minutesUntil = (time: string, now: string) =>
   Math.max(0, Math.ceil((Date.parse(time) - Date.parse(now)) / 60000));
-export const hour = (time: string) =>
-  new Date(time).toLocaleTimeString('fr-FR', {
-    timeZone: 'Europe/Paris',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+export const hour = (time: string) => formatParis(time, { hour: '2-digit', minute: '2-digit' });
 /** A departure can still be caught when it leaves at least `walkMinutes` from now. */
 export const isReachable = (time: string, now: string, walkMinutes: number) =>
   minutesUntil(time, now) >= walkMinutes;

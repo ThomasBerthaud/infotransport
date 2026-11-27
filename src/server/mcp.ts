@@ -1,7 +1,10 @@
 import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
 import { toNodeHandler } from '@modelcontextprotocol/node';
 import { Router } from 'express';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { z } from 'zod';
+import { stopRefSchema } from '../shared/ids.js';
 import { defaultProfile } from '../shared/model.js';
 import type { Service } from './service.js';
 
@@ -12,6 +15,12 @@ const annotations = {
   openWorldHint: false,
 };
 
+// Read from the working directory, like resources/: package.json sits there both in
+// development and in the Docker image, whereas the compiled file lives deeper in dist/.
+const { version } = z
+  .object({ version: z.string().min(1) })
+  .parse(JSON.parse(readFileSync(resolve('package.json'), 'utf8')));
+
 function result(data: Record<string, unknown>) {
   return {
     content: [{ type: 'text' as const, text: JSON.stringify(data) }],
@@ -21,7 +30,7 @@ function result(data: Record<string, unknown>) {
 
 export function createMcpServer(service: Service) {
   const server = new McpServer(
-    { name: 'infotransport', version: '1.0.0' },
+    { name: 'infotransport', version },
     {
       instructions:
         'InfoTransport expose en lecture seule les transports suivis par ce site. ' +
@@ -114,7 +123,7 @@ export function createMcpServer(service: Service) {
       description:
         'Lister les lignes d’un arrêt du catalogue, avec son monitoringRef issu de search_stops.',
       inputSchema: z.object({
-        monitoringRef: z.string().regex(/^STIF:Stop(?:Area:SP|Point:Q):\d+:$/),
+        monitoringRef: stopRefSchema,
       }),
       annotations,
     },

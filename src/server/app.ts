@@ -5,6 +5,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { z } from 'zod';
 import { MinimalBlock } from '../components/Block.js';
+import { discoverableRefSchema } from '../shared/ids.js';
 import { minimalDebugMarkup } from '../shared/minimal-debug.js';
 import { defaultProfile, layout, minimalGridSize, shownInMinimal } from '../shared/model.js';
 import type { Service } from './service.js';
@@ -100,10 +101,7 @@ export function createApp(
   });
   // A GET, but it can spend PRIM quota: another site must not be able to trigger it.
   app.get('/api/discover', sameOriginOnly, async (req, res) => {
-    const ref = z
-      .string()
-      .regex(/^(STIF:Stop(?:Area:SP|Point:Q):\d+:|DEMO:[\w-]+)$/)
-      .parse(req.query.ref);
+    const ref = discoverableRefSchema.parse(req.query.ref);
     res.json(await service.discovery(ref));
   });
   let minimalCss: Promise<string> | undefined;

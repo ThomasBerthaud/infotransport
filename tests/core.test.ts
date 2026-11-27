@@ -17,8 +17,8 @@ import {
 } from '../src/shared/model.js';
 import { Budget, Store } from '../src/server/storage.js';
 import { Service } from '../src/server/service.js';
+import { lineReportsPath } from '../src/shared/ids.js';
 import {
-  lineReportsPath,
   MAX_CONCURRENT_REQUESTS,
   navitiaDate,
   parseDepartures,

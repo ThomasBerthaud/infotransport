@@ -8,17 +8,14 @@ import { ProfileDashboard } from './view.js';
 const Admin = lazy(() => import('./admin.js').then((module) => ({ default: module.Admin })));
 import { api, OfflineError } from './api.js';
 import type { Dashboard } from '../shared/model.js';
+import { formatParis } from '../shared/paris-time.js';
 import { offlineFallback, remember } from './offline-store.js';
 import { registerServiceWorker, useUpdateAvailable } from './pwa.js';
 /** While offline, saved departures are recomputed (and the server tried) this often. */
 const OFFLINE_REFRESH_MS = 30000;
 /** `JJ/MM à HH:MM`, Paris time. */
-const savedAt = (value: string) => {
-  const date = new Date(value);
-  const format = (options: Intl.DateTimeFormatOptions) =>
-    date.toLocaleString('fr-FR', { timeZone: 'Europe/Paris', ...options });
-  return `${format({ day: '2-digit', month: '2-digit' })} à ${format({ hour: '2-digit', minute: '2-digit' })}`;
-};
+const savedAt = (value: string) =>
+  `${formatParis(value, { day: '2-digit', month: '2-digit' })} à ${formatParis(value, { hour: '2-digit', minute: '2-digit' })}`;
 async function loadDashboard(signal: AbortSignal, admin: boolean): Promise<Dashboard> {
   try {
     if (admin) return await api<Dashboard>('/api/dashboard?preview=1', { signal });

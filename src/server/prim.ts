@@ -1,4 +1,6 @@
+import { siriLineRef } from '../shared/ids.js';
 import type { Departure, Discovery, Incident } from '../shared/model.js';
+import { fromParisWallClock } from '../shared/paris-time.js';
 import type { Budget } from './storage.js';
 import { UnavailableError, UpstreamError } from './errors.js';
 import { log } from './log.js';
@@ -96,16 +98,6 @@ export function tidyTitle(title: string) {
     .trim();
   return tidy || title.trim();
 }
-// IDFM Navitia uses `line:IDFM:C01740` where SIRI uses `STIF:Line::C01740:`.
-export function lineReportsPath(lineRef: string) {
-  const code = /^STIF:Line::(C\d+):$/.exec(lineRef)?.[1];
-  if (!code) throw new Error(`Identifiant de ligne invalide : ${lineRef}.`);
-  return `v2/navitia/line_reports/lines/line:IDFM:${code}/line_reports`;
-}
-const stifLine = (id: string) => {
-  const code = /^line:IDFM:(C\d+)$/.exec(id)?.[1];
-  return code ? `STIF:Line::${code}:` : undefined;
-};
 /**
  * Lines a Navitia disruption actually affects, read from its impacted objects:
  * whole lines, line sections, routes and impacted sections. Never the queried line
@@ -125,7 +117,7 @@ function impactedLines(d: Obj): string[] {
     for (const section of [impacted.impacted_section, impacted.impacted_rail_section])
       ids.push(...list(obj(section).routes).map((r) => obj(obj(r).line).id));
   }
-  return [...new Set(ids.map((id) => stifLine(text(id))).filter((ref): ref is string => !!ref))];
+  return [...new Set(ids.map((id) => siriLineRef(text(id))).filter((ref): ref is string => !!ref))];
 }
 /** Disruption ids the queried line's report links to (the line itself or its objects). */
 function linkedDisruptions(payload: Obj, lineRef: string): Set<string> {
@@ -133,7 +125,7 @@ function linkedDisruptions(payload: Obj, lineRef: string): Set<string> {
   for (const raw of list(payload.line_reports)) {
     const report = obj(raw);
     const line = obj(report.line);
-    if (stifLine(text(line.id)) !== lineRef) continue;
+    if (siriLineRef(text(line.id)) !== lineRef) continue;
     for (const holder of [line, ...list(report.pt_objects).map(obj)])
       for (const link of list(holder.links).map(obj))
         if (text(link.type) === 'disruption' || text(link.rel) === 'disruptions')
@@ -142,32 +134,12 @@ function linkedDisruptions(payload: Obj, lineRef: string): Set<string> {
   ids.delete('');
   return ids;
 }
-const parisOffset = (t: number) => {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Europe/Paris',
-      hourCycle: 'h23',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    })
-      .formatToParts(new Date(t))
-      .map((p) => [p.type, Number(p.value)]),
-  );
-  return (
-    Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second) - t
-  );
-};
 // Navitia dates are local wall-clock times (`20261118T060000`), Europe/Paris for IDFM.
 export function navitiaDate(v: unknown): string | undefined {
   const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})$/.exec(text(v));
   if (!m) return iso(v);
   const wall = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
-  const t = wall - parisOffset(wall - parisOffset(wall));
-  return new Date(t).toISOString();
+  return new Date(fromParisWallClock(wall)).toISOString();
 }
 export function parseLineReports(payload: unknown, lineRef: string, now = Date.now()): Incident[] {
   const p = obj(payload);

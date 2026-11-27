@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import express from 'express';
@@ -34,6 +34,8 @@ test('MCP HTTP exposes site data read-only without provider calls or persistent 
   const client = new Client({ name: 'integration-test', version: '1.0.0' });
   try {
     await client.connect(new StreamableHTTPClientTransport(url));
+    const pkg = JSON.parse(await readFile('package.json', 'utf8')) as { version: string };
+    assert.deepEqual(client.getServerVersion(), { name: 'infotransport', version: pkg.version });
     const tools = await client.listTools();
     assert.deepEqual(tools.tools.map((tool) => tool.name).sort(), [
       'get_dashboard',
